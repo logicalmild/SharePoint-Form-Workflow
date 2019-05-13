@@ -1,0 +1,54 @@
+﻿<style>
+.ms-core-sideNavBox-removeLeftMargin{
+  display:none;
+  }
+  
+#contentBox{
+
+	  margin-left:0px !important;
+	  margin-right:0px !important;
+    width:100%;
+   /*padding-left:50px;
+    padding-right:50px;*/
+}
+.ms-breadcrumb-top{
+
+  display:none;
+}
+
+#WPQ2_ListTitleViewSelectorMenu_Container{
+  
+  display:none;
+
+}
+.ms-webpartzone-cell{
+  margin-bottom:0px;
+  
+}
+#DeltaPlaceHolderSearchArea{
+
+  display:none;
+}
+
+#DeltaPlaceHolderPageTitleInTitleArea{
+  background-color: #1ba1e2;
+  color:white;
+  font-weight:bold;
+  padding-left:15px;
+  padding-right:15px;
+  border-radius:10px;
+
+}
+#DeltaPlaceHolderPageTitleInTitleArea span span a{
+  background-color:#1ba1e2;
+  color:white;
+  font-weight:bold;
+  padding-left:15px;
+  padding-right:15px;
+  border-radius:10px;
+
+}
+.ms-verticalAlignTop{
+  vertical-align:middle;
+}
+</style>

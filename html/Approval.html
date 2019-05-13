@@ -1,0 +1,31 @@
+
+    <div class="col-md-12">
+        <div class="col-md-2" style="padding-left:0px; padding-right:0px;">
+
+                <h4 style="color:white;text-align:center; margin-bottom:0px; background-color:#1BA1E2; padding-left:10px; padding-right:10px; padding-top:0px; padding-bottom:0px;">Action</h4>
+            </div>
+            <div class="col-md-12" style="height:2px; background-color:#1BA1E2;"></div>
+            <br>
+            <div class="col-md-6 offset-md-3 shadow" style="background-color:lightgray; padding-top:15px; padding-bottom:15px;">
+                <div class="form-inline"> 
+                    <p>Action by :</p>
+                    <p id="Title_ActionBy" style="margin-left:10px;"></p>
+                    <p id="Text_Approver" style="margin-left:15px;"></p>
+                    <p style="color:#1BA1E2; margin-right:10px;">*</p>
+                    <select id="Approval_Select" class="form-control form-control-sm" style="width:100%; margin-top:10px; margin-bottom:10px;">
+                        <option value="0">Please slelect</option>
+                        <option value="SaveDraft">Save Draft</option>
+                        <option value="SendToApprover">Send to approver</option>
+                        <option value="Approve">Approve</option>
+                        <option value="Accept">Accept</option>
+                        <option value="Complete">Complete</option>
+
+                    </select>
+            
+                    <p style="margin-right:10px;">Comment</p>   
+                    <textarea id="CommentApproval" class="form-control" style="width:100%;" rows="2" ></textarea> 
+                </div>
+                <br>
+                <center><button id="SubmitAction" type="button" class="btn btn-primary btn-sm" style="background-color:#1BA1E2; border-color:#1BA1E2;">Submit</button></center> 
+            </div>
+    </div>

@@ -1,0 +1,150 @@
+
+
+<style>
+    .button {
+      border-radius: 4px;
+      background-color: dodgerblue;
+      border: none;
+      color: #FFFFFF;
+      text-align: center;
+      font-size: 14px;
+      padding-top:5px;
+      padding-bottom:5px;
+      padding-left:15px;
+      padding-right:15px;
+      width: 200px;
+      transition: all 0.5s;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    .button span {
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+      transition: 0.5s;
+    }
+    
+    .button span:after {
+      content: '\00bb';
+      position: absolute;
+      opacity: 0;
+      top: 0;
+      right: -20px;
+      transition: 0.5s;
+    }
+    
+    .button:hover span {
+      padding-right: 25px;
+    }
+    
+    .button:hover span:after {
+      opacity: 1;
+      right: 0;
+    }
+    #MSOZoneCell_WebPartWPQ3{
+    
+        display:none;
+    }
+    
+    .btn-group a {
+    
+    
+        padding: 5px 24px; /* Some padding */
+        cursor: pointer; /* Pointer/hand icon */
+        float: left; /* Float the buttons side by side */
+    
+        background-color:white;
+        color:gray; 
+        font-weight:bold; 
+        border-color:gray;
+        border-width:1px;
+        border-style:solid;
+    
+       
+    }
+    
+    /* Clear floats (clearfix hack) */
+    .btn-group:after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+    
+    .btn-group a:not(:last-child) {
+        border-right: none; /* Prevent double borders */
+    }
+    
+    /* Add a background color on hover */
+    .btn-group button:hover {
+        background-color: #3e8e41;
+    }
+    
+    #contentRow{
+    
+        padding-top:0px;
+    }
+    #s4-titlerow{
+    
+        padding-top:10px;
+        padding-bottom:10px;
+    }
+    
+    
+    </style>
+    
+    
+    
+    
+        <a style="color:white; float:left; margin-top:0px; width:170px;" href="https://scgchemicals.scg.com/lotusnotes/TPE_Roto/SitePages/Request.aspx?FormMaster=0" class="button"><span>New Request</span></a>
+    
+        
+        <div style="margin-top:15px;" class="btn-group">
+            <a id="ViewAllDocument" href="https://scgchemicals.scg.com/lotusnotes/TPE_Roto/Lists/Test_Request/All%20Document.aspx">All Document</a>
+            <a id="ViewMyRequest" href="https://scgchemicals.scg.com/lotusnotes/TPE_Roto/Lists/Test_Request/My%20Request.aspx">My Request</a>
+            <a id="ViewByRequestor" href="https://scgchemicals.scg.com/lotusnotes/TPE_Roto/Lists/Test_Request/By%20Requestor.aspx">By Requestor</a>
+            <a id="ViewByStatus" href="https://scgchemicals.scg.com/lotusnotes/TPE_Roto/Lists/Test_Request/By%20Status.aspx">By Status</a>
+            <a id="ViewByTechnician" href="https://scgchemicals.scg.com/lotusnotes/TPE_Roto/Lists/Test_Request/By%20Technician.aspx">By Technician</a>
+            <a id="ViewByGroupRespondTeam" href="https://scgchemicals.scg.com/lotusnotes/TPE_Roto/Lists/Test_Request/By%20Group%20Respond%20Team.aspx">By Group Respond Team</a>
+        </div>
+    
+    
+        <script type="text/javascript">
+      
+                var CurrentPage = window.location.href;
+                //var arr_pagename = LinkUrl.split('/');
+                //var CurrentPage = arr_pagename[arr_pagename.length-1
+        
+            
+                if(CurrentPage.match('All%20Document') == 'All%20Document'){
+               
+                    var ss = document.getElementById('ViewAllDocument');
+                    ss.setAttribute("style", " background-color: gray;color: white;font-weight:bold; border: 1px solid white;");
+                }
+                else if(CurrentPage.match('My%20Request') == 'My%20Request'){
+               
+                    var ss = document.getElementById('ViewMyRequest');
+                    ss.setAttribute("style", " background-color: gray;color: white;font-weight:bold; border: 1px solid white;");
+                }
+                else if(CurrentPage.match('By%20Requestor') == 'By%20Requestor'){
+                    var ss = document.getElementById('ViewByRequestor');
+                    ss.setAttribute("style", " background-color: gray;color: white;font-weight:bold; border: 1px solid white;");
+                }
+                else if(CurrentPage.match('By%20Status') == 'By%20Status'){
+                    var ss = document.getElementById('ViewByStatus');
+                    ss.setAttribute("style", " background-color: gray;color: white;font-weight:bold; border: 1px solid white;");   
+                }
+                else if(CurrentPage.match('By%20Technician') == 'By%20Technician'){
+                    var ss = document.getElementById('ViewByTechnician');
+                    ss.setAttribute("style", " background-color: gray;color: white;font-weight:bold; border: 1px solid white;");   
+                }
+                else if(CurrentPage.match('By%20Group%20Respond%20Team') == 'By%20Group%20Respond%20Team'){
+                    var ss = document.getElementById('ViewByGroupRespondTeam');
+                    ss.setAttribute("style", " background-color: gray;color: white;font-weight:bold; border: 1px solid white;");   
+                }
+                else{
+                      
+                }
+            
+            
+            </script>

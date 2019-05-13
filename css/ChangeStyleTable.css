@@ -1,0 +1,49 @@
+﻿<style>
+table {
+  border-collapse: collapse;
+  width: 95%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+ 
+}
+
+tr:nth-child(even){background-color: white !important;}
+
+th {
+  background-color: #1BA1E2 !important;
+  color: #484848 !important;
+  font-weight:bold;
+}
+
+th div a , th div{
+
+    color: white !important;
+    font-weight:bold;
+}
+
+#idHomePageNewItem-img , .ms-list-addnew-imgSpan20{
+
+  display:none;
+}
+#idHomePageNewItem{
+
+  font-weight:400;
+}
+.ms-heroCommandLink{
+  color:white;
+  background-color:#1BA1E2;
+  padding-left:20px;
+  padding-right:20px;
+  padding-top:2px;
+  padding-bottom:2px;
+
+}
+.ms-list-addnew-aligntop{
+
+  padding-left:0px;
+}
+
+</style>

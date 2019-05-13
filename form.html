@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
+
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" x-undefined="" />
+<title>Form Template</title>
+<meta http-equiv="X-UA-Compatible" content="IE=10" />
+<SharePoint:CssRegistration Name="default" runat="server" />
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=10; IE=9; IE=8; IE=7" />
+
+<!--
+<script src="/_layouts/1033/init.js"></script>
+<script type="text/javascript" src="./web/js/MicrosoftAjax.js"></script>
+<script src="/_layouts/sp.core.js"></script>
+<script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script>
+<script type="text/javascript" src="/_layouts/15/sp.js"></script>
+-->
+
+
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/js/jquery.min.js"></script>
+<script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/js/config.js"></script>
+
+
+
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/js/form.js"></script>
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/js/attachment.js"></script>
+
+<link rel="stylesheet" href="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/css/form.css">
+<link rel="stylesheet" href="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/bootstrap/css/bootstrap.min.css">
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/js/popper.min.js"></script>
+
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/bootstrap/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/css/jquery-ui.css">
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/js/jquery-ui.js"></script>
+
+<!-- Data Table 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>-->
+
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/js/PeoplePickerData.js"></script>
+<!--
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_LGS/SitePages/web/js/peoplepicker_jquery.js"></script>
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_LGS/SitePages/web/js/peoplepicker_sharepointplus.js"></script>
+-->
+
+    <!--<script type="text/javascript" src="/_layouts/15/sp.core.js"></script>-->
+    <script type="text/javascript" src="/_layouts/15/clienttemplates.js"></script>
+    <script type="text/javascript" src="/_layouts/15/clientforms.js"></script>
+    <script type="text/javascript" src="/_layouts/15/clientpeoplepicker.js"></script>
+    <script type="text/javascript" src="/_layouts/15/autofill.js"></script>
+    <script type="text/javascript" src="/_layouts/15/1033/sts_strings.js"></script>
+
+    <script src="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/summernote/dist/summernote.js"></script>
+    <link rel="stylesheet" href="https://scgchemicals.scg.com/lotusnotes/TPE_StoreReservation/SitePages/web/summernote/dist/summernote.css">
+
+    <!--SweetAlert-->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<!-- Customize -->
+<style>
+        #contentBox{
+
+            min-width:0px !important;
+            padding-left:0px !important;
+            padding-right:0px !important;
+        }
+        .ms-wikicontent{
+
+            padding-right:0px !important;
+        }
+        .lgs-support{
+    
+            margin-right:10px;
+            background-color:white;
+            border-radius: 3px;
+            padding-left:15px; 
+            padding-right:15px;
+            padding-top:2px;
+            padding-bottom:2px;
+            color:#ff6600;
+            margin-bottom:10px;
+            border-color: #ff6600;
+            border-width:1px;
+            border-style:solid;
+    
+        }
+        
+       /* #s4-ribbonrow,#suiteBarDelta{
+
+            display:none;
+        }*/        
+
+    </style>
+</head>
+
+    <body style="background-color:#d0dcef !important;">
+        
+        <div id="PageBody" class="container border-shadow" style="background-color:white; padding-top:20px; padding-bottom:50px;">
+            <!--<div style="padding-top:20px; padding-bottom:50px;">-->
+                <center><div style="margin-top:15%; margin-bottom:15%;" class="loader"></div></center>
+                
+                <div id="Navbar"></div>
+                <div id="Content"></div>
+
+                <div id="Approval"></div>
+                <div id="HistoryLog"></div>
+           <!-- </div>-->
+            
+
+         </div>
+    </body>
+
+</html>

@@ -1,0 +1,20 @@
+<style>
+.ms-tileview-tile-content{
+  background-color: white;
+  color:gray;
+
+}
+
+.ms-tileview-tile-detailsBox{
+
+   background-color:#1ba1e2;
+   opacity: 0.7;
+   font-weight:bold;
+}
+
+.ms-promlink-root{
+  padding-left:100px; 
+  padding-right:100px;
+}
+
+</style>

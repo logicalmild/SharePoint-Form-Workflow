@@ -1,0 +1,757 @@
+
+
+
+
+<script type="text/javascript">
+
+
+// Declare global variable
+var FormID;
+var FormType;
+var ListData = '';
+
+/////////////////////////////////////
+
+// Place For trigger from DOM 
+$('#SubmitAction').click(function(){
+    SubmitAction();
+});
+
+
+$('#CloseForm').click(function(){
+    CloseForm(0,SummaryRequest); 
+});
+
+
+///////////////////////////////
+
+
+function FormBody(){  // called by form.js
+    
+    FormID = GetParameterByName('FormID');
+    FormType = 'FormView';
+    if(FormID.length < 1){
+        FormID = generateUID();
+        FormType = 'FormNew';
+    }
+    
+    FormLoad();
+    
+    $('#summernote').summernote({
+        placeholder: 'Write message here..',
+        tabsize: 1,
+        height: 150,
+        focus: false,
+        dialogsFade: true,
+        
+    });
+}
+
+
+function FormLoad(){
+   
+    SetInitialForm();
+
+    switch(FormType){
+       
+        case 'FormNew':
+                        SetFormView('FormNew');
+                        break;
+        case 'FormView':
+                        var data = GetData();
+
+
+                        var Permission = CheckPermission();   
+                        
+                        if(data[0].FormStatus == 'Save Draft'){ // Form SaveDraft
+                            if(CurrentUser.Name == $('#Requestor').val()){
+                                SetFormView('FormSaveDraft'); 
+                            }
+                        }
+                        else if(Permission.indexOf('Approver') != -1 && data[0].FormStatus == 'Wait for approve'){ // Form Approve
+                            SetFormView('FormApprove');      
+                        }
+                        else if(Permission.indexOf('Admin')  != -1 && data[0].FormStatus == 'Complete'){// Form Admin
+                            SetFormView('FormAdmin');  
+                        }
+                        else{ // Form Visitor
+                            SetFormView('FormVisitor');  
+                           
+                        }   
+
+                        break;
+
+    }
+  
+
+    function SetInitialForm(){
+
+
+        $('#Title_ActionBy').text(CurrentUser.Name);
+        HistoryLog('get');
+
+
+    }
+    function GetData(){
+        var data;
+    
+        return data;
+    }
+
+    function SetFormView(view){
+        //alert(view);
+        switch(view){
+            case 'FormNew':
+                            // set panel status 
+                            $('#CreateDate').text(SetDateTime());
+                            $('#FormStatus').text('Draft');
+                            $('#DocNO').text(GenNumJob());
+
+                            
+                            var arr_approval_option = [0,1];
+                            SetApproval(arr_approval_option);
+
+                            break;
+            case 'FormSaveDraft':
+
+
+
+                            var arr_approval_option = [0,1,6]; // approval in config.js
+                            SetApproval(arr_approval_option);
+                            break;
+            case 'FormApprove':
+
+
+                            var arr_approval_option = [2,3];
+                            SetApproval(arr_approval_option);
+              
+                            break;
+            case 'FormAdmin':
+                            break;
+            case 'FormVisitor':
+
+                            break;
+            case 'FormSupport':
+
+                            var arr_approval_option = [5,4];
+                            SetApproval(arr_approval_option);
+       
+                            break;
+                        }
+
+
+    }
+
+
+}
+
+
+function CheckPermission(){
+    var Permission = [];
+    Permission.push('Visitor');
+    if(CurrentUser.Name == $('#Requestor').val()){
+
+        Permission.push('Requestor');
+        
+    }
+    if(CurrentUser.Name == $('#SelectManager').val()){
+
+        Permission.push('Approver');
+        
+    }
+    var Group = LGSSectionGroup; // LGSSectionGroup is in config.js
+    var query = '?$expand=Username&$top=1000&$select=Username/Title,Username/Id&$filter=UserGroup eq \''+Group+'\'';
+    var data = GetItemByRestAPI(Inter_MasterUserGroup,query);
+    if(data){
+        for(i=0;i<data.length;i++){
+            if(data[i].Username.Title == CurrentUser.Name){
+                
+                Permission.push('Supporter');
+                
+            }
+        }
+
+    }
+    var Admin = AdminGroup; // AdminGroup is in config.js
+    var query = '?$expand=Username&$top=1000&$select=Username/Title,Username/Id&$filter=UserGroup eq \''+Admin+'\'';
+    var data = GetItemByRestAPI(Inter_MasterUserGroup,query);
+    if(data){
+        for(i=0;i<data.length;i++){
+            if(data[i].Username.Title == CurrentUser.Name){
+
+                Permission.push('Admin');
+                
+            }
+        }
+
+    }
+    return Permission;
+}
+
+function SubmitAction(){
+    var Approval_Select = $('#Approval_Select').val();
+    switch(Approval_Select){
+            case 'SaveDraft' :
+                                UpdateFlagAttachment();
+                                var data = SaveDraft();
+                                var status = CheckUpdateOrCreate();                        
+                                
+                                    HistoryLog('add');
+                                    switch(status){
+
+                                        case 'Create':
+                                                        CreateItem(ListData,data);
+                                                        break;
+                                        case 'Update':
+                                                        UpdateItem(ListData,data);
+                                                        break;
+                                    }
+                                
+
+
+                                break;
+            case 'SendToApprover':
+                                
+                                UpdateFlagAttachment();
+                                var data = SendToApprover();
+                                var Pass = ValidateData(data);
+                                if(Pass == true){
+                                    var status = CheckUpdateOrCreate();                                    
+                                    HistoryLog('add');
+                                    switch(status){
+
+                                        case 'Create':
+                                                        CreateItem(ListData,data);
+                                                        break;
+                                        case 'Update':
+                                                        UpdateItem(ListData,data);
+                                                        break;
+                                    }
+                                }
+
+                               
+                               
+                                break;
+            case 'Approve':
+                                var data = Approve();
+                                HistoryLog('add');
+                                UpdateItem(ListData,data);
+                                break;
+            case 'Reject':
+                                var data = Reject();
+                                HistoryLog('add');
+                                UpdateItem(ListData,data);
+                                break;
+
+            case 'Complete':
+                                var data = Complete();
+                                var Pass = ValidateData(data);
+                                if(Pass == true){
+                                    HistoryLog('add');
+                                    UpdateItem(ListData,data);
+                                }
+
+                                break;
+
+            case 'Accept':  
+                                var data = Accept();
+                                HistoryLog('add');
+                                UpdateItem(ListData,data);
+                                break;
+            case 'Terminate':
+                                var data = Terminate();
+                                UpdateItem(ListData,data);
+                                break;
+            default:
+                    alert('Please select approval...');         
+                            
+
+        }
+
+        ///Action by Status///////////////////////////////////////////
+
+        function SaveDraft(){
+    
+            var data = [{
+                Title:null,
+                ID:null,
+                Type:null,
+                ColumnName:null,
+                value:null,
+                Require:null
+            }];
+            
+            
+            var ListPersonID = '';
+            for(i=0;i<arr_CC_Person_id.length;i++){
+                ListPersonID += arr_CC_Person_id[i] + ';#' + arr_CC_Person_title[i] +';#';
+                
+            }
+                
+           // var Detail = $('#summernote').summernote('code');
+            
+
+
+            data[0] = { Title:null,     ID:null,    Type:null,      ColumnName:'FormID',           Value:FormID,                   Require:true};
+            data[1] = { Title:null,     ID:null,    Type:null,      ColumnName:'FormStatus',       Value:'Save Draft',             Require:true};
+            data[2] = { Title:null,     ID:null,    Type:null,      ColumnName:'WorkflowStep',     Value:'0',                      Require:true};
+            data[3] = { Title:null,     ID:null,    Type:null,      ColumnName:'WorkflowStatus',   Value:'Not Start',              Require:true};
+
+            data[19] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                olumnName:'FlagSubmit',       
+                Value:true,                     
+                Require:false
+            };
+            data[20] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'StatusAction',     
+                Value:'Save Draft',             
+                Require:false
+            };
+
+            return data;
+            
+        }
+        function SendToApprover(){
+          
+            var data = [{
+                Title:null,
+                ID:null,
+                Type:null,
+                ColumnName:null,
+                value:null,
+                Require:null
+            }];
+            
+            
+            var ListPersonID = '';
+            for(i=0;i<arr_CC_Person_id.length;i++){
+                ListPersonID += arr_CC_Person_id[i] + ';#' + arr_CC_Person_title[i] +';#';
+                
+            }
+            //var Detail = $('#summernote').summernote('code');
+            
+            data[0] = { 
+                    Title:null,     
+                    ID:null,    
+                    Type:null,      
+                    ColumnName:'FormID',           
+                    Value:FormID,                   
+                    Require:false
+                };
+            data[1] = { 
+                    Title:null,     
+                    ID:null,    
+                    Type:null,      
+                    ColumnName:'FormStatus',      
+                    Value:'',                       
+                    Require:false};
+            data[2] = { 
+                    Title:null,     
+                    ID:null,    
+                    Type:null,      
+                    ColumnName:'WorkflowStep',     
+                    Value:'0',                      
+                    Require:false
+                };
+            data[3] = { 
+                    Title:null,     
+                    ID:null,    
+                    Type:null,      
+                    ColumnName:'WorkflowStatus',  
+                    Value:'Not Start',              
+                    Require:false
+                };
+            data[19] = { 
+                    Title:null,     
+                    ID:null,   
+                    Type:null,      
+                    ColumnName:'FlagSubmit',       
+                    Value:true,                     
+                    Require:false
+                };
+            data[20] = { 
+                    Title:null,     
+                    ID:null,   
+                    Type:null,      
+                    ColumnName:'StatusAction',     
+                    Value:'SendToApprover',         
+                    Require:false
+                };
+
+
+            return data;
+           
+        }
+        function Approve(){
+            var data = [{
+                Title:null,
+                ID:null,
+                Type:null,
+                ColumnName:null,
+                value:null,
+                Require:null
+            }];
+            
+          
+            data[0] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'FlagSubmit',       
+                Value:true,                     
+                Require:false
+            };
+            data[1] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'StatusAction',     
+                Value:'Approve',                 
+                Require:false
+            };
+
+
+            return data;
+        }
+        function Reject(){
+            var data = [{
+                Title:null,
+                ID:null,
+                Type:null,
+                ColumnName:null,
+                value:null,
+                Require:null
+            }];
+            
+          
+            data[0] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'FlagSubmit',       
+                Value:true,                     
+                Require:false
+            };
+            data[1] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'StatusAction',     
+                Value:'Reject',                 
+                Require:false
+            };
+          
+
+            return data;
+        }
+        function Terminate(){
+            
+            var data = [{
+                Title:null,
+                ID:null,
+                Type:null,
+                ColumnName:null,
+                value:null,
+                Require:null
+            }];
+
+            data[0] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'FlagSubmit',       
+                Value:true,                     
+                Require:false
+            };
+            data[1] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,     
+                ColumnName:'StatusAction',     
+                Value:'Terminate',              
+                Require:false
+            };
+            data[2] = { 
+                Title:null,     
+                ID:null,    
+                Type:null,      
+                ColumnName:'FormStatus',       
+                Value:'Terminate',             
+                Require:true
+            };
+
+            return data;
+        }
+        function Accept(){
+            var data = [{
+                Title:null,
+                ID:null,
+                Type:null,
+                ColumnName:null,
+                value:null,
+                Require:null
+            }];
+            
+          
+            data[0] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'FlagSubmit',       
+                Value:true,                     
+                Require:false
+            };
+            data[1] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'StatusAction',     
+                Value:'Accept',                 
+                Require:false
+            };
+
+      
+            return data;
+
+        }
+        function Complete(){
+            var data = [{
+                Title:null,
+                ID:null,
+                Type:null,
+                ColumnName:null,
+                value:null,
+                Require:null
+            }];
+            
+          
+            data[0] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'FlagSubmit',       
+                Value:true,                     
+                Require:false
+            };
+            data[1] = { 
+                Title:null,     
+                ID:null,   
+                Type:null,      
+                ColumnName:'StatusAction',     
+                Value:'Complete',                 
+                Require:false
+            };
+  
+            return data;
+
+        }
+        ///End Action by Status///////////////////////////////////////////
+
+        /// Action to list////////////////////////////////////////////
+
+
+        function CreateItem(ListName,data){    
+         
+            var dataset = {};
+            dataset = data;
+            var clientContext = new SP.ClientContext(SiteUrl);
+            var oList = clientContext.get_web().get_lists().getByTitle(ListName);
+            var itemCreateInfo = new SP.ListItemCreationInformation();
+            this.oListItem = oList.addItem(itemCreateInfo);
+            var length = dataset.length;
+            for(i=0;i<length;i++){
+             
+                if(dataset[i].Value){
+                    
+                    oListItem.set_item(dataset[i].ColumnName,dataset[i].Value);
+                }
+
+                
+            }            
+            oListItem.update();	
+            clientContext.executeQueryAsync(
+            function(){
+                
+                if(ListName == ListData){
+                    alert('Submit Completed..');
+                    window.location.href = SummaryRequest;
+                }
+                
+            },
+            function(){
+
+                alert('Submit error..');
+            }
+
+            );
+        }
+        function UpdateItem(ListName,data){
+
+            
+            var dataset = data;
+            var ItemID;
+            var query = '?$select=ID&$filter=FormID eq \''+FormID+'\'';
+            var data = GetItemByRestAPI(ListName,query);
+            if(data){
+                ItemID = data[0].ID;
+            }
+            
+            var clientContext = new SP.ClientContext(SiteUrl);
+            var oList = clientContext.get_web().get_lists().getByTitle(ListName);
+            this.oListItem = oList.getItemById(ItemID);
+            for(i=0;i<dataset.length;i++){
+        
+                oListItem.set_item(dataset[i].ColumnName,dataset[i].Value);
+            }   
+            oListItem.update();	
+            clientContext.executeQueryAsync(function(){
+
+                if(ListName == ListData){
+                    alert('Submit Completed..');
+                    window.location.href = SummaryRequest;
+                }
+
+            }, function(){alert('Update Item failed');});
+
+
+
+        }
+        function CheckUpdateOrCreate(){
+
+            var query ='?$select=FormID&$top=1&$filter=FormID eq \''+FormID+'\'';
+            var data = GetItemByRestAPI(ListData,query);
+            var status = '';
+            if(data){
+                if(data.length>0){
+                    status = 'Update';
+                }
+                else{
+                    status = 'Create';
+                }
+            }
+            else{
+                status = 'Create';
+            }
+
+            return status;
+        }
+        
+        /// End Action to list////////////////////////////////////////////
+            
+        // validate data //////////////////////////////////////////////////
+        function ValidateData(data){ // return obj of field invalid , return Pass
+          var AlertString = '';
+          var FlagPass = false;
+          var count = 0;
+
+          for (i=0;i<data.length;i++){
+              if(data[i].Require == true){
+                    switch(data[i].Type){
+                        case 'option':  
+
+                                        if(data[i].Value == 'Please select...' || data[i].Value == 0 || data[i].Value == '0'){
+                                             AlertString += '- ' + data[i].Title + ' *<br>';
+                                             count = count+1;
+                                        }
+                                        break;
+                        case 'text':
+                                        if(data[i].Value){
+
+                                        }
+                                        else{
+                                            
+                                            AlertString += '- ' + data[i].Title + ' *<br>';
+                                            count = count+1;
+                                        }
+                                        break;
+
+                        case 'datetime':
+                                        if(data[i].Value){
+
+                                        }
+                                        else{
+                                             
+                                            AlertString += '- ' + data[i].Title + ' *<br>';
+                                            count = count+1;
+                                        }
+                                        break;
+                        case 'people':
+                             
+                                        if(data[i].Value){
+
+                                        }
+                                        else{
+                                            
+                                            AlertString += '- ' + data[i].Title + ' *<br>';
+                                            count = count+1;
+                                        }
+                                        break;
+                    }
+
+                }
+          }
+
+            if(count == 0){
+                FlagPass = true;
+            }
+            else{
+                FlagPass = false;
+                var str='';
+                str = '<div style="color:red;">' + AlertString + '</div>';
+                $('#MainModal').modal('show');
+                $('#TitleModal').text('Please insert data to require field.');
+                $('#ModalBody').empty();
+                $('#ModalBody').append(str);
+                
+            }
+          return FlagPass;
+        }
+        // End validate data //////////////////////////////////////////////////
+
+}
+
+
+// Module functional //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function GenNumJob(){
+    var DocNo = 'LHM-';
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    var hour = today.getHours();
+    var min = today.getMinutes();
+    var sec = today.getSeconds();
+
+    if(dd<10) {
+        dd = '0'+dd;
+    } 
+
+    if(mm<10) {
+        mm = '0'+mm;
+    } 
+    if(min<10){
+        min = '0'+min;
+
+    }
+
+    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
+    today = mm + '/' + dd + '/' + yyyy;// + '; ' + hour + ":" + min;
+
+    DocNo += yyyy;
+    //DocNo += mm;
+    //DocNo += dd;
+
+    return DocNo;
+
+}
+</script>
+
+
+

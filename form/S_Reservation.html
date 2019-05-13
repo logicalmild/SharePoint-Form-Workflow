@@ -1,0 +1,1158 @@
+
+<style>
+        .page-title{
+            background-color:lightgray;
+        }
+        .page-title h4{
+            text-align:center;
+        }
+        label{
+             float:left;
+         }
+    
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+    
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+    
+        tr:nth-child(even){
+            background-color: #f2f2f2
+        }
+        
+    
+        p{
+            margin-bottom:0px;
+        }
+        .accordion {
+            background-color: #eee;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+
+        .active, .accordion:hover {
+            background-color: #ccc;
+        }
+
+        .accordion:after {
+            content: '\002B';
+            color: #777;
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+        }
+
+        .active:after {
+            content: "\2212";
+        }
+
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+        
+
+
+        .part1-info , .part2-info{
+
+            border-style:solid; 
+            border-width:1px; 
+            border-color:lightgray;
+        }
+
+        .part1-info div p , .part2-info div p{
+            color:gray;
+        }
+
+        .underline{
+            padding-left:10px; 
+            padding-right:10px;
+        }
+        .underline div{
+            width:100%; 
+            height:2px; 
+            background-color:lightgray;
+        }
+    </style>
+    
+    
+    
+    
+    <div class="container">
+        <div class="col-md-12 page-title">
+            <h4>ใบขอสำรองคลัง / ยกเลิกสำรองคลังพัสดุ</h4>    
+        </div>
+        <br>
+
+        <div class="row">   
+            <div class="offset-md-3 col-md-2">
+                <p style="text-align:center;">หน่วยงาน</p>  
+            </div>
+            <div class="col-md-3">
+                <input id="Dept_Name" type="text" class="form-control form-control-sm col-md-12">
+            </div>
+            <div class="col-md-1">
+                    <button onclick="GetDepartment();" type="button" class="btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เลือก</button>
+            </div>
+        </div>
+        <br>
+
+
+        <div class="part1-info">
+            <div onclick="TriggerBar('Part1');" class="col-md-12" style="background-color:lightgray; cursor:pointer;">
+                <p>ส่วนที่ 1 สำหรับหน่วยงานที่ขอสำรองคลัง / ยกเลิกสำรองคลังพัสดุ</p>
+            </div>
+            <div class="col-md-12" id="Part1">
+                <div class="row">
+                    <div class="offset-md-3 col-md-2">
+                        <p>วัตถุประสงค์</p>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="radio">
+                            <label><input type="radio" style="margin-right:10px;" name="optradio">สำรองคลัง</label>
+                        </div>
+                        <!--<select id="" class="form-control form-control-sm col-md-12">
+                            <option value="-">Please select...</option>
+                            <option value="สำรองคลัง">สำรองคลัง</option>
+                            <option value="ยกเลิกสำรองคลัง">ยกเลิกสำรองคลัง</option>
+                        </select>-->
+                    </div>
+                    <div class="col-md-2">
+                        <div class="radio">
+                            <label><input type="radio" style="margin-right:10px;" name="optradio">ยกเลิกสำรองคลัง</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row" style="padding-left:10px; padding-right:10px;">   
+                    <div class="form-inline">
+                        <p style="margin-bottom:0px;">รายละเอียดพัสดุ</p> 
+                        
+                    </div>
+                    <div style="width:100%; height:2px; background-color:lightgray;"></div>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">Material Group</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                                <input id="Material_Group" type="text" class="form-control form-control-sm" placeholder="Material Group">
+                                <div class="input-group-append">
+                                    <button onclick="GetMaterialGroup();" class="btn btn-outline-secondary btn-sm" type="button">Choose</button>
+                                </div>
+                        </div>
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">ชื่อพัสดุ</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <p style="margin-bottom:0px;">สูตรเคมี</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">ประเภทสารเติมแต่ง</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <p style="margin-bottom:0px;">สัญญลักษณ์ย่อสารเติมแต่ง</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>มาตรฐานขั้นต่ำด้านอาชีวอนามัย และ ความปลอดภัย</p>
+                        <textarea id="" class="form-control" style="width:100%;" rows="3"></textarea>
+                        <p style="color:red; font-size:13px;">
+                            หมายเหตุ มาตรฐานจะมีระบุอยู่ใน SE-D-0032 กรณีเป็นสินค้าใหม่ไม่มีระบุ ให้แจ้งหน่วยงาน SAFETY เพื่อนำเข้าระบบต่อไป
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>แนบไฟล์</p>
+                        <div class="" style="background-color:#99ccff; height:70%; padding:20px;">
+                            <div style="min-height:70%; width:100%;">
+
+                            </div>
+                            <div class="pull-right">
+                                <button type="button" class="btn btn-default btn-sm">Browse</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <textarea id="" class="form-control" style="width:100%;" rows="2" placeholder="ชื่อ และ ที่อยู่ผู้ขาย 1"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <textarea id="" class="form-control" style="width:100%;" rows="2" placeholder="ชื่อ และ ที่อยู่ผู้ขาย 2"></textarea>
+                    </div>
+                </div><br>
+
+                <div class="table-responsive">          
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อทางการค้า / รายละเอียด</th>
+                            <th style="width:150px;">ขนาดบรรจุ</th>
+                            <th>หน่วย</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="" type="text" class="form-control form-control-sm col-md-12"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+            <div class="row" style="padding-left:10px; padding-right:10px;">   
+                <div class="form-inline">
+                    <p style="margin-bottom:0px; font-weight:bold;">ชนิดของพัสดุ</p> 
+                </div>
+                <div style="width:100%; height:2px; background-color:lightgray;"></div>
+            </div>
+            <br>
+            
+            <div class="row col-md-12">
+                <div class="radio col-md-4">
+                    <label><input type="radio" style="margin-right:10px;" name="stradio">มีผลโดยตรงต่อคุณภาพผลิตภัณฑ์</label>
+                </div><br><br>
+                <div class="radio col-md-4">
+                    <label><input type="radio" style="margin-right:10px;" name="stradio">มีผลเกี่ยวข้องต่อคุณภาพผลิตภัณฑ์</label>
+                </div><br><br>
+                <div class="radio col-md-4">
+                    <label><input type="radio" style="margin-right:10px;" name="stradio">ไม่มีผลต่อคุณภาพผลิตภัณฑ์ / บรรจุภัณฑ์</label>
+                </div><br><br>
+                <div class="radio col-md-4">
+                    <label><input type="radio" style="margin-right:10px;" name="stradio">มีผลโดยตรงต่อคุณภาพบรรจุภัณฑ์</label>
+                </div><br><br>
+                <div class="radio col-md-4">
+                    <label><input type="radio" style="margin-right:10px;" name="stradio">มีผลเกี่ยวข้องต่อคุณภาพบรรจุภัณฑ์</label>
+                </div> 
+            </div>
+            
+            <div class="row underline"><div></div></div><br>
+
+            <div class="row">
+                <div class="col-md-2"> 
+                    <p style="margin-bottom:0px; font-weight: bold;">สำรองตาม</p> 
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="ReserveRadio">แผนผลิต</label>
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="ReserveRadio">MAX-MIN</label>
+                </div>
+                <div class="radio col-md-1">
+                    <label><input type="radio" style="margin-right:10px;" name="ReserveRadio">อื่นๆ</label>
+                </div>
+                <div class="col-md-4 offset-md-1">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12" placeholder="กรณีเลือกอื่นๆ โปรดระบุ">
+                </div>
+            </div><br>
+
+            <div class="row underline"><div></div></div><br>
+
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">ระยะเวลาในการจัดหา</p> 
+                </div>
+                <div class="offset-1 col-md-1">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-1">
+                        <p style="margin-bottom:0px;">วัน</p> 
+                </div>
+                <div class="col-md-3">
+                    <p style="margin-bottom:0px;">อัตราการเบิก</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-2">
+                    <select id="" class="form-control form-control-sm col-md-12">
+                        <option value="-">Please select...</option>
+                        <option value="สำรองคลัง">สำรองคลัง</option>
+                        <option value="ยกเลิกสำรองคลัง">ยกเลิกสำรองคลัง</option>
+                    </select>
+                </div>
+            </div><br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">หน่วยนับ</p> 
+                </div>
+                <div class="col-md-2">
+                    <select id="" class="form-control form-control-sm col-md-12">
+                        <option value="-">Please select...</option>
+                        <option value="สำรองคลัง">สำรองคลัง</option>
+                        <option value="ยกเลิกสำรองคลัง">ยกเลิกสำรองคลัง</option>
+                    </select>
+                </div>
+                <div class="col-md-3 offset-md-1">
+                    <p style="margin-bottom:0px;">GUARANTEE SHELF LIFE</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">เดือน</p>    
+                </div>
+            </div><br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">ราคา / หน่วย</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-2 offset-md-1">
+                    <p style="margin-bottom:0px;">VALUATION CLASS</p> 
+                </div>
+                <div class="col-md-4 offset-md-1">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" placeholder="VALUATION CLASS">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary btn-sm" type="button">Browse</button>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">VENDOR CODE</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-3 offset-md-1">
+                    <p style="margin-bottom:0px;">MANUFACTURING CODE</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+            </div><br>
+            
+            <div class="row underline"><div></div></div><br>
+
+            <div class="row">
+                <div class="col-md-2"> 
+                    <p style="margin-bottom:0px; font-weight: bold;">การจัดเก็บ</p> 
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="ReserveRadio">ในร่ม</label>
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="ReserveRadio">กลางแจ้ง</label>
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="ReserveRadio">ควบคุมอุณหภูมิ</label>
+                </div>
+                <div class="radio col-md-1">
+                    <label><input type="radio" style="margin-right:10px;" name="ReserveRadio">อื่น ๆ</label>
+                </div>
+                <div class="col-md-3">
+                    <input id="" type="text" class="form-control form-control-sm col-md-12" placeholder="กรณีเลือกอื่นๆ โปรดระบุ">
+                </div>
+            </div><br>
+
+            <div class="row underline"><div></div></div><br>
+
+            <div class="row">
+                <div class="col-md-6" style=" border-right: 2px solid lightgray;">
+                        <p>กรณียกเลิกสำรองคลังเนื่องจาก</p>
+                        <textarea id="" class="form-control" style="width:100%;" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <p>แนบไฟล์</p>
+                    <div class="" style="background-color:#99ccff; height:70%; padding:20px;">
+                        <div style="min-height:70%; width:100%; padding:15px;">
+
+                        </div>
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-default btn-sm">Browse</button>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div><br>
+
+            <div class="row underline"><div></div></div><br>
+
+            <div class="row">
+                <div class="col-md-4" style=" border-right: 2px solid lightgray; text-align:center;">
+                    <p style="margin-bottom:0px;">Chumphol Chiengsirisupawong</p>
+                    <p style="margin-bottom:0px;">09/25/2007</p>
+                    <p style="margin-bottom:0px;">วิศกร/หัวหน้างาน(หรือเทียบเท่า)ที่ขอสำรองคลัง</p>
+
+                </div>
+                <div class="col-md-4" style=" border-right: 2px solid lightgray; text-align:center;">
+                    <p style="margin-bottom:0px;">Apichat Ardsalee</p>
+                    <p style="margin-bottom:0px;">09/25/2007</p>
+                    <p style="margin-bottom:0px;">ผู้ตรวจสอบ (ผจผ.)</p>
+                </div>
+                <div class="col-md-4" style=" border-right: 2px solid lightgray; text-align:center;">
+                    <p style="margin-bottom:0px;">Thanakorn Raweesuit</p>
+                    <p style="margin-bottom:0px;">09/25/2007</p>
+                    <p style="margin-bottom:0px;">ผู้อนุมัติ (ผจส.)</p>
+                </div>
+            </div><br>
+
+        </div>
+
+        <div class="part2-info">
+            <div onclick="TriggerBar('Part2');" class="col-md-12" style="background-color:lightgray; cursor:pointer;">
+                <p>ส่วนที่ 2 สำหรับหน่วยงาน Materials Planning & Improvement</p>
+            </div>
+            <div class="col-md-12" id="Part2">
+                <br>
+                <div class="row">
+                    <div class="col-md-6" style="border-right: 2px solid lightgray;">
+                        <div class="row">
+                            <div class="row col-md-12">
+                                <div class="radio col-md-3 offset-md-3">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Agreement">เห็นควร</label>
+                                </div>
+                                <div class="radio col-md-3 offset-md-1">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Agreement">ไม่เห็นควร</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12" style="text-align:center;">
+                                <p style="margin-bottom:0px;">Nisa Jitthaisong</p>
+                                <p style="margin-bottom:0px;">10/11/2007</p>
+                                <p style="margin-bottom:0px;">ผู้ตรวจสอบ (ผจผ.)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="row col-md-12">
+                                <div class="radio col-md-3 offset-md-3">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Approval">อนุมัติ</label>
+                                </div>
+                                <div class="radio col-md-3 offset-md-1">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Approval">ไม่อนุมัติ</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12" style="text-align:center;">
+                            <p style="margin-bottom:0px;">Sompoch Poo-im</p>
+                            <p style="margin-bottom:0px;">12/10/2007</p>
+                            <p style="margin-bottom:0px;">ผู้อนุมัติ (ผจส.)</p>
+                        </div>
+                    </div>
+                </div><br>
+
+                <div class="row underline"><div></div></div><br>
+
+                <div class="row col-md-12">
+                    <div class="col-md-2"> 
+                        <p style="margin-bottom:0px; font-weight: bold;">สำรองโดย</p> 
+                    </div>
+                    <div class="radio col-md-5">
+                        <label><input type="radio" style="margin-right:10px;" name="StoreRadio">Materials Planning & Improvement</label>
+                    </div>
+                    <div class="radio col-md-5">
+                        <label><input type="radio" style="margin-right:10px;" name="StoreRadio">สัญญาตกลงจะซื้อจะขาย</label>
+                    </div>
+                    <div class="radio col-md-1 offset-md-2">
+                        <label><input type="radio" style="margin-right:10px;" name="StoreRadio">อื่นๆ</label>
+                    </div>
+                    <div class="col-md-7">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12" placeholder="กรณีเลือกอื่นๆ โปรดระบุ">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2 offset-md-2">
+                        <p style="margin-bottom:0px;">MINIMUM STOCK</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">MAXIMUM STOCK</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2 offset-md-2">
+                        <p style="margin-bottom:0px;">หมายเลขกำกับพัสดุ</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">สถาณที่เก็บ</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row underline"><div></div></div><br>
+
+                <div class="row">
+                    <div class="col-md-6" style="border-right: 2px solid lightgray;">
+                        <div class="row">
+                            <div class="row col-md-12">
+                                <div class="radio col-md-3 offset-md-3">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Agreement">เห็นควร</label>
+                                </div>
+                                <div class="radio col-md-3 offset-md-1">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Agreement">ไม่เห็นควร</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12" style="text-align:center;">
+                                <p style="margin-bottom:0px;">Nisa Jitthaisong</p>
+                                <p style="margin-bottom:0px;">10/11/2007</p>
+                                <p style="margin-bottom:0px;">Materials Planning Officer</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="row col-md-12">
+                                <div class="radio col-md-3 offset-md-3">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Approval">อนุมัติ</label>
+                                </div>
+                                <div class="radio col-md-3 offset-md-1">
+                                    <label><input type="radio" style="margin-right:10px;" name="Part2Approval">ไม่อนุมัติ</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12" style="text-align:center;">
+                            <p style="margin-bottom:0px;">Sompoch Poo-im</p>
+                            <p style="margin-bottom:0px;">12/10/2007</p>
+                            <p style="margin-bottom:0px;">Assistant Materials Planning & Improvement Manager</p>
+                        </div>
+                    </div>
+            </div><br>
+
+            <div class="row underline"><div></div></div><br>
+
+            <div class="col-md-12">
+                <div class="col-md-2 offset-md-2">
+                    <p style="margin-bottom:0px;">หมายเหตุ</p>
+                </div>
+                <div class="col-md-8 offset-md-2">
+                    <textarea id="" class="form-control" style="width:100%;" rows="3"></textarea>
+                </div>
+            </div><br>
+
+
+
+            </div>
+        </div>
+      
+        <br>
+    
+        <div style="position:fixed; right:5%; top:20%; width:13px;">
+            <a id="CloseForm2" data-toggle="tooltip" title="Close Form" type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(138, 28, 28); border-color:rgb(138, 28, 28); color:white; font-weight:bold;"><i class="fa fa-remove"></i></a>
+            <a onclick="Attachfile();" data-toggle="tooltip" title="Attachfile" type="button" class="btn btn btn-primary btn-md" style="background-color:#1BA1E2; border-color:#1BA1E2; color:white; font-weight:bold;"><i class="fa fa-paperclip"></i></a>
+            <a onclick="SaveDraft();" id="btnSaveDraft" data-toggle="tooltip" title="Save Draft" type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(196, 193, 50); border-color:rgb(196, 193, 50);; color:white; font-weight:bold;"><i class="fa fa-floppy-o"></i></a>
+        </div>
+    </div>
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+        
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight){
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            } 
+            });
+        }
+    </script>
+    
+    
+    <script type="text/javascript">
+    
+    
+        // Declare global variable
+        var FormID = GetParameterByName('FormID');
+        var FormType = 'FormView';
+        var ListData = 'ListName'; // listname store for current item
+        var SummaryPage = SiteUrl + '/Lists/Input_Master';
+        var TempCurrentData = {
+            
+        };
+       
+        /////////////////////////////////////
+    
+        // Place For trigger from DOM 
+        $('#CloseForm , #CloseForm2').click(function(){
+            CloseForm(0,SummaryPage); 
+        });
+    
+        
+        $( "input" ).change(function() {
+            
+                var str = $(this).val();
+                if (str.indexOf(';') > -1 || str.indexOf('[') > -1 || str.indexOf(']') > -1 || str.indexOf('|') > -1)
+                {
+                    $(this).css("background-color","red");
+                    $(this).css("color","white");
+                    alert('Don\'t input "; [ ] |" ');  
+                }
+                else{
+                    $(this).css("color","black");
+                    $(this).css("background-color","white");
+                    
+                }
+    
+        });
+    
+        $('input').keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                event.preventDefault();
+                return false;
+            }
+        });
+        ///////////////////////////////
+        
+    
+        // Set inittial form  
+        // such as option in select , default date, default current user , default text and label
+        function SetInitialForm(){
+            
+    
+    
+    
+        }
+    
+        // Get Data when user click view an item. this will be called by FormView();
+        // if user click new item this function will not be called
+        function GetData(){ // FormMethodTemplate
+            var select = '$select=*';
+            var query = '?' + select + '&$filter=FormID eq \''+FormID+'\'';
+            var data = GetItemByRestAPI(ListData,query);
+            if(data){
+                if(data.length > 0){
+                    
+                    data = data[0];
+                    CheckStatusWorkflow(data[WorkflowInternalName]);  // FormMethodTemplate
+                    
+                    for(var i in TempCurrentData){
+                    
+                            var item;
+                            // Get and set data in element by item data
+                            SetElementByItemData(item);
+                        
+                            
+    
+                        
+                    }
+                }
+                else{
+    
+                    RoutingPage('PageItemNotFound.html'); // FormMethodTemplate
+                }
+                return data;
+            }
+    
+    
+        }
+    
+        // Form display when user click new form .
+        // what you do want to display or change element new form.
+        // input action to this function
+        function FormNew(){
+            // set panel status 
+            $('#DocNO').text('-');
+            $('#CreateDate').text(SetDateTime()); 
+            $('#FormStatus').text('Create');
+            $('#Permission').text('Requestor');
+            SetFormAction(); // FormMethodTemplate
+    
+    
+        }
+    
+        // Form display when user click view an item.
+        // if user click new item this function will not be called.
+        function FormView(){
+            var data = GetData();
+            if(data){
+                SetFormAction(); // FormMethodTemplate
+                $('#DocNO').text(data.RunningNO);
+                $('#CreateDate').text(ConvertDate(data.Created)); 
+                $('#FormStatus').text(data.FormStatus);
+    
+    
+    
+                if(Form.FormStatus == 'Create'){
+        
+    
+                }
+    
+                
+                else if(Form.FormStatus == 'In progress'){
+    
+                    
+                }
+    
+    
+                else if(Form.FormStatus == 'Reject'){
+                    
+                
+                }
+    
+                else if(Form.FormStatus == 'Complete'){
+                    
+    
+                }
+    
+                else{
+                        $('body *').attr('readonly', true);
+                        $('body *').css('cursor', 'no-drop');
+                        $('body *').on('mousedown', function(e) {
+                            e.preventDefault();
+                            this.blur();
+                            window.focus();
+                        });
+                    
+                    $('#Approval').hide();
+                }
+    
+    
+    
+            }
+    
+        }
+    
+        // when user click submit action will take action in this function      
+        function SubmitAction(){ // FormMethodTemplate
+            
+            // disable submit button
+            $('#SubmitAction').prop('disabled',true);
+    
+    
+            var ActionTitle = $("#Approval_Select option:selected").text();
+            Form.StatusAction = $('#Approval_Select').val();
+            Form.FlagSubmit = true;
+            if(Form.StatusAction != 0){
+                $('#MainModal').modal('show');
+                AddLoading();
+                $('#TitleModal').text(ActionTitle);
+    
+    
+    
+                // Validate 
+                var FlagValidatePass = ValidateData(); // FormMethodTemplate
+                // enable submit button
+                $('#SubmitAction').prop('disabled',false);
+                if(FlagValidatePass == false){
+                    return;
+                }
+    
+                var StatusCreate = CheckUpdateOrCreate(ListData); // FormMethodTemplate
+                switch(StatusCreate){   // FormMethodTemplate
+                    case 'Create':
+                        
+                            
+                                CreateListItem(ListData,TempCurrentData); // FormMethodTemplate
+                           
+                                
+                            
+                            break;
+                    case 'Update':
+                            
+                                UpdateListItem(ListData,TempCurrentData); // FormMethodTemplate
+                            
+                            break;
+                }
+                
+                //UpdateFlagAttachment(); // FormMethodTemplate
+                HistoryLog('add'); // FormMethodTemplate
+    
+                var delayInMilliseconds = 1500; //1 second
+                setTimeout(function() {
+                    CloseForm(1,SummaryPage); // FormMethodTemplate
+                }, delayInMilliseconds);
+            }
+            else{
+                alert('Please select any action..');
+                
+                // enable submit button
+                $('#SubmitAction').prop('disabled',false);
+            }
+    
+        }
+    
+    
+    // additional module function //////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+        function TriggerTempData(PartDom){
+            for(var i in TempCurrentData){
+                var Part = TempCurrentData[i];
+                if(i == PartDom){
+                    for(var j in Part){
+                        var field = TempCurrentData[i][j];
+                    
+                            switch(field.TypeDom){
+                                case 'text':
+                                                field.Data = $('#'+field.ID).val();
+                                                break;
+                                case 'textarea':
+                                                field.Data = $('#'+field.ID).val();
+                                                break;
+                                case 'Date':
+                                                field.Data = $('#'+field.ID).val();
+                                            
+                                                break;
+                                case 'select':
+                                                
+                                                if(field.TypeCol == 'people'){  // in case select query from people 
+                                                    if($('#'+field.ID).val() != '-'){
+                                                        field.Data = {
+                                                            //ID: $('#'+field.ID).val(),
+                                                            ID: $('#'+field.ID + ' option').eq($('#'+field.ID).prop("selectedIndex")).val(),
+                                                            Title: $('#'+field.ID+' option:selected').text()
+                                                        }
+                                                    }
+                                                   
+                                                }
+                                                else{ // in case select query from normal text
+                                                    field.Data = $('#'+field.ID).val();
+                                                }
+                                                break;
+                                case 'people':  
+                                             
+                                                field.Data = {
+                                                    ID: $('#'+field.ID).attr('title'),
+                                                    Title: $('#'+field.ID).val()
+                                                }
+                                                
+    
+                                                break;
+                                case 'check':
+                                                if ($('#'+field.ID).is(":checked"))
+                                                {
+                                                    field.Data = true;
+                                                }
+                                                else{
+                                                    field.Data = false;
+                                                }
+                                                break;
+                                case 'var':
+                                                field.Data = field.Data;
+                                   
+                                                break;
+    
+                                case 'object':  
+                                                var index = field.ID;
+                                                var sum_str = '';
+                                                if(index == 'T41' || index == 'T42' || index == 'T43' || index == 'T44' || index == 'T45'){
+                                                    for(loop=1;loop<=10 ;loop++){
+                                                        var TempID = index + '_Col' + loop;
+                                                        var type = $("#"+TempID).attr("type");
+                                                        var TempCheck;
+                                                        switch(type){
+                                                            case 'checkbox':
+    
+                                                                            if ($('#'+TempID).is(":checked"))
+                                                                            {
+                                                                                TempCheck = 'true';
+                                                                            }
+                                                                            else{
+                                                                                TempCheck = 'false';
+                                                                            }
+                                                                            
+                                                                            sum_str += '['+TempID+'|'+TempCheck+'];';
+                                                                            
+                                                                            break;
+                                                            case 'text':
+                                                                            var TempData = $('#'+TempID).val();
+                                                                            sum_str += '['+TempID+'|'+TempData+'];';
+                                                                            
+    
+                                                                            break;
+    
+                                                        }
+                                                        
+                                                    }
+                                                    field.Data = sum_str;
+                                                }
+                                                else{
+                                                    for(loop=1;loop<=100;loop++){
+                                                        var TempID = index + '_Col' + loop;
+                                                        var TempData = $('#'+TempID).val();
+                                                        if(!TempData){
+                                                        
+                                                        }
+                                                        else{
+                                                            sum_str += '['+TempID+'|'+TempData+'];';
+                                                        }     
+                                                    }
+                                                    
+                                                    field.Data = sum_str;
+                                                }
+                                                
+                                                break;
+                            
+                            }
+                            
+                        
+                    }
+                    
+                }
+                
+            }
+    
+           
+    
+        }
+    
+        function SaveDraft(){
+    
+                $('#MainModal').modal('show');
+                AddLoading();
+                $('#TitleModal').text('Save Draft');
+           
+                var StatusCreate = CheckUpdateOrCreate(ListData);
+                switch(StatusCreate){   
+                    case 'Create':
+                           
+                                CreateListItem(ListData,TempCurrentData);
+                            
+                            break;
+                    case 'Update':
+                            
+                                UpdateListItem(ListData,TempCurrentData);
+                            
+                            break;
+                }
+                
+              
+                
+        }
+
+        function TriggerBar(ID){
+
+            $("#"+ID).slideToggle("fast");
+
+        }
+
+        function GetDepartment(){
+            
+            $('#MainModal').modal('show');
+            $('#TitleModal').text('เลือกแผนก');
+            $('#ModalBody').empty();
+            var data = DataConnection(0);
+            if(data){
+
+                var str='';
+                str+='';
+
+                str+='<style="width:100%;">  ';   
+                str+='<div class="table-responsive">  ';        
+                str+='    <table class="table">';
+                str+='        <thead>';
+                str+='         <tr>';
+                str+='            <th>หน่วยงาน</th>';
+                str+='            <th>ผู้จัดการแผนก</th>';
+                str+='            <th>ผู้จัดการส่วน</th>';
+                str+='            <th>ผู้จัดการฝ่าย</th>';
+                str+='            <th>กรรมการผู้จัดการ</th>';
+                str+='            <th>รหัสหน่วยงาน</th>';
+                str+='            <th>เลือก</th>';
+                str+='       </tr>';
+                str+='        </thead>';
+                str+='        <tbody id="Content_Department">';
+
+                    for(i=0;i<data.length;i++){
+                        var Dept_Name = '-';
+                        var Dept_Mgr = '-';
+                        var Section_Mgr = '-';
+                        var Division_Mgr = '-';
+                        var Committee_Mgr = '-';
+                        var Dept_Code = '-';
+
+                        if(data[i].Dept_Name){Dept_Name = data[i].Dept_Name}
+                        if(data[i].Dept_Mgr.Title){Dept_Mgr = data[i].Dept_Mgr.Title}
+                        if(data[i].Section_Mgr.Title){Section_Mgr = data[i].Section_Mgr.Title}
+                        if(data[i].Division_Mgr.Title){Division_Mgr = data[i].Division_Mgr.Title}
+                        if(data[i].Committee_Mgr.Title){Committee_Mgr = data[i].Committee_Mgr.Title}
+                        if(data[i].Dept_Code){Dept_Code = data[i].Dept_Code}
+
+
+                        str+='<tr>';
+                        str+='   <td>'+Dept_Name+'</td>';
+                        str+='   <td>'+Dept_Mgr+'</td>';
+                        str+='   <td>'+Section_Mgr+'</td>';
+                        str+='   <td>'+Division_Mgr+'</td>';
+                        str+='   <td>'+Committee_Mgr+'</td>';
+                        str+='   <td>'+Dept_Code+'</td>';
+                        str+='   <td><button onclick="SetFieldVal(\''+Dept_Name+'\',\'Dept_Name\');" type="button" class="btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เลือก</button></td>';
+                        str+='</tr>';
+                    }
+                str+='        </tbody>';
+                str+='    </table>';
+                str+='</div>';
+                str+='</div>';
+                $('#ModalBody').append(str);
+                $('#ModalBody').css('overflow','auto');
+                $('#ModalBody').css('max-height','400px');
+           
+                
+                $('.modal-dialog ').css('max-width','1000px');
+                $('.modal-dialog ').css('margin','1.75rem auto');
+                
+
+
+
+            } else{
+                $('#ModalBody').appned('No Data..');
+            }
+        }
+
+        function SetFieldVal(Val,ID){    
+            $('#'+ID).val(Val);
+            $('#MainModal').modal('hide');
+
+        }
+
+        function GetMaterialGroup(){
+            
+            $('#MainModal').modal('show');
+            $('#TitleModal').text('เลือก Material Group');
+            $('#ModalBody').empty();
+            var data = DataConnection(1);
+            if(data){
+
+                var str='';
+                str+='';
+
+                str+='<style="width:100%;">  ';   
+                str+='<div class="table-responsive">  ';        
+                str+='    <table class="table">';
+                str+='        <thead>';
+                str+='         <tr>';
+                str+='            <th>Material Group</th>';
+                str+='            <th>Code</th>';
+                str+='            <th>เลขที่ใบเบิกพัสดุ</th>';
+                str+='            <th>เลขที่ใบคืนพัสดุ</th>';
+                str+='            <th>เลขที่ใบยืมพัสดุ</th>';
+                str+='            <th>Year</th>';
+                str+='            <th>Month</th>';
+                str+='       </tr>';
+                str+='        </thead>';
+                str+='        <tbody id="Content_MaterialGroup">';
+
+                    for(i=0;i<data.length;i++){
+                        var Material_Group = '-';
+                        var Code = '-';
+                        var No_Withdraw = '-';
+                        var No_Return = '-';
+                        var No_Lend = '-';
+                        var Year = '-';
+                        var Month = '-';
+
+                        if(data[i].Material_Group){Material_Group = data[i].Material_Group}
+                        if(data[i].Code){Code = data[i].Code}
+                        if(data[i].No_Withdraw){No_Withdraw = data[i].No_Withdraw}
+                        if(data[i].No_Return){No_Return = data[i].No_Return}
+                        if(data[i].No_Lend){No_Lend = data[i].No_Lend}
+                        if(data[i].Year){Year = data[i].Year}
+                        if(data[i].Month){Month = data[i].Month}
+
+
+                        str+='<tr>';
+                        str+='   <td>'+Material_Group+'</td>';
+                        str+='   <td>'+Code+'</td>';
+                        str+='   <td>'+No_Withdraw+'</td>';
+                        str+='   <td>'+No_Return+'</td>';
+                        str+='   <td>'+No_Lend+'</td>';
+                        str+='   <td>'+Year+'</td>';
+                        str+='   <td>'+Month+'</td>';
+                        str+='   <td><button onclick="SetFieldVal(\''+Material_Group+'\',\'Material_Group\');" type="button" class="btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เลือก</button></td>';
+                        str+='</tr>';
+                    }
+                str+='        </tbody>';
+                str+='    </table>';
+                str+='</div>';
+                str+='</div>';
+                $('#ModalBody').append(str);
+                $('#ModalBody').css('overflow','auto');
+                $('#ModalBody').css('max-height','400px');
+           
+                
+                $('.modal-dialog ').css('max-width','1000px');
+                $('.modal-dialog ').css('margin','1.75rem auto');
+                
+
+
+
+            } else{
+                $('#ModalBody').appned('No Data..');
+            }
+        }
+
+    </script>
+    
+    

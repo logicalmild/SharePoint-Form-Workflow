@@ -1,0 +1,227 @@
+<h4 style="text-align:center; margin-top:20px;">Report Hardware History</h4>
+    <br>
+    
+    <div class="container">
+        <div style="border-radius:10px; border-style:solid; border-width:1px; padding-top:20px; padding-bottom:20px;" class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-8 offset-md-2">
+                            <p style="margin-bottom:0px;">Serial NO :</p>
+                            
+                            <input id="myInput" type="text" style="width:100%; height:40px;" name="SerialNO" placeholder="Serial NO">
+                            <div class="autocomplete"></div>
+                        </div>
+                        <!--
+                        <div class="col-md-4">
+                            <div class="form-inline">
+                                <p style="margin-bottom:0px;">Start :</p>
+                                <input id="StartDate" type="date" style="width:300px; height:40px;">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-inline">
+                                <p style="margin-bottom:0px;">End :</p>
+                                <input id="EndDate" type="date" style="width:300px; height:40px;">
+                            </div>
+                        </div>
+                        -->
+                    </div>     
+               
+                <div class="form-inline col-md-4 offset-md-5">
+                    <center>
+                            <button type="button" onclick="GetReport();" class="btn btn-primary">Get Report</button>
+                            <button type="button" onclick="ClearReport();" class="btn btn-danger">Clear</button>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>   
+   <br>
+   <script>
+        function autocomplete(inp, arr) {
+          /*the autocomplete function takes two arguments,
+          the text field element and an array of possible autocompleted values:*/
+          var currentFocus;
+          /*execute a function when someone writes in the text field:*/
+          inp.addEventListener("input", function(e) {
+              var a, b, i, val = this.value;
+              /*close any already open lists of autocompleted values*/
+              closeAllLists();
+              if (!val) { return false;}
+              currentFocus = -1;
+              /*create a DIV element that will contain the items (values):*/
+              a = document.createElement("DIV");
+              a.setAttribute("id", this.id + "autocomplete-list");
+              a.setAttribute("class", "autocomplete-items");
+              /*append the DIV element as a child of the autocomplete container:*/
+              this.parentNode.appendChild(a);
+              /*for each item in the array...*/
+              for (i = 0; i < arr.length; i++) {
+              /*check if the item starts with the same letters as the text field value:*/
+              if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                  /*create a DIV element for each matching element:*/
+                  b = document.createElement("DIV");
+                  /*make the matching letters bold:*/
+                  b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                  b.innerHTML += arr[i].substr(val.length);
+                  /*insert a input field that will hold the current array item's value:*/
+                  b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                  /*execute a function when someone clicks on the item value (DIV element):*/
+                  b.addEventListener("click", function(e) {
+                      /*insert the value for the autocomplete text field:*/
+                      inp.value = this.getElementsByTagName("input")[0].value;
+                      /*close the list of autocompleted values,
+                      (or any other open lists of autocompleted values:*/
+                      closeAllLists();
+                  });
+                  a.appendChild(b);
+              }
+              }
+          });
+          /*execute a function presses a key on the keyboard:*/
+          inp.addEventListener("keydown", function(e) {
+              var x = document.getElementById(this.id + "autocomplete-list");
+              if (x) x = x.getElementsByTagName("div");
+              if (e.keyCode == 40) {
+              /*If the arrow DOWN key is pressed,
+              increase the currentFocus variable:*/
+              currentFocus++;
+              /*and and make the current item more visible:*/
+              addActive(x);
+              } else if (e.keyCode == 38) { //up
+              /*If the arrow UP key is pressed,
+              decrease the currentFocus variable:*/
+              currentFocus--;
+              /*and and make the current item more visible:*/
+              addActive(x);
+              } else if (e.keyCode == 13) {
+              /*If the ENTER key is pressed, prevent the form from being submitted,*/
+              e.preventDefault();
+              if (currentFocus > -1) {
+                  /*and simulate a click on the "active" item:*/
+                  if (x) x[currentFocus].click();
+              }
+              }
+          });
+          function addActive(x) {
+          /*a function to classify an item as "active":*/
+          if (!x) return false;
+          /*start by removing the "active" class on all items:*/
+          removeActive(x);
+          if (currentFocus >= x.length) currentFocus = 0;
+          if (currentFocus < 0) currentFocus = (x.length - 1);
+          /*add class "autocomplete-active":*/
+          x[currentFocus].classList.add("autocomplete-active");
+          }
+          function removeActive(x) {
+          /*a function to remove the "active" class from all autocomplete items:*/
+          for (var i = 0; i < x.length; i++) {
+              x[i].classList.remove("autocomplete-active");
+          }
+          }
+          function closeAllLists(elmnt) {
+          /*close all autocomplete lists in the document,
+          except the one passed as an argument:*/
+          var x = document.getElementsByClassName("autocomplete-items");
+          for (var i = 0; i < x.length; i++) {
+              if (elmnt != x[i] && elmnt != inp) {
+              x[i].parentNode.removeChild(x[i]);
+              }
+          }
+          }
+          /*execute a function when someone clicks in the document:*/
+          document.addEventListener("click", function (e) {
+              closeAllLists(e.target);
+          });
+      }
+      
+      var query = '?$select=Serial_No&$top=5000&$orderby=Serial_No asc';
+      var data = GetItemByRestAPI('Hardware',query);
+      var Serial = [];
+      if(data){
+          for(i=0;i<data.length;i++){
+              Serial.push(data[i].Serial_No);
+          }
+      }
+      /*An array containing all the country names in the world:*/
+      //var Serial = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua & Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre & Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts & Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Turks & Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
+      
+      /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+      autocomplete(document.getElementById("myInput"), Serial);
+  
+  </script>
+   <script type="text/javascript">
+
+    var column = [
+        'View',
+        'Duedate',
+        'Duedate_Unit',
+        'FormStatus',
+        'Issued_By_text',
+        'Serial_No',
+        'TypeHardware',
+        'Function',
+        'DocNo',
+        'Issued_Date',
+        'LocationSite',
+        'SupplierName',
+        'SupplierMail',
+        'SupplierTel'
+
+    ];
+    var column_title = [
+        'View',
+        'เวลาที่กำหนด',
+        'หน่วย',
+        'FormStatus',
+        'ผู้สร้าง',
+        'Serial_No',
+        'ประเภทฮาร์ดแวร์',
+        'Function',
+        'DocNo',
+        'วันที่สร้าง',
+        'LocationSite',
+        'SupplierName',
+        'SupplierMail',
+        'SupplierTel'
+    ]
+
+
+    function GetReport(){
+
+        var loading = '<center><div class="loader" style="margin-top:15%; margin-bottom:15%;"></div></center>';
+        $('#Result').empty();
+        $('#Result').append(loading);
+        
+        var serial = $('#myInput').val();
+        if(serial){
+            var col = '';
+            for(i=0;i<column.length;i++){
+                if(i==column.length-1){
+                    col+=column[i];
+                }
+                else{
+                    col+=column[i]+',';
+                }
+                
+            }
+            var query = '?$select='+col+'&$top=5000&$filter=Serial_No eq \''+serial+'\'';
+            var data = GetItemByRestAPI('RequestFix',query);
+            if(data){
+        
+                RenderReport(data,column)
+            }
+        }
+        else{
+            alert('Please insert data.');
+            $('#Result').empty();
+        }
+
+        
+        
+    }
+    function ClearReport(){
+        $('#Result').empty();
+        $('#myInput').val('');
+    }
+   
+   </script>
