@@ -1,8 +1,8 @@
 # SharePoint-Form-Workflow
 Form &amp; Workflow
 
-<!---- Declare field and list column name ------>
-var TempCurrentData = {
+---- Declare field and list column name ----
+ var TempCurrentData = {
   field1:{
     ID:'ID DOM HTML',
     Title:'Name or title of each field',
@@ -11,7 +11,7 @@ var TempCurrentData = {
     Data:'set initial data to field',
     Col:'List Column Name'
   },
-};
+}; 
 
   (TypeDom)
   - text
