@@ -1,7 +1,7 @@
 # SharePoint-Form-Workflow
 Form &amp; Workflow
 
-... Declare field and list column name 
+``` Declare field and list column name 
  var TempCurrentData = {
   field1:{
     ID:'ID DOM HTML',
@@ -12,7 +12,7 @@ Form &amp; Workflow
     Col:'List Column Name'
   },
 }; 
-...
+```
 
 
   (TypeDom)
