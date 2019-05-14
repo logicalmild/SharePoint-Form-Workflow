@@ -1,7 +1,7 @@
 # SharePoint-Form-Workflow
 Form &amp; Workflow
 
-``` Declare field and list column name 
+``` javascript
  var TempCurrentData = {
   field1:{
     ID:'ID DOM HTML',
