@@ -18,7 +18,20 @@ web
  │    ├── FormTemplate.html
  │    └── New your forms 
  ├── /component
-     ├── 
+ │    ├── Approval.html
+ │    ├── Attachment.html
+ │    ├── Btn_CreateForm.html
+ │    ├── Control_Icon.html
+ │    ├── HistoryLog.html
+ │    ├── ModalTemplate.html
+ │    ├── NavBar.html
+ │    ├── PageFailedOnStart.html
+ │    ├── PageNotFound.html
+ │    ├── PageWorkflowCancelled.html
+ │    ├── PageWorkflowErrorOccurred.html
+ │    ├── PageWorkflowErrorOccurredRetry.html
+ │    ├── PageWorkflowFailedOnStartRetry.html
+ │    └──PageWorkflowInprogress.html
  ├── /img
  ├── /js
  │     ├── attachment.js
@@ -35,10 +48,15 @@ web
  │     
  ├── /report
  │     ├── /css
+ │     │     └── report.css
  │     ├── /datatable
  │     ├── /html_report
+ │     │     ├── AllReport.html
+ │     │     └── Add your new report
  │     ├── /img
  │     ├── /js
+ │     │     ├── config.js
+ │     │     └── report.js
  │     └── Report.aspx
  └── form.html
 ```
