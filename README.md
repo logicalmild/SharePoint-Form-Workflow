@@ -60,6 +60,22 @@ web
  │     └── Report.aspx
  └── form.html
 ```
+Start project with insert file install InstallSiteStruct.html and run in browser under current site
+1) New page in Site Page
+2) Copy path url file InstallSiteStruct.html to your page
+3) save edit and refresh page
+
+First Setting in /js/config.js
+1) SiteUrl (Root) or Current site in SharePoint
+2) All workflow internal name
+3) Display name & internal name of List , Library
+4) FormMaster
+
+New form with FormTemplate.html
+1) 
+2) 
+3) 
+
 
 ``` javascript
  var TempCurrentData = {
