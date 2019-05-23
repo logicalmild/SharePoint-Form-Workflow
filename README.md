@@ -91,16 +91,17 @@ New form with FormTemplate.html
 ```
 
 
-  (TypeDom)     (TypeCol)
-  - text        - singleline
-  - date        - multipleline
-  - label       - date
-  - textarea    - people
-  - select      - radio
+  (TypeDom)     |      (TypeCol)
+  - text        |       - singleline
+  - date        |       - multipleline
+  - label       |       - date
+  - textarea    |       - people
+  - select      |       - radio
   - people
   - radio
   - check
   - object
+  - var
 
 
   
