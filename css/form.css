@@ -143,3 +143,37 @@ li{
 
       width:235px !important;
   }
+
+  #contentBox{
+
+    min-width:0px !important;
+    padding-left:0px !important;
+    padding-right:0px !important;
+}
+.ms-wikicontent{
+
+    padding-right:0px !important;
+}
+.lgs-support{
+
+    margin-right:10px;
+    background-color:white;
+    border-radius: 3px;
+    padding-left:15px; 
+    padding-right:15px;
+    padding-top:2px;
+    padding-bottom:2px;
+    color:#ff6600;
+    margin-bottom:10px;
+    border-color: #ff6600;
+    border-width:1px;
+    border-style:solid;
+
+}
+
+#PageBody{
+  background-color:white; 
+  padding-top:20px; 
+  padding-bottom:50px;
+
+}

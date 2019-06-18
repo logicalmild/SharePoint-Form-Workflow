@@ -1,757 +1,1880 @@
 
-
-
-
-<script type="text/javascript">
-
-
-// Declare global variable
-var FormID;
-var FormType;
-var ListData = '';
-
-/////////////////////////////////////
-
-// Place For trigger from DOM 
-$('#SubmitAction').click(function(){
-    SubmitAction();
-});
-
-
-$('#CloseForm').click(function(){
-    CloseForm(0,SummaryRequest); 
-});
-
-
-///////////////////////////////
-
-
-function FormBody(){  // called by form.js
+<style>
+        .page-title{
+            background-color:lightgray;
+        }
+        .page-title h4{
+            text-align:center;
+        }
+        label{
+             float:left;
+         }
     
-    FormID = GetParameterByName('FormID');
-    FormType = 'FormView';
-    if(FormID.length < 1){
-        FormID = generateUID();
-        FormType = 'FormNew';
-    }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
     
-    FormLoad();
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
     
-    $('#summernote').summernote({
-        placeholder: 'Write message here..',
-        tabsize: 1,
-        height: 150,
-        focus: false,
-        dialogsFade: true,
+        tr:nth-child(even){
+            background-color: #f2f2f2
+        }
         
-    });
-}
-
-
-function FormLoad(){
-   
-    SetInitialForm();
-
-    switch(FormType){
-       
-        case 'FormNew':
-                        SetFormView('FormNew');
-                        break;
-        case 'FormView':
-                        var data = GetData();
-
-
-                        var Permission = CheckPermission();   
-                        
-                        if(data[0].FormStatus == 'Save Draft'){ // Form SaveDraft
-                            if(CurrentUser.Name == $('#Requestor').val()){
-                                SetFormView('FormSaveDraft'); 
-                            }
-                        }
-                        else if(Permission.indexOf('Approver') != -1 && data[0].FormStatus == 'Wait for approve'){ // Form Approve
-                            SetFormView('FormApprove');      
-                        }
-                        else if(Permission.indexOf('Admin')  != -1 && data[0].FormStatus == 'Complete'){// Form Admin
-                            SetFormView('FormAdmin');  
-                        }
-                        else{ // Form Visitor
-                            SetFormView('FormVisitor');  
-                           
-                        }   
-
-                        break;
-
-    }
-  
-
-    function SetInitialForm(){
-
-
-        $('#Title_ActionBy').text(CurrentUser.Name);
-        HistoryLog('get');
-
-
-    }
-    function GetData(){
-        var data;
     
-        return data;
-    }
+        p{
+            margin-bottom:0px;
+        }
+        .accordion {
+            background-color: #eee;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
 
-    function SetFormView(view){
-        //alert(view);
-        switch(view){
-            case 'FormNew':
-                            // set panel status 
-                            $('#CreateDate').text(SetDateTime());
-                            $('#FormStatus').text('Draft');
-                            $('#DocNO').text(GenNumJob());
+        .active, .accordion:hover {
+            background-color: #ccc;
+        }
 
-                            
-                            var arr_approval_option = [0,1];
-                            SetApproval(arr_approval_option);
+        .accordion:after {
+            content: '\002B';
+            color: #777;
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+        }
 
-                            break;
-            case 'FormSaveDraft':
+        .active:after {
+            content: "\2212";
+        }
 
-
-
-                            var arr_approval_option = [0,1,6]; // approval in config.js
-                            SetApproval(arr_approval_option);
-                            break;
-            case 'FormApprove':
-
-
-                            var arr_approval_option = [2,3];
-                            SetApproval(arr_approval_option);
-              
-                            break;
-            case 'FormAdmin':
-                            break;
-            case 'FormVisitor':
-
-                            break;
-            case 'FormSupport':
-
-                            var arr_approval_option = [5,4];
-                            SetApproval(arr_approval_option);
-       
-                            break;
-                        }
-
-
-    }
-
-
-}
-
-
-function CheckPermission(){
-    var Permission = [];
-    Permission.push('Visitor');
-    if(CurrentUser.Name == $('#Requestor').val()){
-
-        Permission.push('Requestor');
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
         
-    }
-    if(CurrentUser.Name == $('#SelectManager').val()){
 
-        Permission.push('Approver');
+
+        .part1-info , .part2-info{
+
+            border-style:solid; 
+            border-width:1px; 
+            border-color:lightgray;
+        }
+
+        .part1-info div p , .part2-info div p{
+            color:gray;
+        }
+
+        .underline{
+            padding-left:10px; 
+            padding-right:10px;
+        }
+        .underline div{
+            width:100%; 
+            height:2px; 
+            background-color:lightgray;
+        }
+
+        /* Tag Department */
+        .Tag-Dept{
+            background-color:#1BA1E2;
+            border-radius:5px;
+            margin-right:10px;
+            float:left;
+            padding-left:15px;
+            padding-right:15px;
+            padding-top:5px;
+            padding-bottom:5px;
+            color:white;
+            margin-bottom:0px;
+            margin-top:10px;
+            
+        }
+        .Tag-Dept p{
+            margin-bottom:0px;
+            float:left;
+        }
+        .Tag-Dept a{
+            background-color:rgb(138, 28, 28); 
+            border-color:rgb(138, 28, 28); 
+            color:white; 
+            font-weight:bold; 
+            margin-left:15px; 
+            padding:0px 7px 0px 7px;
+        }
+
+        .btn-remove-file{
+            background-color:rgb(138, 28, 28); 
+            border-color:rgb(138, 28, 28); 
+            color:white; 
+            font-weight:bold; 
+            margin-left:15px; 
+            padding:0px 7px 0px 7px;
+        }
         
-    }
-    var Group = LGSSectionGroup; // LGSSectionGroup is in config.js
-    var query = '?$expand=Username&$top=1000&$select=Username/Title,Username/Id&$filter=UserGroup eq \''+Group+'\'';
-    var data = GetItemByRestAPI(Inter_MasterUserGroup,query);
-    if(data){
-        for(i=0;i<data.length;i++){
-            if(data[i].Username.Title == CurrentUser.Name){
-                
-                Permission.push('Supporter');
-                
-            }
-        }
-
-    }
-    var Admin = AdminGroup; // AdminGroup is in config.js
-    var query = '?$expand=Username&$top=1000&$select=Username/Title,Username/Id&$filter=UserGroup eq \''+Admin+'\'';
-    var data = GetItemByRestAPI(Inter_MasterUserGroup,query);
-    if(data){
-        for(i=0;i<data.length;i++){
-            if(data[i].Username.Title == CurrentUser.Name){
-
-                Permission.push('Admin');
-                
-            }
-        }
-
-    }
-    return Permission;
-}
-
-function SubmitAction(){
-    var Approval_Select = $('#Approval_Select').val();
-    switch(Approval_Select){
-            case 'SaveDraft' :
-                                UpdateFlagAttachment();
-                                var data = SaveDraft();
-                                var status = CheckUpdateOrCreate();                        
-                                
-                                    HistoryLog('add');
-                                    switch(status){
-
-                                        case 'Create':
-                                                        CreateItem(ListData,data);
-                                                        break;
-                                        case 'Update':
-                                                        UpdateItem(ListData,data);
-                                                        break;
-                                    }
-                                
-
-
-                                break;
-            case 'SendToApprover':
-                                
-                                UpdateFlagAttachment();
-                                var data = SendToApprover();
-                                var Pass = ValidateData(data);
-                                if(Pass == true){
-                                    var status = CheckUpdateOrCreate();                                    
-                                    HistoryLog('add');
-                                    switch(status){
-
-                                        case 'Create':
-                                                        CreateItem(ListData,data);
-                                                        break;
-                                        case 'Update':
-                                                        UpdateItem(ListData,data);
-                                                        break;
-                                    }
-                                }
-
-                               
-                               
-                                break;
-            case 'Approve':
-                                var data = Approve();
-                                HistoryLog('add');
-                                UpdateItem(ListData,data);
-                                break;
-            case 'Reject':
-                                var data = Reject();
-                                HistoryLog('add');
-                                UpdateItem(ListData,data);
-                                break;
-
-            case 'Complete':
-                                var data = Complete();
-                                var Pass = ValidateData(data);
-                                if(Pass == true){
-                                    HistoryLog('add');
-                                    UpdateItem(ListData,data);
-                                }
-
-                                break;
-
-            case 'Accept':  
-                                var data = Accept();
-                                HistoryLog('add');
-                                UpdateItem(ListData,data);
-                                break;
-            case 'Terminate':
-                                var data = Terminate();
-                                UpdateItem(ListData,data);
-                                break;
-            default:
-                    alert('Please select approval...');         
-                            
-
-        }
-
-        ///Action by Status///////////////////////////////////////////
-
-        function SaveDraft(){
+</style>
     
-            var data = [{
-                Title:null,
-                ID:null,
-                Type:null,
-                ColumnName:null,
-                value:null,
-                Require:null
-            }];
-            
-            
-            var ListPersonID = '';
-            for(i=0;i<arr_CC_Person_id.length;i++){
-                ListPersonID += arr_CC_Person_id[i] + ';#' + arr_CC_Person_title[i] +';#';
-                
-            }
-                
-           // var Detail = $('#summernote').summernote('code');
-            
+    <div class="container">
+        <div class="col-md-12 page-title">
+            <h4>ใบขอสำรองคลัง / ยกเลิกสำรองคลังพัสดุ</h4>    
+        </div><br>
 
-
-            data[0] = { Title:null,     ID:null,    Type:null,      ColumnName:'FormID',           Value:FormID,                   Require:true};
-            data[1] = { Title:null,     ID:null,    Type:null,      ColumnName:'FormStatus',       Value:'Save Draft',             Require:true};
-            data[2] = { Title:null,     ID:null,    Type:null,      ColumnName:'WorkflowStep',     Value:'0',                      Require:true};
-            data[3] = { Title:null,     ID:null,    Type:null,      ColumnName:'WorkflowStatus',   Value:'Not Start',              Require:true};
-
-            data[19] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                olumnName:'FlagSubmit',       
-                Value:true,                     
-                Require:false
-            };
-            data[20] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'StatusAction',     
-                Value:'Save Draft',             
-                Require:false
-            };
-
-            return data;
-            
-        }
-        function SendToApprover(){
-          
-            var data = [{
-                Title:null,
-                ID:null,
-                Type:null,
-                ColumnName:null,
-                value:null,
-                Require:null
-            }];
-            
-            
-            var ListPersonID = '';
-            for(i=0;i<arr_CC_Person_id.length;i++){
-                ListPersonID += arr_CC_Person_id[i] + ';#' + arr_CC_Person_title[i] +';#';
-                
-            }
-            //var Detail = $('#summernote').summernote('code');
-            
-            data[0] = { 
-                    Title:null,     
-                    ID:null,    
-                    Type:null,      
-                    ColumnName:'FormID',           
-                    Value:FormID,                   
-                    Require:false
-                };
-            data[1] = { 
-                    Title:null,     
-                    ID:null,    
-                    Type:null,      
-                    ColumnName:'FormStatus',      
-                    Value:'',                       
-                    Require:false};
-            data[2] = { 
-                    Title:null,     
-                    ID:null,    
-                    Type:null,      
-                    ColumnName:'WorkflowStep',     
-                    Value:'0',                      
-                    Require:false
-                };
-            data[3] = { 
-                    Title:null,     
-                    ID:null,    
-                    Type:null,      
-                    ColumnName:'WorkflowStatus',  
-                    Value:'Not Start',              
-                    Require:false
-                };
-            data[19] = { 
-                    Title:null,     
-                    ID:null,   
-                    Type:null,      
-                    ColumnName:'FlagSubmit',       
-                    Value:true,                     
-                    Require:false
-                };
-            data[20] = { 
-                    Title:null,     
-                    ID:null,   
-                    Type:null,      
-                    ColumnName:'StatusAction',     
-                    Value:'SendToApprover',         
-                    Require:false
-                };
-
-
-            return data;
+        <div class="row">   
            
-        }
-        function Approve(){
-            var data = [{
-                Title:null,
-                ID:null,
-                Type:null,
-                ColumnName:null,
-                value:null,
-                Require:null
-            }];
+            <div class="col-md-5">
+                <p style="text-align:left;">บริษัท</p>  
+                <select id="Company" class="form-control form-control-sm col-md-12">
+                    <option value="-">Please select...</option>
+                </select>
+            </div>
+            <div class="col-md-6 offset-md-1">
+                <p style="text-align:left;">หน่วยงานที่ขอ</p>  
+                <div class="form-inline">
+                    <input id="Dept_Name" type="text" class="form-control form-control-sm col-md-10 col-sm-12" autocomplete="off">
+                    <button id="Btn_GetDeptInfo"></button>
+                </div>
+            </div>
+        </div><br>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <p>หน่วยงานที่ใช้งาน</p>
+                <div class="col-md-12" style="background-color:lightgray; min-height:100px; padding-bottom:10px; padding-right:10px;">
+                    <ul id="Panel_Dept" style="padding-left:0px;">
+                        <li id="LastTag" style="clear:both;"></li>
+                    </ul>
+                </div><br>
+                <center>
+                    <button id="Btn_AddDeptTarget"></button>
+                </center>
+            </div>
+        </div><br>
+
+
+        <div class="part1-info">
+            <div id="Part1_TriggerBar" onclick="TriggerBar('Part1');" class="col-md-12" style="background-color:lightgray; cursor:pointer;">
+                <p>ส่วนที่ 1 สำหรับหน่วยงานที่ขอสำรองคลัง / ยกเลิกสำรองคลังพัสดุ</p>
+            </div>
+            <div class="col-md-12" id="Part1">
+                <div class="row">
+                    <div class="offset-md-3 col-md-2">
+                        <p>วัตถุประสงค์</p>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="radio">
+                            <label><input type="radio" style="margin-right:10px;" name="Objective" value="สำรองคลัง">สำรองคลัง</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="radio">
+                            <label><input type="radio" style="margin-right:10px;" name="Objective" value="ยกเลิกสำรองคลัง">ยกเลิกสำรองคลัง</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row" style="padding-left:10px; padding-right:10px;">   
+                    <div class="form-inline">
+                        <p style="margin-bottom:0px;">รายละเอียดพัสดุ</p> 
+                    </div>
+                    <div style="width:100%; height:2px; background-color:lightgray;"></div>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">Material Group</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <input id="Material_Group" type="text" class="form-control form-control-sm" placeholder="Material Group">
+                            <div class="input-group-append">
+                                <button id="Btn_GetMaterialGroup"></button> 
+                            </div>
+                        </div>
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">ชื่อพัสดุ</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="Name_Package" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <p style="margin-bottom:0px;">สูตรเคมี</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="Chem_Formula" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">ประเภทสารเติมแต่ง</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="Type_Additive" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <p style="margin-bottom:0px;">สัญลักษณ์ย่อสารเติมแต่ง</p> 
+                    </div>
+                    <div class="col-md-3">
+                        <input id="Abbr_Additive" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <textarea id="Contact_Vendor1" class="form-control" style="width:100%;" rows="2" placeholder="ชื่อ และ ที่อยู่ผู้ขาย 1"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <textarea id="Contact_Vendor2" class="form-control" style="width:100%;" rows="2" placeholder="ชื่อ และ ที่อยู่ผู้ขาย 2"></textarea>
+                    </div>
+                </div><br>
+
+                <div class="table-responsive">          
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อทางการค้า / รายละเอียด</th>
+                            <th style="width:150px;">ขนาดบรรจุ</th>
+                            <th style="width:150px;">หน่วย</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input id="Trading_Name1" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="Size_Contain1" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><select id="Unit1" class="Unit_Package form-control form-control-sm col-md-12"></select></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><input id="Trading_Name2" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="Size_Contain2" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><select id="Unit2" class="Unit_Package form-control form-control-sm col-md-12"></select></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><input id="Trading_Name3" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><input id="Size_Contain3" type="text" class="form-control form-control-sm col-md-12"></td>
+                                <td><select id="Unit3" class="Unit_Package form-control form-control-sm col-md-12"></select></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+
             
-          
-            data[0] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'FlagSubmit',       
-                Value:true,                     
-                Require:false
-            };
-            data[1] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'StatusAction',     
-                Value:'Approve',                 
-                Require:false
-            };
+            <div class="row underline"><div></div></div><br>
+
+            <div class="row">
+                <div class="col-md-2"> 
+                    <p style="margin-bottom:0px; font-weight: bold;">สำรองตาม</p> 
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="Reserve_Accord" value="แผนผลิต">แผนผลิต</label>
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="Reserve_Accord" value="MAX-MIN">MAX-MIN</label>
+                </div>
+                <div class="radio col-md-1">
+                    <label><input type="radio" style="margin-right:10px;" name="Reserve_Accord" value="อื่นๆ">อื่นๆ</label>
+                </div>
+                <div class="col-md-4 offset-md-1">
+                    <input id="Reserve_Accord_Others" type="text" class="form-control form-control-sm col-md-12" placeholder="กรณีเลือกอื่นๆ โปรดระบุ">
+                </div>
+            </div><br>
+
+            <div class="row underline"><div></div></div><br>
 
 
-            return data;
-        }
-        function Reject(){
-            var data = [{
-                Title:null,
-                ID:null,
-                Type:null,
-                ColumnName:null,
-                value:null,
-                Require:null
-            }];
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">ระยะเวลาในการจัดหา</p> 
+                </div>
+                <div class="offset-1 col-md-1">
+                    <input id="Period_Procure" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-1">
+                        <p style="margin-bottom:0px;">วัน</p> 
+                </div>
+                <div class="col-md-3">
+                    <p style="margin-bottom:0px;">อัตราการเบิก</p> 
+                </div>
+                <div class="col-md-1">
+                    <input id="Num_Withdraw" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-2">
+                    <select id="Num_Withdraw_Unit" class="Unit_Package form-control form-control-sm col-md-12">
+                        <option value="-">Please select...</option>
+                        
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <p style="margin-bottom:0px;">/ เดือน</p> 
+                </div>
+            </div><br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">หน่วยนับ</p> 
+                </div>
+                <div class="col-md-2">
+                    <select id="Package_Unit" class="Unit_Package form-control form-control-sm col-md-12">
+                        <option value="-">Please select...</option>
+                        <option value="สำรองคลัง">สำรองคลัง</option>
+                        <option value="ยกเลิกสำรองคลัง">ยกเลิกสำรองคลัง</option>
+                    </select>
+                </div>
+                <div class="col-md-3 offset-md-1">
+                    <p style="margin-bottom:0px;">GUARANTEE SHELF LIFE</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="Guarantee_Shelf_Life" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">เดือน</p>    
+                </div>
+            </div><br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">ราคา / หน่วย</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="Price_Per_Unit" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-2 offset-md-1">
+                    <p style="margin-bottom:0px;">VALUATION CLASS</p> 
+                </div>
+                <div class="col-md-3 offset-md-1">
+                    <div class="input-group">
+                        <input id="ValuationClass" type="text" class="form-control form-control-sm" placeholder="VALUATION CLASS">
+                        <div class="input-group-append">
+                            <button id="Btn_GetValuationClass"></button>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p style="margin-bottom:0px;">VENDOR CODE</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="Vendor_Code" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+                <div class="col-md-3 offset-md-1">
+                    <p style="margin-bottom:0px;">MANUFACTURER CODE</p> 
+                </div>
+                <div class="col-md-2">
+                    <input id="Manufacturing_Code" type="text" class="form-control form-control-sm col-md-12">
+                </div>
+            </div><br>
             
-          
-            data[0] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'FlagSubmit',       
-                Value:true,                     
-                Require:false
-            };
-            data[1] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'StatusAction',     
-                Value:'Reject',                 
-                Require:false
-            };
-          
+            <div class="row underline"><div></div></div><br>
 
-            return data;
-        }
-        function Terminate(){
-            
-            var data = [{
-                Title:null,
-                ID:null,
-                Type:null,
-                ColumnName:null,
-                value:null,
-                Require:null
-            }];
+            <div class="row">
+                <div class="col-md-2"> 
+                    <p style="margin-bottom:0px; font-weight: bold;">การจัดเก็บ</p> 
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="Keeping" value="ในร่ม">ในร่ม</label>
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="Keeping" value="กลางแจ้ง">กลางแจ้ง</label>
+                </div>
+                <div class="radio col-md-2">
+                    <label><input type="radio" style="margin-right:10px;" name="Keeping" value="ควบคุมอุณหภูมิ">ควบคุมอุณหภูมิ</label>
+                </div>
+                <div class="radio col-md-1">
+                    <label><input type="radio" style="margin-right:10px;" name="Keeping" value="อื่น ๆ">อื่น ๆ</label>
+                </div>
+                <div class="col-md-3">
+                    <input id="Keeping_Others" type="text" class="form-control form-control-sm col-md-12" placeholder="กรณีเลือกอื่นๆ โปรดระบุ">
+                </div>
+            </div><br>
 
-            data[0] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'FlagSubmit',       
-                Value:true,                     
-                Require:false
-            };
-            data[1] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,     
-                ColumnName:'StatusAction',     
-                Value:'Terminate',              
-                Require:false
-            };
-            data[2] = { 
-                Title:null,     
-                ID:null,    
-                Type:null,      
-                ColumnName:'FormStatus',       
-                Value:'Terminate',             
-                Require:true
-            };
+            <div class="row underline"><div></div></div><br>
 
-            return data;
-        }
-        function Accept(){
-            var data = [{
-                Title:null,
-                ID:null,
-                Type:null,
-                ColumnName:null,
-                value:null,
-                Require:null
-            }];
-            
-          
-            data[0] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'FlagSubmit',       
-                Value:true,                     
-                Require:false
-            };
-            data[1] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'StatusAction',     
-                Value:'Accept',                 
-                Require:false
-            };
+            <div class="row">
+                <div class="col-md-12">
+                        <p>สำรองคลัง / ยกเลิกสำรองคลังเนื่องจาก</p>
+                        <textarea id="Case_Cancel_Detail" class="form-control" style="width:100%;" rows="3"></textarea>
+                </div>
+            </div><br>
+            <div class="row">
+                <div class="col-md-12">
+                    <p>แนบไฟล์</p>
+                    <div class="table-responsive">          
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Type</th>
+                                <th>File name</th>
+                                <th style="width:150px;">Created by</th>
+                                <th style="width:150px;">Created</th>
+                                <th style="width:100px;">Remove</th>
+                            </tr>
+                            </thead>
+                            <tbody id="TableFile">
+                                <!-- <tr id="File1">
+                                    <td>1</td>
+                                    <td>SDS</td>
+                                    <td></td>
+                                    <td><button onclick="PreAttach('File1');" type="button" class="btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เพิ่มไฟล์</button></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                               -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div><br>
+                
+            <div class="row underline"><div></div></div><br>
 
+            <div class="row">
+                <div class="col-md-4" style=" border-right: 2px solid lightgray; text-align:center;">
+                    <input id="Requestor" type="text" class="form-control form-control-sm col-md-12" style="margin-bottom:0px; text-align:center;" readonly></input>
+                    <p style="margin-bottom:0px;">สร้างเอกสาร</p>
+                    <p id="RequestDate" style="margin-bottom:0px;"></p>
+                    <p style="margin-bottom:0px;">ผู้สร้างเอกสาร</p>
+
+                </div>
+                <div class="col-md-4" style=" border-right: 2px solid lightgray; text-align:center;">
+                    <input id="Approver1" type="text" class="form-control form-control-sm col-md-12" style="margin-bottom:0px; text-align:center;" readonly></input>
+                    <p id="StatusReview1" style="margin-bottom:0px;"></p>
+                    <p id="ActionDate1" style="margin-bottom:0px;"></p>
+                    <p style="margin-bottom:0px;">ผู้ตรวจสอบ (ผจผ)</p>
+                </div>
+                <div class="col-md-4" style=" border-right: 2px solid lightgray; text-align:center;">
+                    <input id="Approver2" type="text" class="form-control form-control-sm col-md-12" style="margin-bottom:0px; text-align:center;" readonly></input>
+                    <p id="StatusReview2" style="margin-bottom:0px;"></p>
+                    <p id="ActionDate2" style="margin-bottom:0px;"></p>
+                    <p style="margin-bottom:0px;">ผู้อนุมัติ (ผจส)</p>
+                </div>
+            </div><br>
+        </div>
+
+        <div class="part2-info">
+            <div id="Part2_TriggerBar" onclick="TriggerBar('Part2');" class="col-md-12" style="background-color:lightgray; cursor:pointer;">
+                <p>ส่วนที่ 2 สำหรับหน่วยงาน Materials Planning & Scheduling</p>
+            </div>
+            <div class="col-md-12" id="Part2">
+                <br>
+                <div class="row">
+                    <div class="col-md-4" style="border-right: 2px solid lightgray;">
+                        <div class="row">
+                            <div class="col-md-12" style="text-align:center;">
+                                <input id="Approver3" type="text" class="form-control form-control-sm col-md-12" style="margin-bottom:0px; text-align:center;" readonly></input>
+                                <p id="StatusReview3" style="margin-bottom:0px;"></p>
+                                <p id="ActionDate3" style="margin-bottom:0px;"></p>
+                                <p id="PositionName2" style="margin-bottom:0px;">ผู้ตรวจสอบ (ผจผ) Planning</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="border-right: 2px solid lightgray;">
+                        <div class="col-md-12" style="text-align:center;">
+                            <input id="Approver4" type="text" class="form-control form-control-sm col-md-12" style="margin-bottom:0px; text-align:center;" readonly></input>
+                            <p id="StatusReview4" style="margin-bottom:0px;"></p>
+                            <p id="ActionDate4" style="margin-bottom:0px;"></p>
+                            <p id="PositionName3" style="margin-bottom:0px;">ผู้ตรวจสอบ (ผจผ) วัสดุ</p><br>
+                            <button id="Btn_GetReviewerMaterial">เลือก</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="col-md-12" style="text-align:center;">
+                            <input id="Approver5" type="text" class="form-control form-control-sm col-md-12" style="margin-bottom:0px; text-align:center;" readonly></input>
+                            <p id="StatusReview5" style="margin-bottom:0px;"></p>
+                            <p id="ActionDate5" style="margin-bottom:0px;"></p>
+                            <p id="PositionName3" style="margin-bottom:0px;">ผู้ตรวจสอบ (ผจส) วัสดุ MM</p>
+                        </div>
+                    </div>
+                </div><br>
+
+                <div class="row underline"><div></div></div><br>
+
+                <div class="row col-md-12">
+                    <div class="col-md-2"> 
+                        <p style="margin-bottom:0px; font-weight: bold;">สำรองโดย</p> 
+                    </div>
+                    <div class="radio col-md-5">
+                        <label><input type="radio" style="margin-right:10px;" name="Reserve_Status_By2" value="Materials Planning & Improvement">Materials Planning & Improvement</label>
+                    </div>
+                    <div class="radio col-md-5">
+                        <label><input type="radio" style="margin-right:10px;" name="Reserve_Status_By2" value="สัญญาตกลงจะซื้อจะขาย">สัญญาตกลงจะซื้อจะขาย</label>
+                    </div>
+                    <div class="radio col-md-1 offset-md-2">
+                        <label><input type="radio" style="margin-right:10px;" name="Reserve_Status_By2" value="อื่นๆ">อื่นๆ</label>
+                    </div>
+                    <div class="col-md-7">
+                        <input id="Reserve_Status_By2_Others" type="text" class="form-control form-control-sm col-md-12" placeholder="กรณีเลือกอื่นๆ โปรดระบุ">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2 offset-md-2">
+                        <p style="margin-bottom:0px;">MINIMUM STOCK</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="Minimum_Stock" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">MAXIMUM STOCK</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="Maximum_Stock" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2 offset-md-2">
+                        <p style="margin-bottom:0px;">หมายเลขกำกับพัสดุ</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="No_Package2" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                    <div class="col-md-2">
+                        <p style="margin-bottom:0px;">สถานที่เก็บ</p> 
+                    </div>
+                    <div class="col-md-2">
+                        <input id="Storage_Location" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row">
+                    <div class="col-md-2 offset-md-2">
+                        <p style="margin-bottom:0px;">หมายเหตุ</p> 
+                    </div>
+                    <div class="col-md-6">
+                        <input id="Recieve_Package" type="text" class="form-control form-control-sm col-md-12">
+                    </div>
+                </div><br>
+
+                <div class="row underline"><div></div></div><br>
+
+                <div class="row">
+                    <div class="col-md-6" style="border-right: 2px solid lightgray;">
+                        <div class="col-md-12" style="text-align:center;">
+                            <input id="Approver6" type="text" class="form-control form-control-sm col-md-8 offset-md-2" style="margin-bottom:0px; text-align:center;" readonly></input>
+                            <p id="StatusReview6" style="margin-bottom:0px;"></p>
+                            <p id="ActionDate6" style="margin-bottom:0px;"></p>
+                            <p style="text-align:center;">ผู้ดำเนินการ</p><br>
+                            <button onclick="BrowsePeople('#Approver6');" type="button" class="selectpeople btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เลือก</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="col-md-12" style="text-align:center;">
+                            <input id="Approver7" type="text" class="form-control form-control-sm col-md-8 offset-md-2" style="margin-bottom:0px; text-align:center;" readonly></input>
+                            <p id="StatusReview7" style="margin-bottom:0px;"></p>
+                            <p id="ActionDate7" style="margin-bottom:0px;"></p>
+                            <p style="text-align:center;">ผู้ตรวจสอบขั้นสุดท้าย</p><br>
+                            <button onclick="BrowsePeople('#Approver7');" type="button" class="selectpeople btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เลือก</button>
+                        </div>
+                    </div>
+            </div><br>
+
+            <div class="row underline"><div></div></div><br>
+
+            <div class="col-md-12">
+                <div class="col-md-2 offset-md-2">
+                    <p style="margin-bottom:0px;">หมายเหตุ</p>
+                </div>
+                <div class="col-md-8 offset-md-2">
+                    <textarea id="Note" class="form-control" style="width:100%;" rows="3"></textarea>
+                </div>
+            </div><br>
+
+
+
+            </div>
+        </div>
       
-            return data;
+        <br>
+    
+        <div style="position:fixed; right:5%; top:20%; width:13px;">
+            <a id="CloseForm2" data-toggle="tooltip" title="Close Form" type="button" class="btn btn btn-primary btn-md" style="background-color:#ff6600; border-color:#ff6600; color:white; font-weight:bold;"><i class="fa fa-remove"></i></a>
+            <!--<a onclick="Attachfile();" data-toggle="tooltip" title="Attachfile" type="button" class="btn btn btn-primary btn-md" style="background-color:#1BA1E2; border-color:#1BA1E2; color:white; font-weight:bold;"><i class="fa fa-paperclip"></i></a>-->
+            <a onclick="SaveDraft();" id="btnSaveDraft" data-toggle="tooltip" title="Save Draft" type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(196, 193, 50); border-color:rgb(196, 193, 50);; color:white; font-weight:bold; padding-left:11.5px; padding-right:11.5px;"><i class="fa fa-floppy-o"></i></a>
+            <a id="RemoveCurrentForm" onclick="RemoveCurrentForm();" data-toggle="tooltip" title="Remove this form" type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(138, 28, 28); border-color:rgb(138, 28, 28); color:white; font-weight:bold;" ><i class="fa fa-trash-o"></i></a>
+        </div>
 
-        }
-        function Complete(){
-            var data = [{
-                Title:null,
-                ID:null,
-                Type:null,
-                ColumnName:null,
-                value:null,
-                Require:null
-            }];
-            
-          
-            data[0] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'FlagSubmit',       
-                Value:true,                     
-                Require:false
-            };
-            data[1] = { 
-                Title:null,     
-                ID:null,   
-                Type:null,      
-                ColumnName:'StatusAction',     
-                Value:'Complete',                 
-                Require:false
-            };
-  
-            return data;
-
-        }
-        ///End Action by Status///////////////////////////////////////////
-
-        /// Action to list////////////////////////////////////////////
-
-
-        function CreateItem(ListName,data){    
-         
-            var dataset = {};
-            dataset = data;
-            var clientContext = new SP.ClientContext(SiteUrl);
-            var oList = clientContext.get_web().get_lists().getByTitle(ListName);
-            var itemCreateInfo = new SP.ListItemCreationInformation();
-            this.oListItem = oList.addItem(itemCreateInfo);
-            var length = dataset.length;
-            for(i=0;i<length;i++){
-             
-                if(dataset[i].Value){
-                    
-                    oListItem.set_item(dataset[i].ColumnName,dataset[i].Value);
-                }
-
-                
-            }            
-            oListItem.update();	
-            clientContext.executeQueryAsync(
-            function(){
-                
-                if(ListName == ListData){
-                    alert('Submit Completed..');
-                    window.location.href = SummaryRequest;
-                }
-                
-            },
-            function(){
-
-                alert('Submit error..');
-            }
-
-            );
-        }
-        function UpdateItem(ListName,data){
-
-            
-            var dataset = data;
-            var ItemID;
-            var query = '?$select=ID&$filter=FormID eq \''+FormID+'\'';
-            var data = GetItemByRestAPI(ListName,query);
-            if(data){
-                ItemID = data[0].ID;
-            }
-            
-            var clientContext = new SP.ClientContext(SiteUrl);
-            var oList = clientContext.get_web().get_lists().getByTitle(ListName);
-            this.oListItem = oList.getItemById(ItemID);
-            for(i=0;i<dataset.length;i++){
+        <div id="component"></div>
+    </div>
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+        var i;
         
-                oListItem.set_item(dataset[i].ColumnName,dataset[i].Value);
-            }   
-            oListItem.update();	
-            clientContext.executeQueryAsync(function(){
-
-                if(ListName == ListData){
-                    alert('Submit Completed..');
-                    window.location.href = SummaryRequest;
-                }
-
-            }, function(){alert('Update Item failed');});
-
-
-
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight){
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            } 
+            });
         }
-        function CheckUpdateOrCreate(){
+    </script>
+    
+    
+    <script type="text/javascript">
+    
+    
+        // Declare global variable
+        var FormID = GetParameterByName('FormID');
+        var FormType = 'FormView';
+        var ListData = 'StoreData'; // listname store for current item
+        var SummaryPage = SiteUrl + '';
+        var DeptTarget = [];
+        var workflow =  {
+                name:'StoreData',
+                version:'2013'
+        };
+        var TempCurrentData = {
+            field1:{
+                ID:'Company',
+                Title:'บริษัท',
+                TypeDom:'select',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Company'
+            },
+            field2:{
+                ID:'Dept_Name',
+                Title:'หน่วยงานที่ขอ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Dept_Name'
+            },
+            field3:{
+                ID:'',
+                Title:'หน่วยงานที่ใช้งาน',
+                TypeDom:'array',
+                TypeCol:'multipleline',
+                Data:DeptTarget,
+                Col:'Dept_Target'
+            },
+            field4:{
+                ID:'Objective',
+                Title:'วัตถุประสงค์',
+                TypeDom:'radio',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Objective'
+            },
+            field5:{
+                ID:'Material_Group',
+                Title:'Material Group',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Material_Group'
+            },
+            field6:{
+                ID:'Name_Package',
+                Title:'ชื่อพัสดุ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Name_Package'
+            },
+            field7:{
+                ID:'Type_Additive',
+                Title:'ประเภทสารเติมแต่ง',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Type_Additive'
+            },
+            field8:{
+                ID:'Chem_Formula',
+                Title:'สูตรเคมี',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Chem_Formula'
+            },
+            field9:{
+                ID:'Abbr_Additive',
+                Title:'สัญลักษณ์ย่อสารเติมแต่ง',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Abbr_Additive'
+            },
+            field10:{
+                ID:'Contact_Vendor1',
+                Title:'ชื่อ และ ที่อยู่ผู้ขาย 1',
+                TypeDom:'textarea',
+                TypeCol:'multipleline',
+                Data:'',
+                Col:'Contact_Vendor1'
+            },
+            field11:{
+                ID:'Contact_Vendor2',
+                Title:'ชื่อ และ ที่อยู่ผู้ขาย 2',
+                TypeDom:'textarea',
+                TypeCol:'multipleline',
+                Data:'',
+                Col:'Contact_Vendor2'
+            },
+            field12:{
+                ID:'Trading_Name1',
+                Title:'ชื่อทางการค้า / รายละเอียด',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Trading_Name1'
+            },
+            field13:{
+                ID:'Size_Contain1',
+                Title:'ขนาดบรรจุ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Size_Contain1'
+            },
+            field14:{
+                ID:'Unit1',
+                Title:'หน่วย',
+                TypeDom:'select',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Unit1'
+            },
+            field15:{
+                ID:'Trading_Name2',
+                Title:'ชื่อทางการค้า / รายละเอียด',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Trading_Name2'
+            },
+            field16:{
+                ID:'Size_Contain2',
+                Title:'ขนาดบรรจุ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Size_Contain2'
+            },
+            field17:{
+                ID:'Unit2',
+                Title:'หน่วย',
+                TypeDom:'select',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Unit2'
+            },
+            field18:{
+                ID:'Trading_Name3',
+                Title:'ชื่อทางการค้า / รายละเอียด',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Trading_Name3'
+            },
+            field19:{
+                ID:'Size_Contain3',
+                Title:'ขนาดบรรจุ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Size_Contain3'
+            },
+            field20:{
+                ID:'Unit3',
+                Title:'หน่วย',
+                TypeDom:'select',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Unit3'
+            },
+            field21:{
+                ID:'Reserve_Accord',
+                Title:'สำรองตาม',
+                TypeDom:'radio',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Reserve_Accord'
+            },
+            field22:{
+                ID:'Reserve_Accord_Others',
+                Title:'สำรองตาม อื่นๆ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Reserve_Accord_Others'
+            },
+            field23:{
+                ID:'Period_Procure',
+                Title:'ระยะเวลาในการจัดหา',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Period_Procure'
+            },
+            field24:{
+                ID:'Num_Withdraw',
+                Title:'อัตราการเบิก',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Num_Withdraw'
+            },
+            field25:{
+                ID:'Num_Withdraw_Unit',
+                Title:'อัตราการเบิก (หน่วย)',
+                TypeDom:'select',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Num_Withdraw_Unit'
+            },
+            field26:{
+                ID:'Package_Unit',
+                Title:'หน่วยนับ',
+                TypeDom:'select',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Package_Unit'
+            },
+            field27:{
+                ID:'Guarantee_Shelf_Life',
+                Title:'Guarantee_Shelf_Life',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Guarantee_Shelf_Life'
+            },
+            field28:{
+                ID:'Price_Per_Unit',
+                Title:'ราคา / หน่วย',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Price_Per_Unit'
+            },
+            field29:{
+                ID:'ValuationClass',
+                Title:'ValuationClass',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Valuation_Class'
+            },
+            field30:{
+                ID:'Vendor_Code',
+                Title:'Vendor_Code',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Vendor_Code'
+            },
+            field31:{
+                ID:'Manufacturing_Code',
+                Title:'Manufacturing_Code',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Manufacturing_Code'
+            },
+            field32:{
+                ID:'Keeping',
+                Title:'การจัดเก็บ',
+                TypeDom:'radio',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Keeping'
+            },
+            field33:{
+                ID:'Keeping_Others',
+                Title:'การจัดเก็บ อื่นๆ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Keeping_Others'
+            },
+            field34:{
+                ID:'Case_Cancel_Detail',
+                Title:'สำรองคลัง / ยกเลิกสำรองคลังเนื่องจาก',
+                TypeDom:'textarea',
+                TypeCol:'multipleline',
+                Data:'',
+                Col:'Case_Cancel_Detail'
+            },
+            field37:{
+                ID:'Reserve_Status_By2',
+                Title:'Reserve_Status_By2',
+                TypeDom:'radio',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Reserve_Status_By2'
+            },
+            field38:{
+                ID:'Reserve_Status_By2_Others',
+                Title:'Reserve_Status_By2_Others',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Reserve_Status_By2_Others'
+            },
+            field39:{
+                ID:'Minimum_Stock',
+                Title:'Minimum_Stock',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Minimum_Stock'
+            },
+            field40:{
+                ID:'Maximum_Stock',
+                Title:'Maximum_Stock',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Maximum_Stock'
+            },
+            field41:{
+                ID:'No_Package2',
+                Title:'หมายเลขกำกับพัสดุ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'No_Package2'
+            },
+            field42:{
+                ID:'Storage_Location',
+                Title:'สถานที่เก็บ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Storage_Location'
+            },
+            field45:{
+                ID:'Note',
+                Title:'หมายเหตุ',
+                TypeDom:'textarea',
+                TypeCol:'multipleline',
+                Data:'',
+                Col:'Note'
+            },
+            field46:{
+                ID:'Recieve_Package',
+                Title:'ได้รับของ',
+                TypeDom:'text',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'Recieve_Package'
+            },
+            field47:{
+                ID:'RequestDate',
+                Title:'RequestDate',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'RequestDate'
+            },
+            field48:{
+                ID:'ActionDate1',
+                Title:'ActionDate1',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'ActionDate1'
+            },
+            field49:{
+                ID:'ActionDate2',
+                Title:'ActionDate2',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'ActionDate2'
+            },
+            field50:{
+                ID:'ActionDate3',
+                Title:'ActionDate3',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'ActionDate3'
+            },
+            field51:{
+                ID:'ActionDate4',
+                Title:'ActionDate4',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'ActionDate4'
+            },
+            field52:{
+                ID:'Requestor',
+                Title:'วิศวกร/หัวหน้างาน(หรือเทียบเท่า)ที่ขอสำรองคลัง',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Requestor'
+            },
+            field53:{
+                ID:'Approver1',
+                Title:'ผู้ตรวจสอบ(ผจผ)_ผู้ขอสำรอง',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Approver1'
+            },
+            field54:{
+                ID:'Approver2',
+                Title:'ผู้อนุมัติ(ผจส)_ผู้ขอสำรอง',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Approver2'
+            },
+            field55:{
+                ID:'Approver3',
+                Title:'ผู้ตรวจสอบ(ผจผ)_Planning',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Approver3'
+            },
+            field56:{
+                ID:'Approver4',
+                Title:'ผู้ตรวจสอบ(ผจผ)_วัสดุ',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Approver4'
+            },
+            field57:{
+                ID:'Approver5',
+                Title:'ผู้ตรวจสอบ(ผจส)_วัสดุMM',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Approver5'
+            },
+            field58:{
+                ID:'Approver6',
+                Title:'ผู้ดำเนินการ',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Approver6'
+            },
+            field59:{
+                ID:'Approver7',
+                Title:'ผุ้ตรวจสอบขั้นสุดท้าย',
+                TypeDom:'people',
+                TypeCol:'people',
+                Data:'',
+                Col:'Approver7'
+            },
+            field60:{
+                ID:'ActionDate5',
+                Title:'ActionDate5',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'ActionDate5'
+            },
+            field61:{
+                ID:'ActionDate6',
+                Title:'ActionDate6',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'ActionDate6'
+            },
+            field62:{
+                ID:'ActionDate7',
+                Title:'ActionDate7',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'ActionDate7'
+            },
+            field63:{
+                ID:'StatusReview1',
+                Title:'StatusReview1',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'StatusReview1'
+            },
+            field64:{
+                ID:'StatusReview2',
+                Title:'StatusReview2',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'StatusReview2'
+            },
+            field65:{
+                ID:'StatusReview3',
+                Title:'StatusReview3',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'StatusReview3'
+            },
+            field66:{
+                ID:'StatusReview4',
+                Title:'StatusReview4',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'StatusReview4'
+            },
+            field67:{
+                ID:'StatusReview5',
+                Title:'StatusReview5',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'StatusReview5'
+            },
+            field68:{
+                ID:'StatusReview6',
+                Title:'StatusReview6',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'StatusReview6'
+            },
+            field69:{
+                ID:'StatusReview7',
+                Title:'StatusReview7',
+                TypeDom:'label',
+                TypeCol:'singleline',
+                Data:'',
+                Col:'StatusReview7'
+            },
 
-            var query ='?$select=FormID&$top=1&$filter=FormID eq \''+FormID+'\'';
-            var data = GetItemByRestAPI(ListData,query);
-            var status = '';
+        };
+       
+        /////////////////////////////////////
+    
+        // Place For trigger from DOM 
+        $('#CloseForm , #CloseForm2').click(function(){
+            CloseForm(0,SummaryPage); 
+        });
+        
+        function RemoveCurrentForm(){
+            // Get ID Form by FormID
+            var query = '?$select=ID&$top=1&$filter=FormID eq \''+FormID+'\'';
+            var data = GetItemByRestAPI(ListData, query);
             if(data){
-                if(data.length>0){
-                    status = 'Update';
+                RemoveListItem(ListData,data[0].ID);
+            }
+            
+        }
+        
+        $( "input" ).change(function() {
+            
+                var str = $(this).val();
+                if (str.indexOf(';') > -1 || str.indexOf('[') > -1 || str.indexOf(']') > -1 || str.indexOf('|') > -1)
+                {
+                    $(this).css("background-color","red");
+                    $(this).css("color","white");
+                    alert('Don\'t input "; [ ] |" ');  
                 }
                 else{
-                    status = 'Create';
+                    $(this).css("color","black");
+                    $(this).css("background-color","white");
+                    
                 }
+    
+        });
+    
+        $('input').keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                event.preventDefault();
+                return false;
             }
-            else{
-                status = 'Create';
+        });
+        ///////////////////////////////
+        
+    
+        // Set inittial form  
+        // such as option in select , default date, default current user , default text and label
+        function SetInitialForm(){
+            
+
+            // set หน่วย in table ชื่อทางการค้า / รายละเอียด
+            var data = DataConnection(2);
+            if(data){
+                if(data.length > 0){
+                    $('.Unit_Package').empty();
+                    var str='<option value="-">Please select...</option>';
+                    for(i=0;i<data.length;i++){
+                        str+='<option value="'+data[i].Unit+'">'+data[i].Unit+'</option>';
+                    }
+                    $('.Unit_Package').append(str);    
+                }     
+            }
+            //End set หน่วย in table ชื่อทางการค้า / รายละเอียด
+
+            // Set Company
+            var data = DataConnection(4);
+            if(data){
+                if(data.length > 0){
+                    $('#Company').empty();
+                    var str='<option value="-">Please select...</option>';
+                    for(i=0;i<data.length;i++){
+                        str+='<option value="'+data[i].CompanyENG+'">'+data[i].CompanyENG+'</option>';
+                    }
+                    $('#Company').append(str);    
+                }     
+            }
+            // End Set Company
+
+
+            // Set Panel People end of section 2
+            var data = DataConnection(5);
+            if(data){
+                $('#Approver3').val(data[0].User.Title);
+                $('#Approver3').attr('title',data[0].User.Id);
+              
+            }   
+            
+            // End Set Panel People end of section 2
+            
+            // Set Attachment table data
+            Init_Attach_Table();
+
+            // Set btn get reviwer #Btn_GetReviewerMaterial
+            IncludeComponent('component','Btn_GetReviewerMaterial');
+
+            // Set btn get department #Btn_GetDeptInfo
+            IncludeComponent('component','Btn_GetDeptInfo');
+
+            // Set btn get material group
+            IncludeComponent('component','Btn_GetMaterialGroup');
+
+            // Set btn get department target
+            IncludeComponent('component','Btn_AddDeptTarget');
+
+            // Set Get Valuation Class button
+            IncludeComponent('component','Btn_GetValuationClass');
+
+        }
+    
+        // Get Data when user click view an item. this will be called by FormView();
+        // if user click new item this function will not be called
+        function GetData(){ // FormMethodTemplate
+
+            var query = '?$select=*'+
+                ',Requestor/Title,Requestor/Id'+
+                ',Approver1/Title,Approver1/Id'+
+                ',Approver2/Title,Approver2/Id'+
+                ',Approver3/Title,Approver3/Id'+
+                ',Approver4/Title,Approver4/Id'+
+                ',Approver5/Title,Approver5/Id'+
+                ',Approver6/Title,Approver6/Id'+
+                ',Approver7/Title,Approver7/Id'+
+                '&$expand=Requestor,Approver1,Approver2,Approver3,Approver4,Approver5,Approver6,Approver7'+
+                '&$top=1'+
+                '&$filter=FormID eq \''+FormID+'\'';
+
+            var data = GetItemByRestAPI(ListData,query);
+         
+            if(data){
+                if(data.length > 0){
+    
+                    data = data[0];
+                    
+                    var name = data[workflow.name];
+                    
+                    CheckStatusWorkflow(name , workflow.version);  // FormMethodTemplate
+                    
+                    for(var i in TempCurrentData){
+                    
+                            var item = TempCurrentData[i];
+                            var TempData = data[item.Col];
+                            
+                            // Get and set data in element by item data
+                            SetElementByItemData(item,TempData);   
+                    }
+                }
+                else{
+
+                    RoutingPage('PageItemNotFound.html'); // FormMethodTemplate
+                }
+                return data;
+            }
+    
+    
+        }
+    
+        // Form display when user click new form .
+        // what you do want to display or change element new form.
+        // input action to this function
+        function FormNew(){
+            // set panel status 
+            $('#DocNO').text('-');
+            $('#CreateDate , #RequestDate').text(SetDateTime()); 
+            $('#FormStatus').text('สร้างเอกสาร');
+            
+            SetFormAction(); // FormMethodTemplate
+        
+            
+            
+            // Set Panel People end of section 1
+            $('#Requestor').val(CurrentUser.Name);
+            $('#Requestor').attr('title',CurrentUser.ID);
+            // End Set Panel People end of section 1
+
+            //hide button remove right nav
+            $('#RemoveCurrentForm').hide();
+
+            // Disable part 2 exclude admin 
+            if(CurrentUser.Permission == 'Admin'){
+                $('#Permission').text('Admin'); 
+            }
+            else{ // not admin
+                $('#Permission').text('ผู้สร้างเอกสาร');
+                // Disable part 2
+                TriggerBar('Part2');
+                $('#Part2_TriggerBar').removeAttr('onclick');
+            } 
+            
+            
+           
+        }
+    
+        // Form display when user click view an item.
+        // if user click new item this function will not be called.
+        function FormView(){
+            var data = GetData();
+            Queryfile();
+            
+            if(data){
+                Form.FormStatus = data.FormStatus;
+                SetFormAction(); // FormMethodTemplate
+       
+                if(data.Dept_Target){
+                    GetDeptTarget(data.Dept_Target);
+                }
+                
+                // Set top right info
+                $('#DocNO').text(data.RunningNO);
+                $('#CreateDate').text(ConvertDate(data.Created)); 
+                $('#FormStatus').text(data.FormStatus);
+                
+                
+        
+                // Map Current view according to FormView in config.js
+                Form.FormView = FormMaster[MasterFormID].FormStep[Form.FormStatus].FormView;
+            
+                if(Form.FormView){
+                    SwitchViewTo(Form.FormView,data);
+                }
+                else{
+                    Disable_Panel('All');
+                }
+
             }
 
-            return status;
+            // Create View or switch view according to config.js
+            function SwitchViewTo(view){
+            
+                $('.selectpeople').hide();
+
+                switch(view){
+                    case 'ส่งกลับหาผู้สร้างเอกสาร':
+
+                            CurrentRole(data.Requestor.Title,'ผู้สร้างเอกสาร');
+                            TriggerBar('Part2');
+                            $('#Part2_TriggerBar').removeAttr('onclick');
+
+                            break;
+                    case 'สร้างเอกสาร':
+
+                            CurrentRole(data.Requestor.Title,'ผู้สร้างเอกสาร');
+                            TriggerBar('Part2');
+                            $('#Part2_TriggerBar').removeAttr('onclick');
+
+                            break;
+                    case 'รอตรวจสอบจากผู้จัดการแผนก':
+
+                            CurrentRole(data.Approver1.Title,'ผู้ตรวจสอบ (ผจผ)');
+                            TriggerBar('Part2');
+                            $('#Part2_TriggerBar').removeAttr('onclick');
+                            Disable_Panel('Part1');
+                            
+
+                            break;
+                    case 'รออนุมัติจากผู้จัดการส่วน':
+
+                            CurrentRole(data.Approver2.Title,'ผู้อนุมัติ (ผจส)');
+                            TriggerBar('Part2');
+                            $('#Part2_TriggerBar').removeAttr('onclick');
+                            Disable_Panel('Part1');
+
+                            break;
+                    case 'รอตรวจสอบจากผู้ตรวจสอบ_Planning':
+
+                            $('.selectpeople').show();
+                            CurrentRole(data.Approver3.Title,'ผู้ตรวจสอบ (ผจผ) Planning');
+                            Disable_Panel('Part1');
+
+
+                            break;
+                    case 'รอตรวจสอบจากผู้ตรวจสอบวัสดุ':
+
+                            CurrentRole(data.Approver4.Title,'ผู้ตรวจสอบ (ผจผ) วัสดุ');
+                            Disable_Panel('Part1');
+
+
+                            break;
+                    case 'รออนุมัติจากผู้ตรวจสอบวัสดุ_MM':
+
+                            CurrentRole(data.Approver5.Title,'ผู้ตรวจสอบ (ผจส) วัสดุ MM');
+                            Disable_Panel('Part1');
+
+
+                            break;
+                    case 'รอผู้ดำเนินการ':
+
+                            CurrentRole(data.Approver6.Title,'ผู้ดำเนินการ');
+                            Disable_Panel('Part1');
+
+                            break;
+                    case 'รออนุมัติจากผู้ตรวจสอบขั้นสุดท้าย':
+
+                            CurrentRole(data.Approver7.Title,'ผู้ตรวจสอบ');
+                            Disable_Panel('Part1');
+
+                            break;
+                    case 'ส่งกลับหาผู้ดำเนินการ':
+                            
+                            CurrentRole(data.Approver6.Title,'ผู้ดำเนินการ');
+                            Disable_Panel('Part1');
+                            
+                            break;
+                    case 'Complete':
+                            $('#btnSaveDraft').hide();
+                            $('#RemoveCurrentForm').hide();
+                            Disable_Panel('All');
+                            break;
+    
+                }
+
+            }
+            // End Create View or switch view according to config.js
+
+
+            function Disable_Panel(PartID){
+
+                    if(PartID == 'All'){
+
+                        $('#Permission').text('Visitor');
+                        $('body *').attr('readonly', true);
+                        $('body *').css('cursor', 'no-drop');
+                        $('body *').on('mousedown', function(e) {
+                                e.preventDefault();
+                                this.blur();
+                                window.focus();
+                        });
+                        $('body').removeAttr('onclick');
+                        $('#Approval').hide();
+
+                    }else{
+                        
+                        $('#'+PartID+' *').attr('readonly', true);
+                        $('#'+PartID+' *').css('cursor', 'no-drop');
+                        $('#'+PartID+' *').on('mousedown', function(e) {
+                                e.preventDefault();
+                                this.blur();
+                                window.focus();
+                        });
+                        $('#'+PartID+' *').removeAttr('onclick');
+
+                    }    
+            }
+
+            function CurrentRole(Role,TitleRole){
+
+                 
+                    if(CurrentUser.Name == Role || CurrentUser.Permission == 'Admin'){
+                        if(CurrentUser.Name == Role && CurrentUser.Permission == 'Admin'){ // admin & current role
+                            $('#Permission').text(TitleRole);
+                           
+                            
+                        }
+                        else if(CurrentUser.Name == Role && CurrentUser.Permission != 'Admin'){ // current role no admin
+                            $('#Permission').text(TitleRole);
+                            //hide button remove right nav
+                            $('#RemoveCurrentForm').hide();
+                        }
+                        else{// admin no current role
+                            $('#Permission').text('Admin');
+                             
+                            
+                        } 
+                    }else{
+                        
+                        Disable_Panel('All');
+                        //hide button remove right nav
+                        $('#RemoveCurrentForm , #btnSaveDraft').hide();
+                        
+                    }
+            }
+    
+        }
+    
+        // when user click submit action will take action in this function      
+        function SubmitAction(){ // FormMethodTemplate
+            
+            // disable submit button
+            $('#SubmitAction').prop('disabled',true);
+    
+    
+            var ActionTitle = $("#Approval_Select option:selected").text();
+            Form.StatusAction = $('#Approval_Select').val();
+            Form.FlagSubmit = true;
+            if(Form.StatusAction != 0){
+                $('#MainModal').modal('show');
+                AddLoading();
+                $('#TitleModal').text(ActionTitle);
+    
+                TriggerTempData();
+    
+                // Validate 
+                var FlagValidatePass = ValidateData(); // FormMethodTemplate
+                // enable submit button
+                $('#SubmitAction').prop('disabled',false);
+                if(FlagValidatePass == false){
+                    return;
+                }
+                
+                var StatusCreate = CheckUpdateOrCreate(ListData); // FormMethodTemplate
+                switch(StatusCreate){   // FormMethodTemplate
+                    case 'Create':
+                        
+                            
+                                CreateListItem(ListData,TempCurrentData); // FormMethodTemplate
+                           
+                                
+                            
+                            break;
+                    case 'Update':
+                            
+                                UpdateListItem(ListData,TempCurrentData); // FormMethodTemplate
+                            
+                            break;
+                }
+                
+                UpdateFlagAttachment(); // FormMethodTemplate
+                HistoryLog('add'); // FormMethodTemplate
+    
+                var delayInMilliseconds = 1500; //1 second
+                setTimeout(function() {
+                    CloseForm(1,SummaryPage); // FormMethodTemplate
+                }, delayInMilliseconds);
+            }
+            else{
+                alert('Please select any action..');
+                
+                // enable submit button
+                $('#SubmitAction').prop('disabled',false);
+            }
+    
+        }
+    
+        function TriggerTempData(){
+            for(var i in TempCurrentData){
+    
+                        var field = TempCurrentData[i];
+                    
+                            switch(field.TypeDom){
+                                case 'text':
+                                                field.Data = $('#'+field.ID).val();
+                                                break;
+                                case 'textarea':
+                                                field.Data = $('#'+field.ID).val();
+                                                break;
+                                case 'date':
+                                                var tempdata = $('#'+field.ID).val();
+
+                                                if(tempdata){
+                                                    field.Data = $('#'+field.ID).val();
+                                                }
+                                                else{
+                                                    field.Data = '';
+                                                }
+                                                
+                                            
+                                                break;
+
+                                case 'label':
+                                                field.Data = $('#'+field.ID).text();
+                                            
+                                            
+                                                break;
+                                case 'select':
+                                                
+                                                if(field.TypeCol == 'people'){  // in case select query from people 
+                                                    if($('#'+field.ID).val() != '-'){
+                                                        field.Data = {
+                                                            //ID: $('#'+field.ID).val(),
+                                                            ID: $('#'+field.ID + ' option').eq($('#'+field.ID).prop("selectedIndex")).val(),
+                                                            Title: $('#'+field.ID+' option:selected').text()
+                                                        }
+                                                    }
+                                                
+                                                }
+                                                else{ // in case select query from normal text
+                                                    field.Data = $('#'+field.ID).val();
+                                                }
+                                                break;
+                                case 'people':  
+                                            
+                                                field.Data = {
+                                                    ID: $('#'+field.ID).attr('title'),
+                                                    Title: $('#'+field.ID).val()
+                                                }
+                                                
+
+                                                break;
+                                case 'check':
+                                                if ($('#'+field.ID).is(":checked"))
+                                                {
+                                                    field.Data = true;
+                                                }
+                                                else{
+                                                    field.Data = false;
+                                                }
+                                                break;
+                                case 'var':
+                                                field.Data = field.Data;
+                                
+                                                break;
+                                case 'radio':
+                                                field.Data = $('input[name='+field.ID+']:checked').val();
+                                                if(!field.Data){
+                                                    field.Data = '';
+                                                }
+                                
+                                                break;
+                                case 'array':
+                                                    var tempdata = field.Data;
+                                                    field.Data = tempdata.toString();
+                                    
+                                                    break;
+                                case 'object':  
+                                                var index = field.ID;
+                                                var sum_str = '';
+                                                if(index == 'T41' || index == 'T42' || index == 'T43' || index == 'T44' || index == 'T45'){
+                                                    for(loop=1;loop<=10 ;loop++){
+                                                        var TempID = index + '_Col' + loop;
+                                                        var type = $("#"+TempID).attr("type");
+                                                        var TempCheck;
+                                                        switch(type){
+                                                            case 'checkbox':
+
+                                                                            if ($('#'+TempID).is(":checked"))
+                                                                            {
+                                                                                TempCheck = 'true';
+                                                                            }
+                                                                            else{
+                                                                                TempCheck = 'false';
+                                                                            }
+                                                                            
+                                                                            sum_str += '['+TempID+'|'+TempCheck+'];';
+                                                                            
+                                                                            break;
+                                                            case 'text':
+                                                                            var TempData = $('#'+TempID).val();
+                                                                            sum_str += '['+TempID+'|'+TempData+'];';
+                                                                            
+
+                                                                            break;
+
+                                                        }
+                                                        
+                                                    }
+                                                    field.Data = sum_str;
+                                                }
+                                                else{
+                                                    for(loop=1;loop<=100;loop++){
+                                                        var TempID = index + '_Col' + loop;
+                                                        var TempData = $('#'+TempID).val();
+                                                        if(!TempData){
+                                                        
+                                                        }
+                                                        else{
+                                                            sum_str += '['+TempID+'|'+TempData+'];';
+                                                        }     
+                                                    }
+                                                    
+                                                    field.Data = sum_str;
+                                                }
+                                                
+                                                break;
+                            
+                            } 
+                    }      
+    }
+    
+        function SaveDraft(){
+            
+                $('#MainModal').modal('show');
+                AddLoading();
+                $('#TitleModal').text('Save Draft');
+                TriggerTempData();
+              
+                var StatusCreate = CheckUpdateOrCreate(ListData);
+                switch(StatusCreate){   
+                    case 'Create':
+                           
+                                CreateListItem(ListData,TempCurrentData);
+                                UpdateFlagAttachment(); 
+                            break;
+                    case 'Update':
+                            
+                                UpdateListItem(ListData,TempCurrentData);
+                                UpdateFlagAttachment(); 
+                            break;
+                }
+                
+              
+                
+        }
+    
+        // additional module function //////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+
+        function TriggerBar(ID){
+
+            $("#"+ID).slideToggle("fast");
+
+        }
+   
+        function DelDept(ID,Dept){
+
+            var search_term = Dept;
+            for (var i=DeptTarget.length-1; i>=0; i--) {
+                if (DeptTarget[i] === search_term) {
+                    DeptTarget.splice(i, 1);
+                    // break;       //<-- Uncomment  if only the first term has to be removed
+                }
+            }
+            $( "#"+ID ).fadeOut( "slow", function() {
+            // After animation completed:
+                $( "#"+ID ).remove();
+            });
+       
+        }
+
+        function SetFieldVal(Val,ID){    
+            $('#'+ID).val(Val);
+            $('#MainModal').modal('hide');
+
+        }
+          
+        function PreAttach(File){
+            var str='';
+            var title = $('#'+File+' td:nth-child(2)').text();
+            var number = $('#'+File+' td:nth-child(1)').text();
+            //str+='<p>'+title+'</p><br>';
+            str+='<input type="file" class="form-control-file col-md-12" style="border-color:gray; border-width:1px; border-style:solid;" id="getFile" aria-describedby="fileHelp"><br>';
+            str+='<div class="col-md-4 offset-md-5 form-inline">';
+            str+='  <button onclick="uploadFile('+number+');" type="button" class="btn btn btn-primary btn-sm">Upload</button>';
+            str+='  <div id="FileLoading" class="lds-ring" style="visibility:hidden;"><div></div><div></div><div></div><div></div></div>';
+            str+='</div>';
+            
+            $('#MainModal').modal('show');
+            $('#TitleModal').text('แนบไฟล์ ' + title);
+            $('#ModalBody').empty();
+            $('#ModalBody').append(str);
+            $('#ModalBody').css('max-height','400px');
+            $('.modal-dialog ').css('max-width','500px');
+            $('.modal-dialog ').css('margin','1.75rem auto');
         }
         
-        /// End Action to list////////////////////////////////////////////
-            
-        // validate data //////////////////////////////////////////////////
-        function ValidateData(data){ // return obj of field invalid , return Pass
-          var AlertString = '';
-          var FlagPass = false;
-          var count = 0;
+        function Init_Attach_Table(){
+            var TypeFile = [
+                'SDS',
+                'ใบขอนำสารเคมีเข้ามาในโรงงาน',
+                'Approved Vendor List (AVL)',
+                'Specification',
+                'หนังสือ Guarantee Shelf life จากผู้ขาย',
+                'Test Method',
+                'บันทึกการประชุม',
+                'อื่น ๆ'
+            ];
 
-          for (i=0;i<data.length;i++){
-              if(data[i].Require == true){
-                    switch(data[i].Type){
-                        case 'option':  
-
-                                        if(data[i].Value == 'Please select...' || data[i].Value == 0 || data[i].Value == '0'){
-                                             AlertString += '- ' + data[i].Title + ' *<br>';
-                                             count = count+1;
-                                        }
-                                        break;
-                        case 'text':
-                                        if(data[i].Value){
-
-                                        }
-                                        else{
-                                            
-                                            AlertString += '- ' + data[i].Title + ' *<br>';
-                                            count = count+1;
-                                        }
-                                        break;
-
-                        case 'datetime':
-                                        if(data[i].Value){
-
-                                        }
-                                        else{
-                                             
-                                            AlertString += '- ' + data[i].Title + ' *<br>';
-                                            count = count+1;
-                                        }
-                                        break;
-                        case 'people':
-                             
-                                        if(data[i].Value){
-
-                                        }
-                                        else{
-                                            
-                                            AlertString += '- ' + data[i].Title + ' *<br>';
-                                            count = count+1;
-                                        }
-                                        break;
-                    }
-
-                }
-          }
-
-            if(count == 0){
-                FlagPass = true;
+            var str='';
+            for(i=0;i<TypeFile.length;i++){
+                var FileID = 'File'+(i+1);
+                str+='';
+                str+='<tr id="'+FileID+'">';
+                str+='    <td>'+(i+1)+'</td>';
+                str+='    <td>'+TypeFile[i]+'</td>';
+                str+='    <td></td>';
+                str+='    <td><button onclick="PreAttach(\''+FileID+'\');" type="button" class="btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เพิ่มไฟล์</button></td>';
+                str+='    <td></td>';
+                str+='    <td></td>';
+                str+='</tr>';
             }
-            else{
-                FlagPass = false;
-                var str='';
-                str = '<div style="color:red;">' + AlertString + '</div>';
-                $('#MainModal').modal('show');
-                $('#TitleModal').text('Please insert data to require field.');
-                $('#ModalBody').empty();
-                $('#ModalBody').append(str);
-                
-            }
-          return FlagPass;
+
+            $('#TableFile').empty();
+            $('#TableFile').append(str);
+
         }
-        // End validate data //////////////////////////////////////////////////
 
-}
+        function GetDeptTarget(Dept_Target){
 
+            var arr_dept = Dept_Target.split(',');
 
-// Module functional //////////////////////////////////////////////////////////////////////////////////////////////////////
+            for(i=0;i<arr_dept.length;i++){
+                
+                var GUID = generateUID();
+                var tag = '';
+                    tag +='<li id="'+GUID+'" class="Tag-Dept shadow">';
+                    tag +='    <p> '+arr_dept[i]+'</p>';
+                    tag +='    <a onclick="DelDept(\''+GUID+'\',\''+arr_dept[i]+'\');" data-toggle="tooltip" title="Remove department" type="button" class="btn btn btn-primary btn-md">';
+                    tag +='        <i class="fa fa-remove"></i>';
+                    tag +='    </a>';
+                    tag +='</li>';
+                    DeptTarget.push(arr_dept[i]);
+                    $("#LastTag").before(tag);
+            }  
+        }
 
-function GenNumJob(){
-    var DocNo = 'LHM-';
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    if(min<10){
-        min = '0'+min;
-
-    }
-
-    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
-    today = mm + '/' + dd + '/' + yyyy;// + '; ' + hour + ":" + min;
-
-    DocNo += yyyy;
-    //DocNo += mm;
-    //DocNo += dd;
-
-    return DocNo;
-
-}
-</script>
-
-
-
+         // End of additional module function //////////////////////////////////////////////////////////////////////////////////////////////////////
+       
+    </script>
+    
+    
