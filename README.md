@@ -185,9 +185,9 @@ Validate field data (Type support)
 
 ### Datetime
 
-1)  SetDateTime();
-    generate current date only to sharepoint format mm/dd/yy
-    Return string
+1)  SetDateTime();<br/>>
+    generate current date only to sharepoint format mm/dd/yy<br/>>
+    Return string<br/>>
 
 2)  SetTime(time);
     Convert time to sharepoint date and time format mm/dd/yy; hour:min
