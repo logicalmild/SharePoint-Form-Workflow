@@ -52,11 +52,11 @@ Form &amp; Workflow
         ├───img
         └───js
 ```
-##Start
+## Start
 Start project with insert file install InstallSiteStruct.aspx and run in browser under current site
 1) Open page in url SiteUrl/Sitepages/web/Installer/Installer.aspx
 
-##Settings
+## Settings
 First Setting in ./js/config.js
 1) SiteUrl (Root) or Current site in SharePoint
 2) Display name & internal name of List , Library
@@ -155,9 +155,9 @@ Validate field data (Type support)
 - people
 - select
 
-##Function 
+## Function 
 
-###Data
+### Data
 
 1) GetItemByRestAPI(Listname,Query);
     retrieve list data from current site (sync).
@@ -183,7 +183,7 @@ Validate field data (Type support)
     Get data by data connection be create in config.js
     Return json object data.
 
-###Datetime
+### Datetime
 
 1)  SetDateTime();
     generate current date only to sharepoint format mm/dd/yy
@@ -211,7 +211,7 @@ Validate field data (Type support)
 
 
 
-###Interface
+### Interface
 
 1) AddLoading();
    open modal and show loading.
