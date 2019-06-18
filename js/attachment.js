@@ -1,5 +1,8 @@
 'use strict';
 
+
+
+
 jQuery(document).ready(function () {
 
     // Check for FileReader API (HTML5) support.
@@ -40,7 +43,9 @@ function Removefile(ItemID){
                 "X-HTTP-Method": "DELETE",  
             },  
             success: function(data) {  
-                Queryfile() 
+                Init_Attach_Table();
+                Queryfile();
+               
 
             },  
             error: function(data) {  
@@ -53,23 +58,24 @@ function Removefile(ItemID){
 
 function Queryfile(){
 
-    var query = '?$select=*,Author/Title&$expand=Author&$top=100&$filter=FormID eq \''+FormID+'\'';
+    
+    var query = '?$select=*,Author/Title&$expand=Author&$top=100&$filter=FormID eq \''+FormID+'\'&$orderby=Number asc';
     var data = GetItemByRestAPI(Attachment,query);
-    var Result = '';
     if(data){
         for(i=0;i<data.length;i++){
-            Result+='<tr style="border-style:solid; border-width:1px; border-color:lightgray;">  ';
-            Result+='    <td style="text-align:left;" colspan="1">'+(i+1)+'</td>  ';
-            Result+='    <td style="text-align:left;" colspan="1">'+data[i].Title+'</td>  ';
-            Result+='    <td style="text-align:left;" colspan="1">'+ConvertDate(data[i].Created)+'</td>  ';
-            Result+='    <td style="text-align:left;" colspan="1">'+data[i].Author.Title+'</td>';
-            Result+='    <td style="text-align:left;" colspan="1"><a type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(138, 28, 28); border-color:rgb(138, 28, 28); color:white; font-weight:bold;"><i class="fa fa-remove"></i></a></td>';
-            Result+='</tr>';
+            var Result = '';
+            Result += '<td>'+data[i].Number+'</td>';
+            Result += '<td>'+$('#File'+(data[i].Number)+' td:nth-child(2)').text()+'</td>';
+            Result += '<td><a target="_blank" href="'+SiteUrl+'/Attachment/'+data[i].Title+'">'+data[i].Title+'</a></td>';
+            Result += '<td>'+data[i].Author.Title+'</td>';
+            Result += '<td>'+ConvertDateTime(data[i].Created)+'</td>';
+            Result += '<td><a onclick="Removefile(\''+data[i].ID+'\');" data-toggle="tooltip" title="Remove department" type="button" class="btn btn btn-primary btn-md btn-remove-file"><i class="fa fa-remove" style="color:white;"></i></a></td>';
+            $('#File'+data[i].Number).empty();
+            $('#File'+data[i].Number).append(Result);
         }
         
     }
-    $('#ResultFile').empty();
-    $('#ResultFile').append(Result);
+
 }
 
 function UpdateFlagAttachment(){
@@ -111,12 +117,15 @@ function UpdateFlagAttachment(){
 
 // Upload the file.
 // You can upload files up to 2 GB with the REST API.
-function uploadFile() {
-    $('#attachloading').show();
+function uploadFile(number) {
+    //$('#attachloading').show();
+    try{
+
+    $('#FileLoading').css('visibility','visible');
     var FlagDup =  CheckFileExist();
     if(FlagDup == true){
         alert('File is already exist. Please select other file or change filename.');
-        $('#attachloading').hide();
+        $('#FileLoading').css('visibility','hidden');
         return false;
     }
     // Define the folder path for this example.
@@ -146,7 +155,9 @@ function uploadFile() {
                 changeItem.done(function (data, status, xhr) {
                     //alert('file upload successful');
                     Queryfile();
-                    $('#attachloading').hide();
+                    //$('#attachloading').hide();
+                    $('#FileLoading').css('visibility','visible');
+                    $('#MainModal').modal('hide');
                 });
                 changeItem.fail(onError);
             });
@@ -168,6 +179,11 @@ function uploadFile() {
         }
         reader.readAsArrayBuffer(fileInput[0].files[0]);
         return deferred.promise();
+
+    
+ 
+
+
     }
 
     // Add the file to the file collection in the Shared Documents folder.
@@ -223,8 +239,8 @@ function uploadFile() {
         /*var body = String.format("{{'__metadata':{{'type':'{0}'}},'FileLeafRef':'{1}','Title':'{2}'}}",
             itemMetadata.type, newName, newName);
         */
-        var body = String.format("{{'__metadata':{{'type':'{0}'}},'FileLeafRef':'{1}','Title':'{2}','FormID':'{3}','ActiveStatus':'{4}'}}",
-        itemMetadata.type, newName, newName,FormID,true);
+        var body = String.format("{{'__metadata':{{'type':'{0}'}},'FileLeafRef':'{1}','Title':'{2}','FormID':'{3}','ActiveStatus':'{4}','Number':'{5}'}}",
+        itemMetadata.type, newName, newName,FormID,false,number);
 
 
 
@@ -243,6 +259,13 @@ function uploadFile() {
                 "X-HTTP-Method": "MERGE"
             }
         });
+    }
+
+
+    }
+    catch(err){
+        alert('Please select file...');
+        $('#FileLoading').css('visibility','hidden');
     }
 }
 

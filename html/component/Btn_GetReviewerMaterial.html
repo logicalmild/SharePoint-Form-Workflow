@@ -1,0 +1,98 @@
+<style>
+#Btn_GetReviewerMaterial{
+    background-color:white; 
+    border-color:gray; 
+    color:gray;
+}
+</style>
+
+<script>
+    
+    // Set Propoties button 
+    //<button id="Btn_GetReviewerMaterial" onclick="GetReviewer('Reviewer3');" type="button" class="btn btn btn-primary btn-sm" >เลือก</button>
+    var Btn_ID = '#Btn_GetReviewerMaterial';
+    var DomID = 'Approver4';
+    var Text_btn = 'เลือก';
+    var fn = 'GetReviewer';
+    var click = fn+'(\''+DomID+'\');';
+      
+    var approver_temp;
+    
+
+    
+    $(Btn_ID).attr('type','button');
+    $(Btn_ID).attr('class','btn btn btn-primary btn-sm selectpeople');
+    $(Btn_ID).text(Text_btn);
+    $(Btn_ID).attr('onclick',click);
+    // End Propoties button /////////////////////////////////////////////////////////////////////
+    
+
+    function GetReviewer(ID){
+        $('#MainModal').modal('show');
+        $('#TitleModal').text('Select reviewer');
+        $('#ModalBody').empty();
+        var data = DataConnection(6);
+        if(data){
+            approver_temp = data;
+            var str='';
+            str+='';
+
+            str+='<style="width:100%;">  ';   
+            str+='<div class="table-responsive">  ';        
+            str+='    <table class="table">';
+            str+='        <thead>';
+            str+='         <tr>';
+            str+='            <th>Reviewer</th>';
+            str+='            <th>Manager</th>';
+            str+='            <th>เลือก</th>';
+            str+='       </tr>';
+            str+='        </thead>';
+            str+='        <tbody>';
+
+                for(i=0;i<data.length;i++){
+                    var User = '-';
+                    var Manager = '-';
+
+
+                    if(data[i].User){
+                        User = data[i].User;
+                    }
+                    if(data[i].Manager){
+                        Manager = data[i].Manager;
+                    }
+
+                    str+='<tr>';
+                    str+='   <td>'+User.Title+'</td>';
+                    str+='   <td>'+Manager.Title+'</td>';
+                    str+='   <td><button onclick="SetFieldApprover4_5(\''+i+'\');" type="button" class="btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เลือก</button></td>';
+                    str+='</tr>';
+                }
+            str+='        </tbody>';
+            str+='    </table>';
+            str+='</div>';
+            str+='</div>';
+            $('#ModalBody').append(str);
+
+        } else{
+            $('#ModalBody').appned('No Data..');
+        }
+    }
+
+
+    function SetFieldPeopleVal(UserID,UserTitle,DomID){
+        $('#'+DomID).val(UserTitle);
+        $('#'+DomID).attr('title',UserID);
+        $('#MainModal').modal('hide');
+    }
+
+    function SetFieldApprover4_5(index){
+
+        $('#Approver4').val(approver_temp[index].User.Title);
+        $('#Approver4').attr('title',approver_temp[index].User.Id);
+        
+        $('#Approver5').val(approver_temp[index].Manager.Title);
+        $('#Approver5').attr('title',approver_temp[index].Manager.Id);
+
+        $('#MainModal').modal('hide');
+    }
+</script>

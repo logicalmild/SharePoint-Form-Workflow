@@ -26,8 +26,17 @@ var MasterFormID = GetParameterByName('FormMaster'); // Select form and set valu
 
 
 $(document).ready(function(){
+    
     //$('#s4-ribbonrow').hide();
     //$('#suiteBarDelta').hide();
+    GetCurrentUser();
+    GetCurrentGroupsUser();
+    
+
+});
+
+
+function StateForm(){
     if(!MasterFormID){
         RoutingPage('PageNotFound.html');
     }
@@ -67,8 +76,7 @@ $(document).ready(function(){
         dialogsFade: true,
         
     });
-});
-
+}
 
 function MainForm(){
     try{
@@ -81,13 +89,15 @@ function MainForm(){
  
     Form.FormStatus = GetParameterByName('FormStatus');
     if(!Form.FormStatus.length){
-            Form.FormStatus = 'Create';
+            Form.FormStatus = 'สร้างเอกสาร';
     }
     GetMasterForm();
     GenerateTemplate();
     
-    GetCurrentUser();
+    
+    
     GenerateForm();
+  
     
 }
 /////////////////////////////////////////////////////////////////////
@@ -258,6 +268,35 @@ function GetItemByRestAPI(Listname,Query){
     return extr_Data;
 }
 
+function GetItemFromOtherSite(Site,Listname,Query){
+
+    var requestUri = Site + "/_api/web/lists/getByTitle('"+Listname+"')/items" + Query;
+    var requestHeaders = {
+    "accept": "application/json;odata=verbose"
+    }
+    var extr_Data;
+
+    $.ajax({
+        url: requestUri,
+        type: 'GET',
+        dataType: 'json',
+        async: false,
+        headers: requestHeaders,
+        success: function (data) 
+        {      
+            data = data.d.results; 
+            extr_Data = data;
+            
+        },
+        error: function ajaxError(response) {
+            console.log(response.status + ' ' + response.statusText);
+        }
+    });
+
+    return extr_Data;
+
+}
+
 function GetParameterByName(name) { 
     
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -280,9 +319,7 @@ function GetCurrentUser(){
 
          userid = _spPageContextInfo.userId;
     }
-    
 
-        
         var requestUri = _spPageContextInfo.webAbsoluteUrl + "/_api/web/getuserbyid(" + userid + ")";
         var requestHeaders = { "accept" : "application/json;odata=verbose" };
         $.ajax({
@@ -299,7 +336,7 @@ function GetCurrentUser(){
             CurrentUser.ID = data.Id;
             CurrentUser.Name = data.Title;
             CurrentUser.Email = data.Email;
-            //alert(loginName);
+            
             
         }
 
@@ -307,11 +344,49 @@ function GetCurrentUser(){
             alert("error");
         }
 
-    
+        
+
+       
 
     
 
 }
+
+function GetCurrentGroupsUser(){ 			
+	var clientContext = new SP.ClientContext.get_current();
+    var oWeb = clientContext.get_web();
+	currentUser = oWeb.get_currentUser();
+	allGroups = currentUser.get_groups();
+    clientContext.load(allGroups);
+	clientContext.executeQueryAsync(function(){
+
+        var grpsEnumerator = allGroups.getEnumerator();
+        while(grpsEnumerator.moveNext())
+        {
+            var group = grpsEnumerator.get_current();
+            var grpId = group.get_id();
+            var grpTitle = group.get_title();
+            CurrentUser.GroupTitle.push(grpTitle);
+            CurrentUser.GroupID.push(grpId);
+        }		 
+        
+        // Set CurrentUser Permission to admin if groupid contain group admin
+        var GroupID = CurrentUser.GroupID;
+        var GroupTitle = CurrentUser.GroupTitle;
+        var num = GroupID.indexOf(GroupAdminID); 
+        if(num > -1){
+            CurrentUser.Permission = 'Admin';
+        }else{
+            CurrentUser.Permission = 'Visitor';
+        }
+
+
+        StateForm();
+        
+
+    }, function(){console.log('Get CurrentGroupUser Failed');});
+}
+
 
 function generateUID() {
 	// I generate the UID from two parts here 
@@ -509,6 +584,28 @@ function ConvertDate(DateTime){
     return today;
 }
 
+function ConvertDateTime(DateTime){
+    
+    var today = new Date(DateTime);
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    var hour = today.getHours();
+    var min = today.getMinutes();
+    var sec = today.getSeconds();
+
+    if(dd<10) {
+        dd = '0'+dd;
+    } 
+
+    if(mm<10) {
+        mm = '0'+mm;
+    } 
+    today = dd + '/' + mm + '/' + yyyy + '; ' + hour + ":" + min;
+
+    return today;
+}
+
 function HistoryLog(Status){
 
     if(Status == 'add'){
@@ -523,11 +620,12 @@ function HistoryLog(Status){
             comment = '-';
         }
 
-            data[0] = { ColumnName:'Action',        Value:$('#Approval_Select option:selected').text()};
-            data[1] = { ColumnName:'Action_by',     Value:CurrentUser.Name};
-            data[2] = { ColumnName:'DateTime',      Value:GetCurrentTime()};
-            data[3] = { ColumnName:'Comment',       Value:comment};
-            data[4] = { ColumnName:'FormID',        Value:FormID};
+            data[0] = { ColumnName:'Role',          Value:$('#Permission').text()};
+            data[1] = { ColumnName:'Action',        Value:$('#Approval_Select option:selected').text()};
+            data[2] = { ColumnName:'Action_by',     Value:CurrentUser.Name};
+            data[3] = { ColumnName:'DateTime',      Value:GetCurrentTime()};
+            data[4] = { ColumnName:'Comment',       Value:comment};
+            data[5] = { ColumnName:'FormID',        Value:FormID};
             
             var clientContext = new SP.ClientContext(SiteUrl);
             var oList = clientContext.get_web().get_lists().getByTitle(Disp_HistoryLog);
@@ -551,13 +649,14 @@ function HistoryLog(Status){
             });
     }
     else if('get'){
-        var query = '?$select=Action,Action_by,DateTime,Comment,FormID&$top=100&$filter=FormID eq \''+FormID+'\'&$orderby=Created asc';
+        var query = '?$select=Action,Action_by,DateTime,Comment,FormID,Role&$top=100&$filter=FormID eq \''+FormID+'\'&$orderby=Created asc';
         var data = GetItemByRestAPI(Disp_HistoryLog,query);
         if(data){
             $('#HistoryRow').empty();
             var str='';
             for(i=0;i<data.length;i++){
                 str+='<tr style="border-style:solid; border-width:1px; border-color:lightgray;">';
+                str+='  <td style="text-align:left;" colspan="1">'+data[i].Role+'</td>';
                 str+='  <td style="text-align:left;" colspan="1">'+data[i].Action+'</td>';
                 str+='  <td style="text-align:left;" colspan="1">'+data[i].Action_by+'</td>';
                 str+='  <td style="text-align:left;" colspan="1">'+data[i].DateTime+'</td>';
@@ -680,7 +779,7 @@ function GenDocNo(Type){ // DocNO,Year
     switch(Type){
         case 'DocNo': 
                         length = length + 1;
-                        value = 'ROTO-' + yyyy+'/'+length;
+                        value = 'ST-' + yyyy+'/'+length;
                         break;
 
         case 'Year':    value = yyyy;
@@ -816,6 +915,16 @@ function ValidateData(){ // return Pass
                                     }
                                     
                                     break;
+                            // case 'radio':
+
+                            //         if($('#'+FieldValidate.ID).is(':checked')) { 
+                            //             // checked an item
+                            //         }else{
+                            //             texterror += FieldValidate.Title + '<br>';
+                            //             FlagPass = false;
+                            //         }
+                                    
+                            //         break;
                             case 'date':
                                     var data = $('#'+FieldValidate.ID).val();
                                     if(!data){
@@ -832,7 +941,7 @@ function ValidateData(){ // return Pass
                                     break;
                             case 'select':
                                     var data = $('#'+FieldValidate.ID).val();
-                                    if(data == '-'){
+                                    if(data == '-' || data == 'Please select...'){
                                         texterror += FieldValidate.Title + '<br>';
                                         FlagPass = false;
                                     }
@@ -937,7 +1046,7 @@ function Attachfile(){
 }
 
 function CreateListItem(ListName,Object){
-                
+    debugger;   
     var dataset = {};
     dataset = Object;
     var clientContext = new SP.ClientContext(SiteUrl);
@@ -995,8 +1104,8 @@ function UpdateListItem(ListName,Object){
     });
 
 }
-function DeleteListItem(ListName,ItemID){
-    //
+function RemoveListItem(ListName,ItemID){
+
     var status = false;
     var flag = confirm('Do you want to delete this item ?');
     if(flag == true){
@@ -1005,8 +1114,9 @@ function DeleteListItem(ListName,ItemID){
             this.oListItem = oList.getItemById(ItemID);
             oListItem.deleteObject();
             clientContext.executeQueryAsync(function(){
-                console.log('Remove complete');
+               alert('Remove complete');
                 status = true;
+                window.location.href = SiteUrl;
             
                
             },function(){
@@ -1022,7 +1132,6 @@ function DeleteListItem(ListName,ItemID){
 function SetFormAction(){
     var index = GetParameterByName('FormMaster');
     for(var i in FormMaster[index]){
-       
         switch(i){
             case 'FormStep':
                             var item = FormMaster[index][i];
@@ -1055,12 +1164,12 @@ function SetPropertiesForm(oListItem,Status){
         case 'Create':
                         var index = GetParameterByName('FormMaster');
                         var LinkForm = SiteUrl + '/SitePages/'+FormMaster[index].FormName+'.aspx?FormMaster='+ index +'&FormID=' + FormID;
-                        var TagLink = '<a href="'+LinkForm+'">View</a>';
+                        var TagLink = '<a target="_blank" href="'+LinkForm+'">View</a>';
 
                         oListItem.set_item('View',TagLink);
                         oListItem.set_item('FormID',FormID);
-                        //oListItem.set_item('RunningNO',GenDocNo('DocNo'));
-                        //oListItem.set_item('Year',GenDocNo('Year'));
+                        oListItem.set_item('RunningNO',GenDocNo('DocNo'));
+                        oListItem.set_item('Year',GenDocNo('Year'));
                         
                         
                         break;
@@ -1267,4 +1376,34 @@ function IncludeComponent(ElementID,Component){
         });
   
     $('#'+ElementID).append(response);
+}
+function DataConnection(ConnectionID){
+    var SiteUrl = Connection_Obj[ConnectionID].SiteUrl;
+    var ListName = Connection_Obj[ConnectionID].ListName;
+    var Query = Connection_Obj[ConnectionID].Query;
+
+    var requestUri = SiteUrl + "/_api/web/lists/getByTitle('"+ListName+"')/items" + Query;
+    var requestHeaders = {
+    "accept": "application/json;odata=verbose"
+    }
+    var extr_Data;
+
+    $.ajax({
+        url: requestUri,
+        type: 'GET',
+        dataType: 'json',
+        async: false,
+        headers: requestHeaders,
+        success: function (data) 
+        {      
+            data = data.d.results; 
+            extr_Data = data;
+            
+        },
+        error: function ajaxError(response) {
+            console.log(response.status + ' ' + response.statusText);
+        }
+    });
+
+    return extr_Data;
 }

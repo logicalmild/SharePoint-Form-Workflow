@@ -1,0 +1,115 @@
+<style>
+        #Btn_AddDeptTarget{
+            background-color:white; 
+            border-color:gray; 
+            color:gray;
+        }
+</style>
+        
+<script>
+    
+    // Set btn get department dept infomation
+    // <button onclick="GetDepartmentTarget();" type="button" class="btn btn btn-primary btn-sm col-md-1 offset-md-5 offset-sm-10 col-sm-2" style="background-color:white; border-color:gray; color:gray;">เพิ่ม</button>
+    var Btn_ID = '#Btn_AddDeptTarget';
+    var DomID = '';
+    var Text_btn = 'เพิ่ม';
+    var fn = 'GetDepartmentTarget';
+    var click = fn+'(\''+DomID+'\');';
+    
+    
+    $(Btn_ID).attr('type','button');
+    $(Btn_ID).attr('class','btn btn btn-primary btn-sm');
+    $(Btn_ID).text(Text_btn);
+    $(Btn_ID).attr('onclick',click);
+    // End Propoties button /////////////////////////////////////////////////////////////////////
+    
+    
+    function GetDepartmentTarget(){
+        
+        $('#MainModal').modal('show');
+        $('#TitleModal').text('เลือกแผนก');
+        $('#ModalBody').empty();
+        var data = DataConnection(0);
+        if(data){
+
+            var str='';
+            str+='';
+
+            str+='<style="width:100%;">  ';   
+            str+='<div class="table-responsive">  ';        
+            str+='    <table class="table">';
+            str+='        <thead>';
+            str+='         <tr>';
+            str+='            <th>หน่วยงาน</th>';
+            str+='            <th>ผู้จัดการแผนก</th>';
+            str+='            <th>ผู้จัดการส่วน</th>';
+            str+='            <th>ผู้จัดการฝ่าย</th>';
+            str+='            <th>กรรมการผู้จัดการ</th>';
+            str+='            <th>รหัสหน่วยงาน</th>';
+            str+='            <th>เลือก</th>';
+            str+='       </tr>';
+            str+='        </thead>';
+            str+='        <tbody id="Content_Department">';
+
+                for(i=0;i<data.length;i++){
+                    var Dept_Name = '-';
+                    var Dept_Mgr = '-';
+                    var Section_Mgr = '-';
+                    var Division_Mgr = '-';
+                    var Committee_Mgr = '-';
+                    var Dept_Code = '-';
+
+                    if(data[i].Dept_Name){Dept_Name = data[i].Dept_Name}
+                    if(data[i].Dept_Mgr.Title){Dept_Mgr = data[i].Dept_Mgr.Title}
+                    if(data[i].Section_Mgr.Title){Section_Mgr = data[i].Section_Mgr.Title}
+                    if(data[i].Division_Mgr.Title){Division_Mgr = data[i].Division_Mgr.Title}
+                    if(data[i].Committee_Mgr.Title){Committee_Mgr = data[i].Committee_Mgr.Title}
+                    if(data[i].Dept_Code){Dept_Code = data[i].Dept_Code}
+
+
+                    str+='<tr>';
+                    str+='   <td>'+Dept_Name+'</td>';
+                    str+='   <td>'+Dept_Mgr+'</td>';
+                    str+='   <td>'+Section_Mgr+'</td>';
+                    str+='   <td>'+Division_Mgr+'</td>';
+                    str+='   <td>'+Committee_Mgr+'</td>';
+                    str+='   <td>'+Dept_Code+'</td>';
+                    str+='   <td><button onclick="AddDeptToPanel(\''+Dept_Name+'\');" type="button" class="btn btn btn-primary btn-sm" style="background-color:white; border-color:gray; color:gray;">เพิ่ม</button></td>';
+                    str+='</tr>';
+                }
+            str+='        </tbody>';
+            str+='    </table>';
+            str+='</div>';
+            str+='</div>';
+            $('#ModalBody').append(str);
+            $('#ModalBody').css('overflow','auto');
+            $('#ModalBody').css('max-height','400px');
+            $('.modal-dialog ').css('max-width','1100px');
+            $('.modal-dialog ').css('margin','1.75rem auto');
+        
+        } else{
+            $('#ModalBody').appned('No Data..');
+        }
+
+    }
+    
+    function AddDeptToPanel(Dept){
+
+        var GUID = generateUID();
+        var tag = '';
+            tag +='';
+            tag +='<li id="'+GUID+'" class="Tag-Dept shadow">';
+            tag +='    <p> '+Dept+'</p>';
+            tag +='    <a onclick="DelDept(\''+GUID+'\',\''+Dept+'\');" data-toggle="tooltip" title="Remove department" type="button" class="btn btn btn-primary btn-md">';
+            tag +='        <i class="fa fa-remove"></i>';
+            tag +='    </a>';
+            tag +='</li>';
+            DeptTarget.push(Dept);
+            $("#LastTag").before(tag);
+            
+          
+    }
+
+   
+
+</script>
