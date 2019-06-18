@@ -22,8 +22,12 @@ var Form = {
     FlagSubmit:false
 }
 var MasterFormID = GetParameterByName('FormMaster'); // Select form and set value in config.js
-
-
+var FormID = GetParameterByName('FormID');
+var FormType = 'FormView';
+// Map FieldData & workflow according to FieldData & workflow in config.js
+var workflow =  FormMaster[MasterFormID].Workflow;
+var TempCurrentData = FormMaster[MasterFormID].FieldData;
+var ListData = FormMaster[MasterFormID].Listname;
 
 $(document).ready(function(){
     
@@ -1212,7 +1216,7 @@ function RoutingPage(Page){
     $('#PageBody').empty();
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/html/"+Page,   
+            url: SiteUrl + "/SitePages/web/component/"+Page,   
             async: false,
             success : function(text)
             {
@@ -1406,4 +1410,233 @@ function DataConnection(ConnectionID){
     });
 
     return extr_Data;
+}
+
+// when user click submit action will take action in this function      
+function SubmitAction(){ // FormMethodTemplate
+        
+    // disable submit button
+    $('#SubmitAction').prop('disabled',true);
+
+
+    var ActionTitle = $("#Approval_Select option:selected").text();
+    Form.StatusAction = $('#Approval_Select').val();
+    Form.FlagSubmit = true;
+    if(Form.StatusAction != 0){
+        $('#MainModal').modal('show');
+        AddLoading();
+        $('#TitleModal').text(ActionTitle);
+
+        TriggerTempData();
+
+        // Validate 
+        var FlagValidatePass = ValidateData(); // FormMethodTemplate
+        // enable submit button
+        $('#SubmitAction').prop('disabled',false);
+        if(FlagValidatePass == false){
+            return;
+        }
+        
+        var StatusCreate = CheckUpdateOrCreate(ListData); // FormMethodTemplate
+        switch(StatusCreate){   // FormMethodTemplate
+            case 'Create':
+                
+                    
+                        CreateListItem(ListData,TempCurrentData); // FormMethodTemplate
+                    
+                        
+                    
+                    break;
+            case 'Update':
+                    
+                        UpdateListItem(ListData,TempCurrentData); // FormMethodTemplate
+                    
+                    break;
+        }
+        
+        UpdateFlagAttachment(); // FormMethodTemplate
+        HistoryLog('add'); // FormMethodTemplate
+
+        var delayInMilliseconds = 1500; //1 second
+        setTimeout(function() {
+            CloseForm(1,SummaryPage); // FormMethodTemplate
+        }, delayInMilliseconds);
+    }
+    else{
+        alert('Please select any action..');
+        
+        // enable submit button
+        $('#SubmitAction').prop('disabled',false);
+    }
+
+}
+
+function TriggerTempData(){
+    for(var i in TempCurrentData){
+
+                var field = TempCurrentData[i];
+            
+                    switch(field.TypeDom){
+                        case 'text':
+                                        field.Data = $('#'+field.ID).val();
+                                        break;
+                        case 'textarea':
+                                        field.Data = $('#'+field.ID).val();
+                                        break;
+                        case 'date':
+                                        var tempdata = $('#'+field.ID).val();
+
+                                        if(tempdata){
+                                            field.Data = $('#'+field.ID).val();
+                                        }
+                                        else{
+                                            field.Data = '';
+                                        }
+                                        
+                                    
+                                        break;
+
+                        case 'label':
+                                        field.Data = $('#'+field.ID).text();
+                                    
+                                    
+                                        break;
+                        case 'select':
+                                        
+                                        if(field.TypeCol == 'people'){  // in case select query from people 
+                                            if($('#'+field.ID).val() != '-'){
+                                                field.Data = {
+                                                    //ID: $('#'+field.ID).val(),
+                                                    ID: $('#'+field.ID + ' option').eq($('#'+field.ID).prop("selectedIndex")).val(),
+                                                    Title: $('#'+field.ID+' option:selected').text()
+                                                }
+                                            }
+                                        
+                                        }
+                                        else{ // in case select query from normal text
+                                            field.Data = $('#'+field.ID).val();
+                                        }
+                                        break;
+                        case 'people':  
+                                    
+                                        field.Data = {
+                                            ID: $('#'+field.ID).attr('title'),
+                                            Title: $('#'+field.ID).val()
+                                        }
+                                        
+
+                                        break;
+                        case 'check':
+                                        if ($('#'+field.ID).is(":checked"))
+                                        {
+                                            field.Data = true;
+                                        }
+                                        else{
+                                            field.Data = false;
+                                        }
+                                        break;
+                        case 'var':
+                                        field.Data = field.Data;
+                        
+                                        break;
+                        case 'radio':
+                                        field.Data = $('input[name='+field.ID+']:checked').val();
+                                        if(!field.Data){
+                                            field.Data = '';
+                                        }
+                        
+                                        break;
+                        case 'array':
+                                            var tempdata = field.Data;
+                                            field.Data = tempdata.toString();
+                            
+                                            break;
+                        case 'object':  
+                                        var index = field.ID;
+                                        var sum_str = '';
+                                        if(index == 'T41' || index == 'T42' || index == 'T43' || index == 'T44' || index == 'T45'){
+                                            for(loop=1;loop<=10 ;loop++){
+                                                var TempID = index + '_Col' + loop;
+                                                var type = $("#"+TempID).attr("type");
+                                                var TempCheck;
+                                                switch(type){
+                                                    case 'checkbox':
+
+                                                                    if ($('#'+TempID).is(":checked"))
+                                                                    {
+                                                                        TempCheck = 'true';
+                                                                    }
+                                                                    else{
+                                                                        TempCheck = 'false';
+                                                                    }
+                                                                    
+                                                                    sum_str += '['+TempID+'|'+TempCheck+'];';
+                                                                    
+                                                                    break;
+                                                    case 'text':
+                                                                    var TempData = $('#'+TempID).val();
+                                                                    sum_str += '['+TempID+'|'+TempData+'];';
+                                                                    
+
+                                                                    break;
+
+                                                }
+                                                
+                                            }
+                                            field.Data = sum_str;
+                                        }
+                                        else{
+                                            for(loop=1;loop<=100;loop++){
+                                                var TempID = index + '_Col' + loop;
+                                                var TempData = $('#'+TempID).val();
+                                                if(!TempData){
+                                                
+                                                }
+                                                else{
+                                                    sum_str += '['+TempID+'|'+TempData+'];';
+                                                }     
+                                            }
+                                            
+                                            field.Data = sum_str;
+                                        }
+                                        
+                                        break;
+                    
+                    } 
+            }      
+}
+
+function SaveDraft(){
+    
+        $('#MainModal').modal('show');
+        AddLoading();
+        $('#TitleModal').text('Save Draft');
+        TriggerTempData();
+        
+        var StatusCreate = CheckUpdateOrCreate(ListData);
+        switch(StatusCreate){   
+            case 'Create':
+                    
+                        CreateListItem(ListData,TempCurrentData);
+                        UpdateFlagAttachment(); 
+                    break;
+            case 'Update':
+                    
+                        UpdateListItem(ListData,TempCurrentData);
+                        UpdateFlagAttachment(); 
+                    break;
+        }
+        
+        
+        
+}
+
+function RemoveCurrentForm(){
+    // Get ID Form by FormID
+    var query = '?$select=ID&$top=1&$filter=FormID eq \''+FormID+'\'';
+    var data = GetItemByRestAPI(ListData, query);
+    if(data){
+        RemoveListItem(ListData,data[0].ID);
+    }
+    
 }
