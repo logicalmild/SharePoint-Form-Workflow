@@ -166,7 +166,7 @@ function GenerateForm(){
     $('title').text(Form.FormName);
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/form/"+Form.FileName,   
+            url: SiteUrl + "/SitePages/web/form/"+Form.FileName+"/"+Form.FileName+".html",   
             async: false,
             success : function(text)
             {
@@ -187,7 +187,7 @@ function GenerateNavBar(){
 
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/html/NavBar.html",   
+            url: SiteUrl + "/SitePages/web/component/NavBar/NavBar.html",   
             async: false,
             success : function(text)
             {
@@ -199,7 +199,7 @@ function GenerateNavBar(){
 
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/html/ModalTemplate.html",   
+            url: SiteUrl + "/SitePages/web/component/ModalTemplate/ModalTemplate.html",   
             async: false,
             success : function(text)
             {
@@ -215,7 +215,7 @@ function GenerateApproval(){
 
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/html/Approval.html",   
+            url: SiteUrl + "/SitePages/web/component/Approval/Approval.html",   
             async: false,
             success : function(text)
             {
@@ -232,7 +232,7 @@ function GenerateHistoryLog(){
    
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/html/HistoryLog.html",   
+            url: SiteUrl + "/SitePages/web/component/HistoryLog/HistoryLog.html",   
             async: false,
             success : function(text)
             {
@@ -1216,7 +1216,7 @@ function RoutingPage(Page){
     $('#PageBody').empty();
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/component/"+Page,   
+            url: SiteUrl + "/SitePages/web/component/Page"+Page,   
             async: false,
             success : function(text)
             {
