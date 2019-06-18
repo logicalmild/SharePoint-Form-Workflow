@@ -4,13 +4,22 @@ Form &amp; Workflow
 ## Lib Form
 ``` bash
 └───web
+    ├───asset
+    │   └───icon
+    ├───component
+    │   ├───Approval
+    │   ├───Attachment
+    │   ├───Btn_CreateForm.html
+    │   ├───Control_Icon
+    │   ├───HistoryLog
+    │   ├───ModalTemplate
+    │   ├───NavBar
+    │   └───Page
     ├───css
     │   └───images
     ├───form
-    ├───html
-    │   └───component
-    ├───img
-    │   └───icon
+    │   ├───FormTemplate
+    │   └───S_Reservation
     ├───js
     ├───lib
     │   ├───bootstrap
@@ -43,10 +52,9 @@ Form &amp; Workflow
         ├───img
         └───js
 ```
-Start project with insert file install InstallSiteStruct.html and run in browser under current site
-1) New page in Site Page
-2) Copy path url file InstallSiteStruct.html to your page
-3) save edit and refresh page
+Start project with insert file install InstallSiteStruct.aspx and run in browser under current site
+1) Open page in url SiteUrl/Sitepages/web/Installer/Installer.aspx
+
 
 First Setting in /js/config.js
 1) SiteUrl (Root) or Current site in SharePoint

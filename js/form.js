@@ -1365,7 +1365,7 @@ function IncludeComponent(ElementID,Component){
        
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/html/component/" + Component + '.html',   
+            url: SiteUrl + "/SitePages/web/html/component/" + Component + "/"+ Component+".html",   
             async: false,
             success : function(text)
             {

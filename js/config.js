@@ -68,6 +68,20 @@ FormMaster[0] = {
     FormID :'1',
     FormName :'',
     FileName :'',
+    FieldData:{
+        field1:{
+            ID:'Dom ID',
+            Title:'Title of field',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Column name'
+        },
+    },
+    Workflow:{
+        name:'',
+        version:'2013'
+    },
     FormStep:{
         Create:{
             FormStatus:'Create',
