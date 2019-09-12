@@ -1,0 +1,209 @@
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+    <script src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/jquery.min.js"></script> 
+    <script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script> 
+    <script type="text/javascript" src="/_layouts/15/sp.js"></script> 
+    <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/config.js"></script>
+    <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/SPGuide.js"></script>
+    <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/Log.js"></script>
+    <!-- <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/Gengine.js"></script> -->
+</head>
+
+<style>
+
+a{
+  text-decoration:none;
+}
+.container {
+  width: 80%;
+  position: absolute;
+  /* top: 0; */
+  left: 100px;
+  right: 0;
+  /* bottom: 0; */
+  margin: auto;
+  box-sizing: border-box;
+ 
+}
+
+.items {
+  border-radius: 5px;
+  cursor: pointer;
+  border: 3px dotted white;
+  transition: all 0.6s;
+  padding-top:50px;
+  padding-bottom:50px;
+  width:300px;
+  float:left;
+  margin:10px;
+}
+
+.icon-wrapper,
+.project-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wrapper i {
+  font-size: 35px;
+  color: #f09609;
+  transform: translateY(0px);
+  transition: all 0.6s;
+}
+
+.icon-wrapper {
+  align-self: end;
+}
+
+.project-name {
+  align-self: start;
+}
+
+.project-name p {
+  margin-top:10px;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #f09609;
+  transform: translateY(0px);
+  transition: all 2s;
+}
+
+.items:hover {
+  border: 3px solid #f09609;
+  transition: all 2s;
+}
+.items:hover .project-name p {
+  transform: translateY(-10px);
+}
+.items:hover .icon-wrapper i {
+  transform: translateY(5px);
+}
+.ms-core-sideNavBox-removeLeftMargin{
+  display:none;
+  }
+  
+#contentBox{
+
+	  margin-left:0px !important;
+	  margin-right:0px !important;
+    width:100%;
+   /*padding-left:50px;
+    padding-right:50px;*/
+}
+.ms-breadcrumb-top{
+
+  display:none;
+}
+
+#WPQ2_ListTitleViewSelectorMenu_Container{
+  
+  display:none;
+
+}
+.ms-webpartzone-cell{
+  margin-bottom:0px;
+  
+}
+#DeltaPlaceHolderSearchArea{
+
+  display:none;
+}
+
+#DeltaPlaceHolderPageTitleInTitleArea{
+  background-color: #f09609;
+  color:white;
+  font-weight:bold;
+  padding-left:15px;
+  padding-right:15px;
+  border-radius:10px;
+
+}
+#DeltaPlaceHolderPageTitleInTitleArea span span a{
+  background-color:#f09609;
+  color:white;
+  font-weight:bold;
+  padding-left:15px;
+  padding-right:15px;
+  border-radius:10px;
+
+}
+.ms-verticalAlignTop{
+  vertical-align:middle;
+}
+</style>
+
+
+<div class="container">
+
+   
+    <a id="ProblemReport"  href="https://scgchemicals.scg.com/lotusnotes/TPCQA/Lists/ProblemReport">
+      <div class="items">
+        <div class="icon-wrapper">
+          <i class="fa fa-th-list"></i>
+        </div>
+        <div class="project-name">
+          <p>Problem Report</p>
+        </div>
+      </div>
+    </a>
+   
+    <a id="SpecialRequest" href="https://scgchemicals.scg.com/lotusnotes/TPCQA/Lists/SpecialRequest">
+      <div class="items">
+        <div class="icon-wrapper">
+          <i class="fa fa-file-text-o"></i>
+        </div>
+        <div class="project-name">
+          <p>Special Request</p>
+        </div>
+      </div> 
+    </a>
+
+      <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/Shared%20Documents">
+        <div class="items">
+          <div class="icon-wrapper">
+            <i class="fa fa-folder-o"></i>
+          </div>
+          <div class="project-name">
+            <p>Document Library</p>
+          </div>
+        </div> 
+      </a>
+
+      <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/Workflow%20Diagram.aspx">
+        <div class="items">
+          <div class="icon-wrapper">
+            <i class="fa fa-sitemap"></i>
+          </div>
+          <div class="project-name">
+            <p>Workflow Diagram</p>
+          </div>
+        </div> 
+      </a>
+
+      <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/Setting.aspx">
+        <div class="items">
+          <div class="icon-wrapper">
+            <i class="fa fa-gear"></i>
+          </div>
+          <div class="project-name">
+            <p>Settings</p>
+          </div>
+        </div> 
+      </a>
+
+      <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/Master Data.aspx">
+        <div class="items">
+          <div class="icon-wrapper">
+            <i class="fa fa-database"></i>
+          </div>
+          <div class="project-name">
+            <p>Master Data</p>
+          </div>
+        </div> 
+      </a>
+      </a>
+  </div>
+      
+

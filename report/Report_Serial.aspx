@@ -51,7 +51,7 @@
     
 </form>
     <ul class="ul_report">
-        <li class="li_report"><a href="https://scgchemicals.scg.com/lotusnotes/TPE_LHM/">TPE Hardware Management</a></li>
+        <li class="li_report"><a href="https://scgchemicals.scg.com/lotusnotes/TPE_LHM">TPE Hardware Management</a></li>
         <li class="li_report"><a class="active" href="https://scgchemicals.scg.com/lotusnotes/TPE_LHM/SitePages/web/report/Report_Serial.aspx">Report by Serial NO</a></li>
         <li class="li_report"><a href="https://scgchemicals.scg.com/lotusnotes/TPE_LHM/SitePages/web/report/Report_Hardware.aspx">Report by Hardware</a></li>
     </ul>

@@ -1,0 +1,189 @@
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+  <script src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/jquery.min.js"></script> 
+  <script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script> 
+  <script type="text/javascript" src="/_layouts/15/sp.js"></script> 
+  <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/config.js"></script>
+  <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/SPGuide.js"></script>
+  <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/Log.js"></script>
+  <!-- <script type="text/javascript" src="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/web/js/Gengine.js"></script> -->
+</head>
+
+
+<style>   
+        .container {
+          padding: 2px 16px;
+        }
+        
+        #contentBox{
+        
+          margin-left:0px !important;
+          margin-right:0px !important;
+          width:100%;
+          padding-left:50px;
+          padding-right:50px;
+        }
+        
+        table {
+          border-collapse: collapse;
+          width: 95%;
+        }
+        
+        th, td {
+          text-align: left;
+          padding: 8px;
+         
+        }
+        
+        tr:nth-child(even){background-color: white !important;}
+        
+        th {
+          background-color: #f09609 !important;
+          color: #484848 !important;
+          font-weight:bold;
+        }
+        
+        th div a , th div{
+        
+            color: white !important;
+            font-weight:bold;
+        }
+        
+        #idHomePageNewItem-img , .ms-list-addnew-imgSpan20{
+        
+          display:none;
+        }
+        #idHomePageNewItem{
+        
+          font-weight:400;
+        }
+        .ms-heroCommandLink{
+          color:white;
+          background-color:#f09609;
+          padding-left:20px;
+          padding-right:20px;
+          padding-top:2px;
+          padding-bottom:2px;
+        
+        }
+        .ms-list-addnew-aligntop{
+        
+          padding-left:0px;
+        }
+        
+        
+        
+        .ms-core-sideNavBox-removeLeftMargin{
+          display:none;
+          }
+        .ms-breadcrumb-top{
+        
+          display:none;
+        }
+        
+        #WPQ2_ListTitleViewSelectorMenu_Container{
+          
+          display:none;
+        
+        }
+        .ms-webpartzone-cell{
+          margin-bottom:0px;
+          
+        }
+        #DeltaPlaceHolderSearchArea{
+        
+          display:none;
+        }
+        
+        #DeltaPlaceHolderPageTitleInTitleArea{
+          background-color: #f09609;
+          color:white;
+          font-weight:bold;
+          padding-left:15px;
+          padding-right:15px;
+          border-radius:10px;
+        
+        }
+        #DeltaPlaceHolderPageTitleInTitleArea span span a{
+          background-color:#f09609;
+          color:white;
+          font-weight:bold;
+          padding-left:15px;
+          padding-right:15px;
+          border-radius:10px;
+        
+        }
+        .ms-verticalAlignTop{
+          vertical-align:middle;
+        }
+        
+        .my-btn-active{
+          background-color: #f09609;
+          color: white;
+          font-weight:bold; 
+          border: 1px solid white; 
+          border-radius:5px; 
+          padding-left:25px; 
+          padding-right:25px;
+          box-shadow: 0 2px #999;
+          cursor:pointer;
+        }
+        .my-btn{
+          padding-left:25px;
+          padding-right:25px;
+          cursor:pointer;
+        }
+        
+        
+        tr:nth-child(even) {
+            background-color: rgba(20, 45, 55, 0.69) !important;
+      
+        }
+        </style>
+        
+        
+ 
+        <br>
+        <div style="float:left; margin-bottom:10px;">
+          <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/SitePages/Form.aspx?FormMaster=0"><button class="my-btn" style="background-color:dodgerblue; color:white; border-radius:6px;" id="ViewAllRequest" type="button">Create</button></a>
+          <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/Lists/ProblemReport/AllItems.aspx"><button class="my-btn" id="ViewAllItem" type="button">All Item</button></a>
+          <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/Lists/ProblemReport/By%20Requestor.aspx"><button style="margin-left:0px;" class="my-btn" id="ViewByRequestor" type="button">By Requestor</button></a>
+          <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/Lists/ProblemReport/By%20Created%20Date.aspx"><button style="margin-left:0px;" class="my-btn" id="ViewByCreatedDate" type="button">By Created Date</button></a>
+          <a href="https://scgchemicals.scg.com/lotusnotes/TPCQA/Lists/ProblemReport/By%20Status.aspx"><button style="margin-left:0px;" class="my-btn" id="ViewByStatus" type="button">By Status</button></a>
+          <a><div style="clear:both;"></div></a>
+        </div>
+        
+        <script type="text/javascript">
+              
+          var CurrentPage = window.location.href;
+          //var arr_pagename = LinkUrl.split('/');
+          //var CurrentPage = arr_pagename[arr_pagename.length-1
+        
+        
+          if(CurrentPage.match('AllItems') == 'AllItems'){
+         
+              var ss = document.getElementById('ViewAllItem');
+              ss.setAttribute("class", "my-btn-active");
+          }
+          else if(CurrentPage.match('By%20Requestor') == 'By%20Requestor'){
+         
+              var ss = document.getElementById('ViewByRequestor');
+              ss.setAttribute("class", "my-btn-active");
+          }
+          else if(CurrentPage.match('By%20Created%20Date') == 'By%20Created%20Date'){
+         
+              var ss = document.getElementById('ViewByCreatedDate');
+              ss.setAttribute("class", "my-btn-active");
+          }
+          else if(CurrentPage.match('By%20Status') == 'By%20Status'){
+         
+              var ss = document.getElementById('ViewByStatus');
+              ss.setAttribute("class", "my-btn-active");
+          }
+       
+          else{
+                
+          }
+        
+        
+        </script>

@@ -1,6 +1,7 @@
 'use strict';
 
 
+ var rndString = "";
 
 
 jQuery(document).ready(function () {
@@ -9,6 +10,8 @@ jQuery(document).ready(function () {
     if (!window.FileReader) {
         alert('This browser does not support the FileReader API.');
     }
+
+
 });
 
 function CheckFileExist(){
@@ -56,27 +59,27 @@ function Removefile(ItemID){
    
 }
 
-function Queryfile(){
+// function Queryfile(){
 
     
-    var query = '?$select=*,Author/Title&$expand=Author&$top=100&$filter=FormID eq \''+FormID+'\'&$orderby=Number asc';
-    var data = GetItemByRestAPI(Attachment,query);
-    if(data){
-        for(i=0;i<data.length;i++){
-            var Result = '';
-            Result += '<td>'+data[i].Number+'</td>';
-            Result += '<td>'+$('#File'+(data[i].Number)+' td:nth-child(2)').text()+'</td>';
-            Result += '<td><a target="_blank" href="'+SiteUrl+'/Attachment/'+data[i].Title+'">'+data[i].Title+'</a></td>';
-            Result += '<td>'+data[i].Author.Title+'</td>';
-            Result += '<td>'+ConvertDateTime(data[i].Created)+'</td>';
-            Result += '<td><a onclick="Removefile(\''+data[i].ID+'\');" data-toggle="tooltip" title="Remove department" type="button" class="btn btn btn-primary btn-md btn-remove-file"><i class="fa fa-remove" style="color:white;"></i></a></td>';
-            $('#File'+data[i].Number).empty();
-            $('#File'+data[i].Number).append(Result);
-        }
+//     var query = '?$select=*,Author/Title&$expand=Author&$top=100&$filter=FormID eq \''+FormID+'\'&$orderby=Created asc';
+//     var data = GetItemByRestAPI(Attachment,query);
+//     if(data){
+//         for(i=0;i<data.length;i++){
+//             var Result = '';
+//             Result += '<td>'+data[i].GroupID+'</td>';
+//             Result += '<td>'+$('#File'+(data[i].GroupID)+' td:nth-child(2)').text()+'</td>';
+//             Result += '<td><a target="_blank" href="'+SiteUrl+'/Attachment/'+data[i].Title+'">'+data[i].Title+'</a></td>';
+//             Result += '<td>'+data[i].Author.Title+'</td>';
+//             Result += '<td>'+ConvertDateTime(data[i].Created)+'</td>';
+//             Result += '<td><a onclick="Removefile(\''+data[i].ID+'\');" data-toggle="tooltip" title="Remove department" type="button" class="btn btn btn-primary btn-md btn-remove-file"><i class="fa fa-remove" style="color:white;"></i></a></td>';
+//             $('#File'+data[i].GroupID).empty();
+//             $('#File'+data[i].GroupID).append(Result);
+//         }
         
-    }
+//     }
 
-}
+// }
 
 function UpdateFlagAttachment(){
 
@@ -117,25 +120,59 @@ function UpdateFlagAttachment(){
 
 // Upload the file.
 // You can upload files up to 2 GB with the REST API.
-function uploadFile(number) {
-    //$('#attachloading').show();
-    try{
+function uploadFile(GroupID,InputID,IconLoading,IconComplete) {
+    
+    // build a string with random characters
 
-    $('#FileLoading').css('visibility','visible');
-    var FlagDup =  CheckFileExist();
+    rndString = GenGUID();
+
+    try{
+        $('#'+IconLoading).show();
+        $('#'+IconComplete).hide();
+        $('#FileLoading').css('visibility','visible');
+    //var FlagDup =  CheckFileExist();
+    var FlagDup = false;
     if(FlagDup == true){
         alert('File is already exist. Please select other file or change filename.');
         $('#FileLoading').css('visibility','hidden');
         return false;
     }
+
+
+
     // Define the folder path for this example.
     var serverRelativeUrlToFolder = '/' + SiteCollection + '/' + SubSite + '/' + Attachment;
 
     // Get test values from the file input and text input page controls.
-    var fileInput = jQuery('#getFile');
+    var fileInput = jQuery('#'+InputID);
     //var newName = jQuery('#displayName').val();
-    var newName = $('input[type=file]').val().split('\\').pop();
+    var newName = $('#'+InputID).val().split('\\').pop();
+    var FileType = newName.split('.');
+   
+
+    // check file support from config .js
+    if(FileType[0] != 'All'){
+        
+        FileType = FileType[1];
+        FileType = FileType.toLowerCase();
+        if(FileSupport.indexOf(FileType) == -1){
+    
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: 'File type is inconrrect.',
+                footer: '<a href>File type is support by this below <br> '+FileSupport+'</a>'
+              });
+    
+    
+            $('#'+IconLoading).hide();
+            return ;
+        }
+    }
+    /////////////////////////////////////////////////////
+
     // Get the server URL.
+
     var serverUrl = _spPageContextInfo.webAbsoluteUrl;
     // Initiate method calls using jQuery promises.
     // Get the local file as an array buffer.
@@ -155,9 +192,10 @@ function uploadFile(number) {
                 changeItem.done(function (data, status, xhr) {
                     //alert('file upload successful');
                     Queryfile();
-                    //$('#attachloading').hide();
-                    $('#FileLoading').css('visibility','visible');
-                    $('#MainModal').modal('hide');
+                    $('#'+IconLoading).hide();
+                    $('#'+IconComplete).show();
+                    //$('#FileLoading').css('visibility','visible');
+                    //$('#MainModal').modal('hide');
                 });
                 changeItem.fail(onError);
             });
@@ -197,7 +235,7 @@ function uploadFile(number) {
         var fileCollectionEndpoint = String.format(
                 "{0}/_api/web/getfolderbyserverrelativeurl('{1}')/files" +
                 "/add(overwrite=true, url='{2}')",
-                serverUrl, serverRelativeUrlToFolder, fileName);
+                serverUrl, serverRelativeUrlToFolder, rndString);
             
 
     
@@ -239,8 +277,14 @@ function uploadFile(number) {
         /*var body = String.format("{{'__metadata':{{'type':'{0}'}},'FileLeafRef':'{1}','Title':'{2}'}}",
             itemMetadata.type, newName, newName);
         */
-        var body = String.format("{{'__metadata':{{'type':'{0}'}},'FileLeafRef':'{1}','Title':'{2}','FormID':'{3}','ActiveStatus':'{4}','Number':'{5}'}}",
-        itemMetadata.type, newName, newName,FormID,false,number);
+
+
+       
+		
+		
+
+        var body = String.format("{{'__metadata':{{'type':'{0}'}},'FileLeafRef':'{1}','Title':'{2}','FormID':'{3}','ActiveStatus':'{4}','GroupID':'{5}'}}",
+        itemMetadata.type, rndString, newName,FormID,false,GroupID);
 
 
 
@@ -266,6 +310,8 @@ function uploadFile(number) {
     catch(err){
         alert('Please select file...');
         $('#FileLoading').css('visibility','hidden');
+        $('#'+IconLoading).hide();
+        $('#'+IconComplete).hide();
     }
 }
 
@@ -273,3 +319,4 @@ function uploadFile(number) {
 function onError(error) {
     alert(error.responseText);
 }
+

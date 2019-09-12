@@ -1,13 +1,4 @@
 
-var CurrentUser = {
-    ID: null,
-    Name: null,
-    Email: null,
-    Permission:null,
-    GroupTitle:[],
-    GroupID:[]
-};
-
 var Form = {
     FormID:null,
     FormName:null,
@@ -28,6 +19,9 @@ var FormType = 'FormView';
 var workflow =  FormMaster[MasterFormID].Workflow;
 var TempCurrentData = FormMaster[MasterFormID].FieldData;
 var ListData = FormMaster[MasterFormID].Listname;
+var ListInternalName = FormMaster[MasterFormID].ListInternalName;
+var FormatRunningNO = FormMaster[MasterFormID].FormatRunningNO;
+var SummaryPage = SiteUrl + '/Lists/' + ListInternalName;// dashboard after submit form
 
 $(document).ready(function(){
     
@@ -35,11 +29,122 @@ $(document).ready(function(){
     //$('#suiteBarDelta').hide();
     GetCurrentUser();
     GetCurrentGroupsUser();
-    
+    var InGroupMember = CheckUserInGroupID(GroupMember);    
+    if(InGroupMember == false){
+        AddCurrentUserToGroupMember();
+    }
+
+    StartSummernote();
+});
+
+// Place For trigger for DOM 
+$('#CloseForm , #CloseForm2').click(function(){
+    CloseForm(0,SummaryPage); 
+});
+
+$('input').keypress(function(event){
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == '13'){
+        event.preventDefault();
+        return false;
+    }
+});
+
+$( "input" ).change(function() {
+            
+    var str = $(this).val();
+    if (str.indexOf(';') > -1 || str.indexOf('[') > -1 || str.indexOf(']') > -1 || str.indexOf('|') > -1)
+    {
+        $(this).css("background-color","red");
+        $(this).css("color","white");
+        alert('Don\'t input "; [ ] |" ');  
+    }
+    else{
+        $(this).css("color","black");
+        $(this).css("background-color","white");
+        
+    }
 
 });
 
+function StartSummernote(){
+    $('#summernote1').summernote({
+    
+        toolbar: [
+            // [groupName, [list of button]]
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['picture'],
+            ['para', ['paragraph']],
+            ['table', ['table']],
 
+        ],
+        popover: {
+                    image: [
+                        ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+                        ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                        ['remove', ['removeMedia']]
+                    ],
+                    link: [
+                        ['link', ['linkDialogShow', 'unlink']]
+                    ],
+                    air: [
+                        ['color', ['color']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['para', ['ul', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']]
+                    ]
+                }
+
+
+        });   
+
+        $('.note-popover , .popover').hide();
+}
+function GetData(query){ // FormMethodTemplate
+            
+    var query = '?$select=*&$filter=FormID eq \''+FormID+'\'';
+    var data = GetItemByRestAPI(ListData,query);
+ 
+    if(data){
+        if(data.length > 0){
+
+            data = data[0];
+            
+            if(data[workflow.name]){
+                var name = data[workflow.name];
+                CheckStatusWorkflow(name , workflow.version);  // FormMethodTemplate
+            }
+            for(var i in TempCurrentData){
+            
+                    var item = TempCurrentData[i];
+                    var TempData = data[item.Col];
+                        // Get and set data in element by item data
+                        SetElementByItemData(item,TempData);   
+            }
+        }
+        else{
+
+            RoutingPage('PageItemNotFound.html'); // FormMethodTemplate
+            return;
+        }
+        return data;
+    }
+}
+function RefreshPage(){
+
+    var body = '';
+    body+='<center><div style="margin-top:15%; margin-bottom:15%;" class="loader"></div></center>';
+    body+='<div id="Navbar"></div>';
+    body+='<div id="Content"></div>';
+    body+='<div id="Approval"></div>';
+    body+='<div id="HistoryLog"></div>';
+    $('#PageBody').empty();
+    $('#PageBody').append(body);
+         
+    GetCurrentUser();
+    GetCurrentGroupsUser();
+}
 function StateForm(){
     if(!MasterFormID){
         RoutingPage('PageNotFound.html');
@@ -65,7 +170,12 @@ function StateForm(){
 
     // Check btn Submit action be clicked
     $('#SubmitAction').click(function(){
-        SubmitAction();
+        
+
+            SubmitAction();
+
+      
+        
     });
 
 
@@ -81,7 +191,6 @@ function StateForm(){
         
     });
 }
-
 function MainForm(){
     try{
         Form.FormName = FormMaster[MasterFormID].FormName; 
@@ -93,20 +202,13 @@ function MainForm(){
  
     Form.FormStatus = GetParameterByName('FormStatus');
     if(!Form.FormStatus.length){
-            Form.FormStatus = 'สร้างเอกสาร';
+            Form.FormStatus = 'Create';
     }
     GetMasterForm();
     GenerateTemplate();
-    
-    
-    
     GenerateForm();
-  
-    
 }
 /////////////////////////////////////////////////////////////////////
-
-
 function FormBody(){  // called by form.js // FormMethodTemplate
         
     if(FormID.length < 1){
@@ -115,7 +217,6 @@ function FormBody(){  // called by form.js // FormMethodTemplate
     }
     FormLoad();
 }
-
 function FormLoad(){
        
     SetInitialForm();
@@ -131,21 +232,8 @@ function FormLoad(){
                         break;
 
     }
-    
-    
-    
-
     SetRequireField(); // FormMethodTemplate
 }
-
-
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
 function GetMasterForm(){
 
         Form.FormID = FormMaster[MasterFormID].FormID;
@@ -153,14 +241,12 @@ function GetMasterForm(){
         Form.FileName = FormMaster[MasterFormID].FileName;
    
 }
-
 function GenerateTemplate(){
 
     GenerateNavBar();
     GenerateApproval();
     GenerateHistoryLog();
 }
-
 function GenerateForm(){
     
     $('title').text(Form.FormName);
@@ -182,12 +268,13 @@ function GenerateForm(){
     
 
 }
-
 function GenerateNavBar(){
 
-    var response;
+        IncludeComponent('Navbar','NavBar');
+
+        var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/component/NavBar/NavBar.html",   
+            url: SiteUrl + "/SitePages/web/component/RightNavMenu/RightNavMenu.html",   
             async: false,
             success : function(text)
             {
@@ -195,7 +282,7 @@ function GenerateNavBar(){
             }
         });
 
-        $('#Navbar').append(response);
+        $('body').append(response);
 
     var response;
         $.ajax({ type: "GET",   
@@ -210,7 +297,6 @@ function GenerateNavBar(){
         $('body').prepend(response);
 
 }
-
 function GenerateApproval(){
 
     var response;
@@ -227,7 +313,6 @@ function GenerateApproval(){
 
 
 }
-
 function GenerateHistoryLog(){
    
     var response;
@@ -242,73 +327,6 @@ function GenerateHistoryLog(){
 
         $('#HistoryLog').append(response);
 }
-
-
-function GetItemByRestAPI(Listname,Query){ 
-    
-    var requestUri = SiteUrl + "/_api/web/lists/getByTitle('"+Listname+"')/items" + Query;
-    var requestHeaders = {
-    "accept": "application/json;odata=verbose"
-    }
-    var extr_Data;
-
-    $.ajax({
-        url: requestUri,
-        type: 'GET',
-        dataType: 'json',
-        async: false,
-        headers: requestHeaders,
-        success: function (data) 
-        {      
-            data = data.d.results; 
-            extr_Data = data;
-            
-        },
-        error: function ajaxError(response) {
-            console.log(response.status + ' ' + response.statusText);
-        }
-    });
-
-    return extr_Data;
-}
-
-function GetItemFromOtherSite(Site,Listname,Query){
-
-    var requestUri = Site + "/_api/web/lists/getByTitle('"+Listname+"')/items" + Query;
-    var requestHeaders = {
-    "accept": "application/json;odata=verbose"
-    }
-    var extr_Data;
-
-    $.ajax({
-        url: requestUri,
-        type: 'GET',
-        dataType: 'json',
-        async: false,
-        headers: requestHeaders,
-        success: function (data) 
-        {      
-            data = data.d.results; 
-            extr_Data = data;
-            
-        },
-        error: function ajaxError(response) {
-            console.log(response.status + ' ' + response.statusText);
-        }
-    });
-
-    return extr_Data;
-
-}
-
-function GetParameterByName(name) { 
-    
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-		results = regex.exec(location.search);
-	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
-
 function GetCurrentUser(){
 
     var UserID = GetParameterByName('UserID');
@@ -340,22 +358,14 @@ function GetCurrentUser(){
             CurrentUser.ID = data.Id;
             CurrentUser.Name = data.Title;
             CurrentUser.Email = data.Email;
-            
+            CurrentUser.LoginName = data.LoginName;
             
         }
 
         function onError(error) {
             alert("error");
         }
-
-        
-
-       
-
-    
-
 }
-
 function GetCurrentGroupsUser(){ 			
 	var clientContext = new SP.ClientContext.get_current();
     var oWeb = clientContext.get_web();
@@ -390,17 +400,6 @@ function GetCurrentGroupsUser(){
 
     }, function(){console.log('Get CurrentGroupUser Failed');});
 }
-
-
-function generateUID() {
-	// I generate the UID from two parts here 
-	// to ensure the random number provide enough bits.
-	var firstPart = (Math.random() * 46656) | 0;
-	var secondPart = (Math.random() * 46656) | 0;
-	firstPart = ("000" + firstPart.toString(36)).slice(-3);
-	secondPart = ("000" + secondPart.toString(36)).slice(-3);
-	return firstPart + secondPart;
-}
 function AddLoading(){
     
     $('#ModalBody').empty();
@@ -408,149 +407,6 @@ function AddLoading(){
     var loading ='<center><div class="loader" style="margin-top:15%; margin-bottom:15%;"></div></center>';
     $('#ModalBody').append(loading);
 }
-
-function SetDateTime(){
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    if(min<10){
-        min = '0'+min;
-
-    }
-    
-    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
-	today = mm + '/' + dd + '/' + yyyy;// + '; ' + hour + ":" + min;
-    
-
-    return today;
-}
-
-function SetTime(time){
-    var today = new Date(time);
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    if(min<10){
-        min = '0'+min;
-
-    }
-    
-    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
-	today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min;
-    
-
-    return today;
-}
-
-function GetCurrentTime(){
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    if(min<10){
-        min = '0'+min;
-
-    }
-    
-    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
-	today = mm + '/' + dd + '/' + yyyy + ', ' + hour + ":" + min;
-    
-
-    return today;
-}
-
-
-function GetCurrentDate(){
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    if(min<10){
-        min = '0'+min;
-
-    }
-    
-    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
-	today = mm + '/' + dd + '/' + yyyy;
-    
-
-    return today;
-}
-
-function GetCurrentYear(){
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    if(min<10){
-        min = '0'+min;
-
-    }
-    
-    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
-	today = dd + '/' + mm + '/' + yyyy;
-    
-
-    return yyyy;  
-}
-
-
 function CloseForm(flagclose,LinkPage){
 
     if(flagclose == 1){
@@ -562,54 +418,7 @@ function CloseForm(flagclose,LinkPage){
             window.location.href = LinkPage;
         } 
     }
-    
-    
 }
-
-function ConvertDate(DateTime){
-    
-    var today = new Date(DateTime);
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    today = mm + '/' + dd + '/' + yyyy + ', ' + hour + ':' + min;    
-
-    return today;
-}
-
-function ConvertDateTime(DateTime){
-    
-    var today = new Date(DateTime);
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    today = dd + '/' + mm + '/' + yyyy + '; ' + hour + ":" + min;
-
-    return today;
-}
-
 function HistoryLog(Status){
 
     if(Status == 'add'){
@@ -678,7 +487,7 @@ function HistoryLog(Status){
 
 }
 function BrowsePeople(ID){
-
+    $('.modal-dialog').css('max-width','500px');
     var str='';
     str+='';
     str+='<div class="form-inline col-md-12" style="margin-bottom:30px; margin-left:auto; margin-right:auto;">';
@@ -693,7 +502,6 @@ function BrowsePeople(ID){
     $('#MainModal').modal('show');
 
 }
-
 function RetreiveInfoPerson(ID){
     var EmpID;
     var EmpName;
@@ -728,7 +536,6 @@ function RetreiveInfoPerson(ID){
     
     $('#MainModal').modal('hide');
 }
-
 function SetApproval(arr){
 
     var str='<option value="0">Please select...</option>';
@@ -740,7 +547,6 @@ function SetApproval(arr){
     $('#Approval_Select').empty();
     $('#Approval_Select').append(str);
 }
-
 function GenDocNo(Type){ // DocNO,Year
 
     var DocNo = '';
@@ -783,7 +589,7 @@ function GenDocNo(Type){ // DocNO,Year
     switch(Type){
         case 'DocNo': 
                         length = length + 1;
-                        value = 'ST-' + yyyy+'/'+length;
+                        value = FormatRunningNO + yyyy+'/'+length;
                         break;
 
         case 'Year':    value = yyyy;
@@ -792,40 +598,6 @@ function GenDocNo(Type){ // DocNO,Year
     }
     return value;
 }
-
-function GenNumJob(){
-    var DocNo = 'Roto-';
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-    var hour = today.getHours();
-    var min = today.getMinutes();
-    var sec = today.getSeconds();
-
-    if(dd<10) {
-        dd = '0'+dd;
-    } 
-
-    if(mm<10) {
-        mm = '0'+mm;
-    } 
-    if(min<10){
-        min = '0'+min;
-
-    }
-
-    //today = mm + '/' + dd + '/' + yyyy + '; ' + hour + ":" + min + ":" + sec;
-    today = mm + '/' + dd + '/' + yyyy;// + '; ' + hour + ":" + min;
-
-    DocNo += yyyy;
-    //DocNo += mm;
-    //DocNo += dd;
-
-    return DocNo;
-
-}
-
 function CheckUpdateOrCreate(List){
 
     var query ='?$select=FormID&$top=1&$filter=FormID eq \''+FormID+'\'';
@@ -845,7 +617,6 @@ function CheckUpdateOrCreate(List){
 
     return status;
 }
-
 function SetFormatData(dataset,oListItem){
     for(var i in dataset){
         var item = dataset[i];
@@ -879,6 +650,13 @@ function SetFormatData(dataset,oListItem){
                                 }
                                 
                                 break;
+            case 'people_multiple':
+                                if(Value){
+                                    
+                                    Value = Value;
+                                }
+                                
+                                break;
             case 'radio':
                                 if(Value){
                                     Value = Value
@@ -887,27 +665,33 @@ function SetFormatData(dataset,oListItem){
             
         
         }
-        oListItem.set_item(Column,Value);
-                
-                
-
-            
+        oListItem.set_item(Column,Value);      
     }
  
 }
-
 function ValidateData(){ // return Pass
     
     var FormIndex = GetParameterByName('FormMaster');
     var FormConfig = FormMaster[FormIndex];
     var Setting = FormConfig['FormStep'];
+
     var texterror = '';
     var FlagPass = true;
     for(var i in Setting){
         if(Setting[i].FormStatus == Form.FormStatus){
             for(var j in Setting[i].Validate){
                     var FieldValidate = Setting[i].Validate[j];
-                    var require = $('#'+FieldValidate.ID).attr('require');
+                    var require;
+                    if(FieldValidate.Type == 'radio'){
+                        if(!$("input[name='"+FieldValidate.ID+"']").is(':checked')) { 
+                            // checked an item
+                            texterror += FieldValidate.Title + '<br>';
+                            FlagPass = false;
+                            // $("input[name='"+FieldValidate.ID+"']").attr('style','border-color:red;');
+                        }
+                    }else{
+                         require = $('#'+FieldValidate.ID).attr('require');
+                    }
                     
                     if(require == 'true'){
                         switch(FieldValidate.Type){
@@ -916,24 +700,19 @@ function ValidateData(){ // return Pass
                                     if(!data){
                                         texterror += FieldValidate.Title + '<br>';
                                         FlagPass = false;
+                                        $('#'+FieldValidate.ID).attr('style','border-color:red;');
+                                        
                                     }
                                     
                                     break;
-                            // case 'radio':
-
-                            //         if($('#'+FieldValidate.ID).is(':checked')) { 
-                            //             // checked an item
-                            //         }else{
-                            //             texterror += FieldValidate.Title + '<br>';
-                            //             FlagPass = false;
-                            //         }
-                                    
-                            //         break;
                             case 'date':
                                     var data = $('#'+FieldValidate.ID).val();
                                     if(!data){
                                         texterror += FieldValidate.Title + '<br>';
                                         FlagPass = false;
+                                      
+                            
+                                        $('#'+FieldValidate.ID).attr('style','border-color:red;text-align:center;');
                                     }
                                     break;
                             case 'people':
@@ -941,29 +720,29 @@ function ValidateData(){ // return Pass
                                     if(!data){
                                         texterror += FieldValidate.Title + '<br>';
                                         FlagPass = false;
+                              
+                                        $('#'+FieldValidate.ID).attr('style','border-color:red;text-align:center;');
                                     }
                                     break;
                             case 'select':
                                     var data = $('#'+FieldValidate.ID).val();
-                                    if(data == '-' || data == 'Please select...'){
+                                    if(data == '-' || data == 'Please select...' || data == 'Please Select...'){
                                         texterror += FieldValidate.Title + '<br>';
                                         FlagPass = false;
+                                        $('#'+FieldValidate.ID).attr('style','border-color:red;');
+                                        
                                     }
                                     break;
 
                         }
-
-                        
-                        
-                        
-                    }
-                    
-                    
+     
+                    }        
             }
             
         }
         
     }
+
 
     if(FlagPass == false){
         var str='';
@@ -972,11 +751,13 @@ function ValidateData(){ // return Pass
         $('#TitleModal').text('Please insert data to require field.');
         $('#ModalBody').empty();
         $('#ModalBody').append(str);
+        $('#SubmitAction').prop('disabled',false);
     }
     return FlagPass;
 
 }
 function Attachfile(){
+    
 
         
     $('#MainModal').modal();
@@ -1048,9 +829,8 @@ function Attachfile(){
 
 
 }
-
 function CreateListItem(ListName,Object){
-    debugger;   
+
     var dataset = {};
     dataset = Object;
     var clientContext = new SP.ClientContext(SiteUrl);
@@ -1062,15 +842,47 @@ function CreateListItem(ListName,Object){
     oListItem.update();	
     clientContext.executeQueryAsync(
     function(){
+
+        $('#MainModal').modal('hide');
+
+        Swal.fire(
+            'Submit Successfully',
+            'Click for continue',
+            'success',
+            {
+                timer: 1500
+            }
+        ).then((result) => {
+
+            if(result.value){
+                SubmitActionFinalFlag(true);
+            }
+
+        });
         
-        $('#ModalBody').empty();
-        $('#ModalBody').append('<p style="text-align:center;">Successfully...<p>');
+        
+
+        // $('#ModalBody').empty();
+        // $('#ModalBody').append('<p style="text-align:center;">Successfully...<p>');
         
     },
-    function(){
+    function(sender, args){
 
-        $('#ModalBody').empty();
-        $('#ModalBody').append('<p style="text-align:center; color:red;">Create list item error...<p>');
+        $('#MainModal').modal('hide');
+
+        Swal.fire({
+            type: 'error',
+            title: 'Oops... <br> Something went wrong!',
+            footer: 'Please contact your site admin for support.',
+           
+            
+        });
+
+        SubmitActionFinalFlag(false);
+        // $('#ModalBody').empty();
+        // $('#ModalBody').append('<p style="text-align:center; color:red;">Create list item error...<p>');
+        // alert('Request failed. ' + args.get_message() + '\n' + args.get_stackTrace());
+       
     }
 
     );
@@ -1095,15 +907,38 @@ function UpdateListItem(ListName,Object){
     oListItem.update();	
     clientContext.executeQueryAsync(function(){
 
-        $('#ModalBody').empty();
-        $('#ModalBody').append('<p style="text-align:center;">Save Successfully...<p>');
+        
+        // $('#ModalBody').empty();
+        // $('#ModalBody').append('<p style="text-align:center;">Save Successfully...<p>');
+        $('#MainModal').modal('hide');
+        Swal.fire(
+            'Submit Successfully',
+            'Click for continue',
+            'success',
+            {
+                timer: 1500
+            }
+        ).then((result) => {
+
+            if(result.value){
+                SubmitActionFinalFlag(true);
+            }
+
+        });
 
     }, function(){
 
+        $('#MainModal').modal('hide');
 
-        $('#ModalBody').empty();
-        $('#ModalBody').append('<p style="text-align:center; color:red;">Create list item error...<p>');
+        Swal.fire({
+            type: 'error',
+            title: 'Oops... <br> Something went wrong!',
+            footer: 'Please contact your site admin for support.',
+            
+            
+        });
 
+        SubmitActionFinalFlag(false);
 
     });
 
@@ -1132,8 +967,8 @@ function RemoveListItem(ListName,ItemID){
     
     
 }
-
 function SetFormAction(){
+
     var index = GetParameterByName('FormMaster');
     for(var i in FormMaster[index]){
         switch(i){
@@ -1162,11 +997,11 @@ function SetFormAction(){
         }
     }
 }
-
 function SetPropertiesForm(oListItem,Status){
     switch(Status){
         case 'Create':
                         var index = GetParameterByName('FormMaster');
+                        // var LinkForm = SiteUrl + '/SitePages/'+FormMaster[index].FormName+'.aspx?FormMaster='+ index +'&FormID=' + FormID;
                         var LinkForm = SiteUrl + '/SitePages/'+FormMaster[index].FormName+'.aspx?FormMaster='+ index +'&FormID=' + FormID;
                         var TagLink = '<a target="_blank" href="'+LinkForm+'">View</a>';
 
@@ -1188,8 +1023,10 @@ function SetPropertiesForm(oListItem,Status){
     oListItem.set_item('FlagSubmit',Form.FlagSubmit);
   
 }
-
 function SetRequireField(){
+    
+    $('.MarkRequired').remove();
+
     var FormIndex = GetParameterByName('FormMaster');
     var FormConfig = FormMaster[FormIndex];
     var Setting = FormConfig['FormStep'];
@@ -1199,9 +1036,10 @@ function SetRequireField(){
            
             for(var j in Setting[i].Validate){
                     var FieldValidate = Setting[i].Validate[j];
-                    var str = '<p style="color:red; right:5px; position:absolute; top:0px; margin-bottom:0px; z-index:99;">*</p>';
+                    var str = '<p class="MarkRequired" style="color:red; left:0; position:absolute; top:0px; margin-bottom:0px; z-index:99;">*</p>';
                     $('#' + FieldValidate.ID).before(str);
                     $('#' + FieldValidate.ID).attr('require', true);
+                    
                     
             }
            
@@ -1209,14 +1047,60 @@ function SetRequireField(){
        
     }
 }
+function SetRequireFieldByAction(ActionID,FieldID,TypeDom,Title,Condition){
+    var data = $('#' + ActionID).val();
+    if(data){
+        if(data == Condition){
+            var FormIndex = GetParameterByName('FormMaster');
+            var FormConfig = FormMaster[FormIndex];
+            var Setting = FormConfig['FormStep'];
+            for(var i in Setting){
+         
+                if(Setting[i].FormStatus == Form.FormStatus){
+                   var ObjField = Setting[i].Validate;
+                        Objlength = Object.keys(ObjField).length;
+                        ObjField['field' + (Objlength + 1)] = {
+                            Title:Title,
+                            ID:FieldID,
+                            Type:TypeDom
+                        };      
+                }
+            }    
+            SetRequireField();
+        }else{
 
+            var FormIndex = GetParameterByName('FormMaster');
+            var FormConfig = FormMaster[FormIndex];
+            var Setting = FormConfig['FormStep'];
+            for(var i in Setting){
+         
+                if(Setting[i].FormStatus == Form.FormStatus){
+                    var ObjField = Setting[i].Validate;
+                    for(var j in Setting[i].Validate){
+                        var FieldValidate = Setting[i].Validate[j];
+
+                        if(FieldValidate.ID == FieldID){
+                            
+                            delete ObjField[j];
+                            
+                        }
+                    }
+                }
+            }    
+
+
+            SetRequireField();
+        }
+    }
+
+}
 function RoutingPage(Page){
 
     $('title').text(Form.FormName);
     $('#PageBody').empty();
     var response;
         $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/component/Page"+Page,   
+            url: SiteUrl + "/SitePages/web/component/Page/"+Page,   
             async: false,
             success : function(text)
             {
@@ -1228,7 +1112,6 @@ function RoutingPage(Page){
 
     $('.loader').remove();
 }
-
 function CheckStatusWorkflow(value,version){
 
     if(version == '2013'){
@@ -1269,117 +1152,117 @@ function CheckStatusWorkflow(value,version){
     }
     return;
 }
-
 function SetElementByItemData(item,TempData){
-    switch(item.TypeDom){
-                        
-        case 'text':
-                    $('#'+item.ID).val(TempData);
-                    break;
-        case 'date':
-                    if(TempData){
-                        $('#'+item.ID).val(ConvertDate(TempData));
-                    }
-                    
-                    break;
-        case 'label':
-                    if(TempData){
-                        $('#'+item.ID).text(TempData);
-                    }
-                    
-                    break;
-        case 'textarea':
-                    $('#'+item.ID).val(TempData);
-                    break;
-        case 'select':
-                    if(item.TypeCol == 'people'){
-                        
-                        $('#'+item.ID).val(TempData.Id);
-                    }
-                    else{
 
-                        $('#'+item.ID).val(TempData);   
-                    }
-                    break;
-        case 'people':
-                    //
-                    item.Data;
-                    if(TempData){
-                      
-                        $('#'+item.ID).attr("title",TempData.Id);
-                        $('#'+item.ID).val(TempData.Title);
+
+    try{
+        switch(item.TypeDom){
                         
-                    }
-                    break;
-
-        case 'radio':
-                    if(TempData){
-
-                        $('input[name='+item.ID+'][value="'+TempData+'"]').prop("checked",true);
-
-                    }
-                    //
-                    break;
-        case 'check':
-                    if(TempData == true){
-                        $('#'+item.ID).prop('checked', true);
-                        var Str_Part = item.ID;
-                        Str_Part = Str_Part.substring(1,Str_Part.length);
-                        var Section = 'Part' + Str_Part;
-                        
-                        TriggerBar(Section);
-                    }
-                    break;
-        case 'object':
-            
-                    if(TempData){
-                        var TempData = TempData;
-                        var arr_data =  TempData.split(';');
-                        var arr_data_length = arr_data.length;
-                        if(arr_data_length > 1){
-                            arr_data_length = arr_data_length - 1 ;
+            case 'text':
+                        $('#'+item.ID).val(TempData);
+                        break;
+            case 'date':
+                        if(TempData){
+                            $('#'+item.ID).val(ConvertDateOnly(TempData));
                         }
-                        for(l=0;l<arr_data_length;l++){
                         
-                            var TempArr = arr_data[l];
-                            var str_arr = TempArr.substring(1,TempArr.length-1);
-                            var obitem = str_arr.split('|');
-                            var ID = obitem[0];
-                            var value = obitem[1];
-                            if(value == 'true'){
-                                
-                                $('#'+ID).prop("checked", true );
-                            }
-                            else if(value == 'false'){
-                            
-                                $('#'+ID).prop("checked", false );
-                            }
-                            else{
-                                $('#'+ID).val(value);
-                            }
-                            
+                        break;
+            case 'label':
+                        if(TempData){
+                            $('#'+item.ID).text(TempData);
                         }
-
-                    }
-                    break;
-    }
-}
-
-function IncludeComponent(ElementID,Component){
-       
-    var response;
-        $.ajax({ type: "GET",   
-            url: SiteUrl + "/SitePages/web/html/component/" + Component + "/"+ Component+".html",   
-            async: false,
-            success : function(text)
-            {
-                response = text;
-            
-            },
+                        
+                        break;
+            case 'textarea':
+                        $('#'+item.ID).val(TempData);
+                        break;
+            case 'select':
+                        if(item.TypeCol == 'people'){
+                            
+                            $('#'+item.ID).val(TempData.Id);
+                        }
+                        else{
     
-        });
-  
-    $('#'+ElementID).append(response);
+                            $('#'+item.ID).val(TempData);   
+                        }
+                        break;
+    
+            case 'summernote':
+                        $('#'+item.ID).summernote('code', TempData);
+    
+                        break;
+            case 'people':
+                        //
+                        item.Data;
+                        if(TempData){
+                          
+                            $('#'+item.ID).attr("title",TempData.Id);
+                            $('#'+item.ID).val(TempData.Title);
+                            
+                        }
+                        break;
+            case 'people_multiple':
+                        break;
+    
+            case 'radio':
+                        if(TempData){
+    
+                            $('input[name='+item.ID+'][value="'+TempData+'"]').prop("checked",true);
+    
+                        }
+                        //
+                        break;
+            case 'check':
+                        if(TempData == true){
+                            $('#'+item.ID).prop('checked', true);
+                            var Str_Part = item.ID;
+                            Str_Part = Str_Part.substring(1,Str_Part.length);
+                            var Section = 'Part' + Str_Part;
+                            
+                            TriggerBar(Section);
+                        }
+                        break;
+            case 'object':
+                
+                        if(TempData){
+                            var TempData = TempData;
+                            var arr_data =  TempData.split(';');
+                            var arr_data_length = arr_data.length;
+                            if(arr_data_length > 1){
+                                arr_data_length = arr_data_length - 1 ;
+                            }
+                            for(l=0;l<arr_data_length;l++){
+                            
+                                var TempArr = arr_data[l];
+                                var str_arr = TempArr.substring(1,TempArr.length-1);
+                                var obitem = str_arr.split('|');
+                                var ID = obitem[0];
+                                var value = obitem[1];
+                                if(value == 'true'){
+                                    
+                                    $('#'+ID).prop("checked", true );
+                                }
+                                else if(value == 'false'){
+                                
+                                    $('#'+ID).prop("checked", false );
+                                }
+                                else{
+                                    $('#'+ID).val(value);
+                                }
+                                
+                            }
+    
+                        }
+                        break;
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+
+
+
+    
 }
 function DataConnection(ConnectionID){
     var SiteUrl = Connection_Obj[ConnectionID].SiteUrl;
@@ -1411,10 +1294,8 @@ function DataConnection(ConnectionID){
 
     return extr_Data;
 }
-
 // when user click submit action will take action in this function      
 function SubmitAction(){ // FormMethodTemplate
-        
     // disable submit button
     $('#SubmitAction').prop('disabled',true);
 
@@ -1423,44 +1304,54 @@ function SubmitAction(){ // FormMethodTemplate
     Form.StatusAction = $('#Approval_Select').val();
     Form.FlagSubmit = true;
     if(Form.StatusAction != 0){
-        $('#MainModal').modal('show');
-        AddLoading();
-        $('#TitleModal').text(ActionTitle);
+        // $('#MainModal').modal('show');
+        // AddLoading();
+        // $('#TitleModal').text(ActionTitle);
 
         TriggerTempData();
 
         // Validate 
         var FlagValidatePass = ValidateData(); // FormMethodTemplate
-        // enable submit button
-        $('#SubmitAction').prop('disabled',false);
+        
         if(FlagValidatePass == false){
             return;
         }
-        
+    
         var StatusCreate = CheckUpdateOrCreate(ListData); // FormMethodTemplate
-        switch(StatusCreate){   // FormMethodTemplate
-            case 'Create':
-                
+        // $('#MainModal').modal('hide');
+        try{
+
+            switch(StatusCreate){   // FormMethodTemplate
+                case 'Create':
                     
-                        CreateListItem(ListData,TempCurrentData); // FormMethodTemplate
                     
+                            CreateListItem(ListData,TempCurrentData); // FormMethodTemplate
                         
-                    
-                    break;
-            case 'Update':
-                    
-                        UpdateListItem(ListData,TempCurrentData); // FormMethodTemplate
-                    
-                    break;
+                            
+                        
+                        break;
+                case 'Update':
+                        
+                            UpdateListItem(ListData,TempCurrentData); // FormMethodTemplate
+                        
+                        break;
+            }
+
+        }catch(err){
+            
+            
+
+            Swal.fire({
+                type: 'error',
+                title: 'Oops... <br> Something went wrong!',
+                footer: 'Please contact your site admin for support.<br> error: \''+err+'\'',
+                
+                
+            });
+
+            $('#SubmitAction').prop('disabled',false);
         }
         
-        UpdateFlagAttachment(); // FormMethodTemplate
-        HistoryLog('add'); // FormMethodTemplate
-
-        var delayInMilliseconds = 1500; //1 second
-        setTimeout(function() {
-            CloseForm(1,SummaryPage); // FormMethodTemplate
-        }, delayInMilliseconds);
     }
     else{
         alert('Please select any action..');
@@ -1470,8 +1361,24 @@ function SubmitAction(){ // FormMethodTemplate
     }
 
 }
+function SubmitActionFinalFlag(Flag){
+    
 
+    if(Flag == true){
+
+        UpdateFlagAttachment(); // FormMethodTemplate
+        HistoryLog('add'); // FormMethodTemplate
+        CloseForm(1,SummaryPage); // FormMethodTemplate
+
+    }else{
+
+        // enable submit button
+        $('#SubmitAction').prop('disabled',false);
+
+    }
+}
 function TriggerTempData(){
+
     for(var i in TempCurrentData){
 
                 var field = TempCurrentData[i];
@@ -1526,6 +1433,13 @@ function TriggerTempData(){
                                         
 
                                         break;
+                        case 'people_multiple':  
+                                    
+                                        field.Data = SetPeople_Param(''+field.ID+'');
+                                        
+                                        break;
+
+                                        
                         case 'check':
                                         if ($('#'+field.ID).is(":checked"))
                                         {
@@ -1547,10 +1461,17 @@ function TriggerTempData(){
                         
                                         break;
                         case 'array':
-                                            var tempdata = field.Data;
-                                            field.Data = tempdata.toString();
-                            
-                                            break;
+                                        var tempdata = field.Data;
+                                        field.Data = tempdata.toString();
+                        
+                                        break;
+
+                        case 'summernote':
+
+                                        field.Data = $('#'+field.ID).summernote('code');
+
+                                        break;
+
                         case 'object':  
                                         var index = field.ID;
                                         var sum_str = '';
@@ -1605,7 +1526,6 @@ function TriggerTempData(){
                     } 
             }      
 }
-
 function SaveDraft(){
     
         $('#MainModal').modal('show');
@@ -1630,7 +1550,6 @@ function SaveDraft(){
         
         
 }
-
 function RemoveCurrentForm(){
     // Get ID Form by FormID
     var query = '?$select=ID&$top=1&$filter=FormID eq \''+FormID+'\'';
@@ -1639,4 +1558,152 @@ function RemoveCurrentForm(){
         RemoveListItem(ListData,data[0].ID);
     }
     
+}
+function CheckMemberGroup(GroupID){
+
+    var clientContext = new SP.ClientContext(SiteUrl);
+    var collGroup = clientContext.get_web().get_siteGroups();
+    var oGroup = collGroup.getById(GroupID);
+    this.collUser = oGroup.get_users();
+    clientContext.load(collUser);
+
+
+    clientContext.executeQueryAsync(function(){
+
+        var userInfo = '';
+        var userEnumerator = collUser.getEnumerator();
+        var CountUser = collUser.get_count();
+    
+        var TempUserIDArr = [];
+        while (userEnumerator.moveNext()) {
+            var oUser = userEnumerator.get_current();
+            userInfo += '\nUser: ' + oUser.get_title() + 
+                '\nID: ' + oUser.get_id() + 
+                '\nEmail: ' + oUser.get_email() + 
+                '\nLogin Name: ' + oUser.get_loginName();
+                
+                TempUserIDArr.push(oUser.get_id());
+
+        }
+
+        if(TempUserIDArr.indexOf(CurrentUser.ID) == -1){
+            AddCurrentUserToGroupMember();
+        }else{
+           // alert('User is in group');
+        }
+
+    
+
+    }, function(){
+
+
+        alert('Request failed. ' + args.get_message() + '\n' + args.get_stackTrace());
+
+    });
+    
+}
+
+
+function CurrentRole(Role,TitleRole){
+    
+                     
+    if(CurrentUser.Name == Role || CurrentUser.Permission == 'Admin'){
+        if(CurrentUser.Name == Role && CurrentUser.Permission == 'Admin'){ // admin & current role
+            $('#Permission').text(TitleRole);
+           
+            
+        }
+        else if(CurrentUser.Name == Role && CurrentUser.Permission != 'Admin'){ // current role no admin
+            $('#Permission').text(TitleRole);
+            //hide button remove right nav
+            $('#RemoveCurrentForm').hide();
+        }
+        else{// admin no current role
+            $('#Permission').text('Admin');
+             
+            
+        } 
+    }else{
+        
+        Disable_Panel('All');
+        //hide button remove right nav
+        $('#RemoveCurrentForm , #btnSaveDraft').hide();
+        
+    }
+}
+
+function Disable_Panel(PartID){
+    
+    if(PartID == 'All'){
+
+        $('#Permission').text('Visitor');
+        $('body *').attr('readonly', true);
+        $('body *').css('cursor', 'no-drop');
+        $('body *').on('mousedown', function(e) {
+                e.preventDefault();
+                this.blur();
+                window.focus();
+        });
+        $('body').removeAttr('onclick');
+        $('#Approval').hide();
+
+    }else{
+        
+        $('#'+PartID+' *').attr('readonly', true);
+        $('#'+PartID+' *').css('cursor', 'no-drop');
+        $('#'+PartID+' *').on('mousedown', function(e) {
+                e.preventDefault();
+                this.blur();
+                window.focus();
+        });
+        $('#'+PartID+' *').removeAttr('onclick');
+
+    }    
+}
+
+function RenderView(data){
+    if(data){
+        Form.FormStatus = data.FormStatus;
+        SetFormAction(); // FormMethodTemplate
+            
+        // Set top right info
+        $('#DocNO').text(data.RunningNO);
+        $('#CreateDate').text(ConvertDate(data.Created)); 
+        $('#FormStatus').text(data.FormStatus);
+        
+
+        // Map Current view according to FormView in config.js
+        Form.FormView = FormMaster[MasterFormID].FormStep[Form.FormStatus].FormView;
+    
+        if(Form.FormView){
+            SwitchViewTo(Form.FormView,data);
+        }
+        else{
+            Disable_Panel('All');
+        }
+
+    }
+}
+
+function RenderFormNew(){
+    // set panel status 
+    $('#DocNO').text('-');
+    $('#CreateDate , #RequestDate').text(SetDateTime()); 
+    $('#FormStatus').text('Create');
+    
+    SetFormAction(); // FormMethodTemplate
+
+    // Set Panel People end of section 1
+    $('#Requestor').val(CurrentUser.Name);
+    $('#Requestor').attr('title',CurrentUser.ID);
+    // End Set Panel People end of section 1
+
+    // Disable part 2 exclude admin 
+    if(CurrentUser.Permission == 'Admin'){
+        $('#Permission').text('Admin'); 
+    }
+    else{ // not admin
+        $('#Permission').text('Requestor');
+      
+    }  
 }

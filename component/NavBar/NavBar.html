@@ -1,15 +1,29 @@
+<style>
+#CloseForm , #RefreshForm{
+
+    transition-duration: 0.4s;
+    color: white;
+    background-color:#f09609; 
+    border-color:#f09609;
+
+}
+
+#CloseForm:hover , #RefreshForm:hover {
+  background-color: white; /* Green */
+  color: #f09609;
+}
+</style>
 <div>
     <div class="row">
             <div class="col-lg-7 col-md-7 col-sm-6">
-                <div class="form-inline">
-                    <button id="CloseForm" type="button" class="btn btn btn-primary btn-md" style="background-color:#1BA1E2; border-color:#1BA1E2;"><i class="fa fa-close"></i> Close</button>
-                    <!--<button onclick="Attachfile();" type="button" class="btn btn btn-primary btn-md" style="background-color:#1BA1E2; border-color:#1BA1E2; margin-left:15px;"><i class="fa fa-paperclip" style="margin-right:5px;"></i>Attachfile</button>-->
+                <div id="TopNavMenu" class="form-inline">
+
                 </div>
             </div>
 
             
             <div class="offset-md-1 col-md-4 col-sm-6" style="padding-top:10px; padding-bottom:10px; color:white;">
-                <div style="background-color:#1BA1E2; padding-top:10px; padding-bottom:10px;">
+                <div style="background-color:#f09609; padding-top:10px; padding-bottom:10px;">
                     <div class="form-inline">
                         <p class="col-lg-4 col-md-5 col-sm-4 col-5" style="padding-bottom:0px; margin-bottom:0px; text-align:left;">Running No</p>
                         <p class="col-lg-8 col-md-5 col-sm-6 col-5" style="margin-bottom:0px;" id="DocNO">Status</p>
@@ -31,3 +45,27 @@
             </div>
     </div>
 </div> <br>
+
+
+<script type="text/javascript">
+
+    var TopMenuStr = '';
+    var CloseFormBtn = '<button id="CloseForm" type="button" class="btn btn btn-primary btn-md"><i class="fa fa-close"></i> Exit</button>';
+    var RefreshBtn = '<button id="RefreshForm" onclick="RefreshPage();" type="button" class="btn btn btn-primary btn-md" style="margin-left:15px;"><i class="fa fa-refresh"></i> Refresh</button>';
+    var AttachfileBtn = '<button onclick="Attachfile();" type="button" class="btn btn btn-primary btn-md" style="background-color:#1BA1E2; border-color:#1BA1E2; margin-left:15px;"><i class="fa fa-paperclip" style="margin-right:5px;"></i>Attachfile</button>';
+    var TopMenu =  FormMaster[MasterFormID].Nav.TopNav;
+
+    if(TopMenu.CloseForm){
+        TopMenuStr += CloseFormBtn;
+    }
+    if(TopMenu.Refresh){
+        TopMenuStr += RefreshBtn;
+    }
+    if(TopMenu.AttachFile){
+        TopMenuStr += AttachfileBtn;
+    }
+
+    $('#TopNavMenu').empty();
+    $('#TopNavMenu').append(TopMenuStr);
+
+</script>

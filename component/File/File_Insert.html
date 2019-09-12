@@ -1,0 +1,171 @@
+<style>
+        .attachfile{
+            width:auto;
+            margin-right: 10px;
+            background-color: white;
+            border-radius: 3px;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            color: #ff6600;
+            margin-bottom: 5px;
+            border-color: #ff6600;
+            border-width: 1px;
+            border-style: solid;
+            
+        }
+        
+        #AttachZone a {
+            color:#ff6600;
+            text-decoration:none;
+        }
+        
+        </style>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-2">
+                        <p>Revise</p>
+                    </div>
+                    <div class="col-md-10">
+                        <input id="Revise" type="text" class="form-control form-control-sm col-md-4">
+                    </div>
+                </div>
+            </div>
+        </div><br>
+        
+        <div class="row">
+            <div class="col-md-2">
+                <p>ไฟล์แนบ</p>
+            </div>    
+            <div class="row col-md-10">
+                <div class="col-md-9">
+                    <input type="file" class="form-control-file" style="border-color:gray; border-width:1px; border-style:solid;" id="getFile" aria-describedby="fileHelp">
+                </div>
+                <div class="col-md-2">
+                    <button id="btn_uploadFile"></button>
+                </div>
+                <div class="col-md-1">
+                    <div id="attachloading"  style="display:none;" class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                    <img id="complete_upload_icon" style="width:20px; height:20px; display:none;" src="https://scgchemicals.scg.com/lotusnotes/MaterialManagement/SitePages/web/asset/icon/correct.png">
+                </div>
+                    
+                </div>
+            </div>
+        </div><br>
+        
+        <div class="row">
+            <div class="col-md-10 offset-md-2">
+                <ul id="AttachZone" class="form-inline" style="padding-left:0px;">
+                    <!-- <a href="#"><li class="attachfile">test.xls</li></a> -->
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-2">
+                <p>Note</p>
+            </div>
+            <div class="col-md-10">
+                
+                <textarea id="Note" class="form-control" style="width:100%;" rows="2"></textarea>
+            </div>
+        </div><br><br>
+        
+        <center>
+            <button onclick="CreateFile();" style="margin-left:10px;" type="button" class="btn btn btn-primary btn-sm col-md-1">บันทึก</button>
+        </center>
+        
+        <br>
+        
+        <script type="text/javascript">
+        
+            var GroupID = generateUID();
+            $('#btn_uploadFile').replaceWith('<button id="btn_uploadFile" onclick="uploadFile(\''+GroupID+'\');" style="margin-left:10px;" type="button" class="btn btn btn-primary btn-sm">Upload</button>');
+        
+    
+        
+            function CreateFile(){
+        
+                var Revise = $('#Revise').val();
+                var Note = $('#Note').val();
+                
+        
+                var clientContext = new SP.ClientContext(SiteUrl);
+                var oList = clientContext.get_web().get_lists().getByTitle('MRP_Report_FileInfo');
+                var itemCreateInfo = new SP.ListItemCreationInformation();
+                this.oListItem = oList.addItem(itemCreateInfo);
+        
+                if(Revise){oListItem.set_item('Revise',Revise);}
+                if(Note){oListItem.set_item('Note',Note);}
+                oListItem.set_item('FormID',FormID)
+                oListItem.set_item('TopicID',GroupID);
+        
+        
+                oListItem.update();	
+                
+                clientContext.executeQueryAsync(
+                    function(){
+                        SetFlagAttachTrue();
+                        Get_File();  
+                        $('#ModalBody').empty();
+                        $('#MainModal').modal('hide');   
+                        
+                    },
+                    function(){
+        
+                        console.log('error');
+                        
+                    });
+            
+            }
+        
+            function Queryfile(){
+     
+                var query = '?$select=*&$expand=File&$top=100&$filter=FormID eq \''+FormID+'\' and GroupID eq \''+GroupID+'\'&$orderby=Created desc';
+                var data = GetItemByRestAPI(Attachment,query);
+                if(data){
+        
+                    $('#AttachZone').empty();
+                    var str = '';
+        
+                    for(i=0;i<data.length;i++){
+                      str+='<a href="'+SiteUrl+'/Attachment/'+data[i].File.Name+'" download="'+data[i].Title+'"><li style="cursor:pointer;" class="attachfile">'+data[i].Title+'<br><p style="margin-bottom:0px; text-align:center;">'+ConvertDate(data[i].TimeStamp)+'</p></li></a>';
+                    }
+        
+                    $('#AttachZone').append(str);
+        
+                }
+            }
+        
+        
+            function SetFlagAttachTrue(){
+                var query = '?$select=*&$top=100&$filter=FormID eq \''+FormID+'\' and GroupID eq \''+GroupID+'\'';
+                var data = GetItemByRestAPI(Attachment,query);
+        
+                if(data){
+                    for(i=0;i<data.length;i++){
+                        UpdateItem(data[i].ID);
+                    }
+                }
+        
+                function UpdateItem(ItemID){
+        
+                    var ctx = new SP.ClientContext.get_current();
+                    var customList = ctx.get_web().get_lists().getByTitle(Attachment);
+                    var listItem = customList.getItemById(ItemID);
+        
+                    /*Set the value and update*/
+                    listItem.set_item('ActiveStatus', 1);
+                    listItem.update();
+        
+                    ctx.executeQueryAsync(function(){
+                        /*Need to change this to show on the page*/
+                        console.log('Update flag successful'); 
+                    },function(sender, args){
+                        alert('Request failed. '+args.get_message() + '\n' + args.get_stackTrace());
+                    });
+                }
+            }
+        </script>

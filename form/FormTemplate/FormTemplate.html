@@ -1,246 +1,72 @@
 
+<div class="container">
+
+
+    <div id="component"></div>
+</div>
     
-    <div class="container">
-
-        <!-- Form interface-->
-
-        <div id="component"></div>
-    </div>
-
-    
-    <script type="text/javascript">
-
-        // Declare global variable
-        var SummaryPage = SiteUrl + '';// dashboard after submit form
-        /////////////////////////////////////
-    
-        // Place For trigger for DOM 
-        $('#CloseForm , #CloseForm2').click(function(){
-            CloseForm(0,SummaryPage); 
-        });
         
-        $( "input" ).change(function() {
-            
-                var str = $(this).val();
-                if (str.indexOf(';') > -1 || str.indexOf('[') > -1 || str.indexOf(']') > -1 || str.indexOf('|') > -1)
-                {
-                    $(this).css("background-color","red");
-                    $(this).css("color","white");
-                    alert('Don\'t input "; [ ] |" ');  
-                }
-                else{
-                    $(this).css("color","black");
-                    $(this).css("background-color","white");
-                    
-                }
-    
-        });
-    
-        $('input').keypress(function(event){
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-            if(keycode == '13'){
-                event.preventDefault();
-                return false;
-            }
-        });
-        ///////////////////////////////
+<script type="text/javascript">
+
+    // Set inittial form  
+    // such as option in select , default date, default current user , default text and label
+    function SetInitialForm(){
         
-    
-        // Set inittial form  
-        // such as option in select , default date, default current user , default text and label
-        function SetInitialForm(){
+
+        
+    }       
+
+    // Form display when user click new form .
+    // what you do want to display or change element new form.
+    // input action to this function
+    function FormNew(){
+        RenderFormNew();
+        
+        
+    }
+
+    // Form display when user click view an item.
+    // if user click new item this function will not be called.
+    function FormView(){
+        var data = GetData(query);
+                    Queryfile();
+                    RenderView(data);
+    }
+
+    // Create View or switch view according to config.js
+    function SwitchViewTo(view){
+
+        switch(view){
             
-         
-            
-            
-            //IncludeComponent('ElementID','ComponentName');
-            IncludeComponent('component','RightNavMenu');
+            case 'Closed':
+                                break;
+            case 'Cancelled':
+                                break;
+            case 'Complete':
+                                break;
 
         }
-    
-        // Get Data when user click view an item. this will be called by FormView();
-        // if user click new item this function will not be called
-        function GetData(){ // FormMethodTemplate
 
-            var query = '';
-            var data = GetItemByRestAPI(ListData,query);
-         
-            if(data){
-                if(data.length > 0){
-    
-                    data = data[0];
-                    
-                    var name = data[workflow.name];
-                    
-                    CheckStatusWorkflow(name , workflow.version);  // FormMethodTemplate
-                    
-                    for(var i in TempCurrentData){
-                    
-                            var item = TempCurrentData[i];
-                            var TempData = data[item.Col];
-                            
-                            // Get and set data in element by item data
-                            SetElementByItemData(item,TempData);   
-                    }
-                }
-                else{
+    }
+    // End Create View or switch view according to config.js
 
-                    RoutingPage('PageItemNotFound.html'); // FormMethodTemplate
-                }
-                return data;
+
+    function Queryfile(){
+        var query = '?$select=*&$expand=File&$top=100&$filter=FormID eq \''+FormID+'\'&$orderby=Created desc';
+        var data = GetItemByRestAPI(Attachment,query);
+        if(data){
+
+            $('#AttachZone').empty();
+            var str = '';
+
+            for(i=0;i<data.length;i++){
+                str+='<a href="'+SiteUrl+'/Attachment/'+data[i].File.Name+'" download="'+data[i].Title+'"><li style="cursor:pointer;" class="attachfile">'+data[i].Title+'<br><p style="margin-bottom:0px; text-align:center;">'+ConvertDate(data[i].TimeStamp)+'</p></li></a>';
             }
-    
-    
+
+            $('#AttachZone').append(str);
+
         }
-    
-        // Form display when user click new form .
-        // what you do want to display or change element new form.
-        // input action to this function
-        function FormNew(){
-            // set panel status 
-            $('#DocNO').text('-');
-            $('#CreateDate , #RequestDate').text(SetDateTime()); 
-            $('#FormStatus').text('Create');
-            
-            SetFormAction(); // FormMethodTemplate
-        
-            
-            
-            // Set Panel People end of section 1
-            $('#Requestor').val(CurrentUser.Name);
-            $('#Requestor').attr('title',CurrentUser.ID);
-            // End Set Panel People end of section 1
-
-            //hide button remove right nav
-            $('#RemoveCurrentForm').hide();
-
-            // Disable part 2 exclude admin 
-            if(CurrentUser.Permission == 'Admin'){
-                $('#Permission').text('Admin'); 
-            }
-            else{ // not admin
-                $('#Permission').text('Requestor');
-              
-            } 
-            
-            
-           
-        }
-    
-        // Form display when user click view an item.
-        // if user click new item this function will not be called.
-        function FormView(){
-            var data = GetData();
-            //Queryfile();
-            
-            if(data){
-                Form.FormStatus = data.FormStatus;
-                SetFormAction(); // FormMethodTemplate
-       
-                if(data.Dept_Target){
-                    GetDeptTarget(data.Dept_Target);
-                }
-                
-                // Set top right info
-                $('#DocNO').text(data.RunningNO);
-                $('#CreateDate').text(ConvertDate(data.Created)); 
-                $('#FormStatus').text(data.FormStatus);
-                
-                
-        
-                // Map Current view according to FormView in config.js
-                Form.FormView = FormMaster[MasterFormID].FormStep[Form.FormStatus].FormView;
-            
-                if(Form.FormView){
-                    SwitchViewTo(Form.FormView,data);
-                }
-                else{
-                    Disable_Panel('All');
-                }
-
-            }
-
-            // Create View or switch view according to config.js
-            function SwitchViewTo(view){
-                switch(view){
-                    
-                    case 'สร้างเอกสาร':
-
-                            CurrentRole(data.Requestor.Title,'ผู้สร้างเอกสาร');
-                            break;
-                    
-                    case 'Complete':
-                            $('#btnSaveDraft').hide();
-                            Disable_Panel('All');
-                            break;
-    
-                }
-
-            }
-            // End Create View or switch view according to config.js
-
-
-            function Disable_Panel(PartID){
-
-                    if(PartID == 'All'){
-
-                        $('#Permission').text('Visitor');
-                        $('body *').attr('readonly', true);
-                        $('body *').css('cursor', 'no-drop');
-                        $('body *').on('mousedown', function(e) {
-                                e.preventDefault();
-                                this.blur();
-                                window.focus();
-                        });
-                        $('body').removeAttr('onclick');
-                        $('#Approval').hide();
-
-                    }else{
-                        
-                        $('#'+PartID+' *').attr('readonly', true);
-                        $('#'+PartID+' *').css('cursor', 'no-drop');
-                        $('#'+PartID+' *').on('mousedown', function(e) {
-                                e.preventDefault();
-                                this.blur();
-                                window.focus();
-                        });
-                        $('#'+PartID+' *').removeAttr('onclick');
-
-                    }    
-            }
-
-            function CurrentRole(Role,TitleRole){
-
-                 
-                    if(CurrentUser.Name == Role || CurrentUser.Permission == 'Admin'){
-                        if(CurrentUser.Name == Role && CurrentUser.Permission == 'Admin'){ // admin & current role
-                            $('#Permission').text(TitleRole);
-                           
-                            
-                        }
-                        else if(CurrentUser.Name == Role && CurrentUser.Permission != 'Admin'){ // current role no admin
-                            $('#Permission').text(TitleRole);
-                            //hide button remove right nav
-                            $('#RemoveCurrentForm').hide();
-                        }
-                        else{// admin no current role
-                            $('#Permission').text('Admin');
-                             
-                            
-                        } 
-                    }else{
-                        
-                        Disable_Panel('All');
-                        //hide button remove right nav
-                        $('#RemoveCurrentForm , #btnSaveDraft').hide();
-                        
-                    }
-            }
-    
-        }
-    
-    
-       
+    } 
 </script>
-    
-    
+        
+        

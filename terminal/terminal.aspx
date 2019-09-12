@@ -6,7 +6,7 @@
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" x-undefined="" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Installer</title>
+<title>SP Terminal</title>
 <meta http-equiv="X-UA-Compatible" content="IE=10" />
 
 <SharePoint:CssRegistration Name="default" runat="server" />
@@ -25,7 +25,7 @@
     <form id="form1" runat="server">
     </form>
     
-    <div style="min-height:400px;" id="term_demo"></div>
+    <div style="min-height:600px;" id="term_demo"></div>
   
 
 

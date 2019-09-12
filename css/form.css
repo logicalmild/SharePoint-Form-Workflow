@@ -1,4 +1,57 @@
-﻿.shadow{
+﻿.ms-core-sideNavBox-removeLeftMargin{
+  display:none;
+  }
+  
+#contentBox{
+
+	  margin-left:0px !important;
+	  margin-right:0px !important;
+    width:100%;
+   /*padding-left:50px;
+    padding-right:50px;*/
+}
+.ms-breadcrumb-top{
+
+  display:none;
+}
+
+#WPQ2_ListTitleViewSelectorMenu_Container{
+  
+  display:none;
+
+}
+.ms-webpartzone-cell{
+  margin-bottom:0px;
+  
+}
+#DeltaPlaceHolderSearchArea{
+
+  display:none;
+}
+
+#DeltaPlaceHolderPageTitleInTitleArea{
+  background-color: #f09609;
+  color:white;
+  font-weight:bold;
+  padding-left:15px;
+  padding-right:15px;
+  border-radius:10px;
+
+}
+#DeltaPlaceHolderPageTitleInTitleArea span span a{
+  background-color:#f09609;
+  color:white;
+  font-weight:bold;
+  padding-left:15px;
+  padding-right:15px;
+  border-radius:10px;
+
+}
+.ms-verticalAlignTop{
+  vertical-align:middle;
+}
+
+.shadow{
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -9,7 +62,7 @@
 .loader {
   border: 16px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 16px solid #1BA1E2;
+  border-top: 16px solid #f09609;
   width: 120px;
   height: 120px;
   -webkit-animation: spin 2s linear infinite; /* Safari */
@@ -80,7 +133,7 @@ li{
   }
 
   .tag-person li{
-      background-color:#1BA1E2; 
+      background-color:#f09609; 
       border-radius:5px; 
       padding-left:15px; 
       
@@ -97,7 +150,7 @@ li{
       padding-left:5px; 
       padding-right:5px; 
       background-color:white; 
-      color:#1BA1E2 !important;
+      color:#f09609 !important;
   }
 
 
@@ -108,7 +161,7 @@ li{
   }
 
   .tag-file li{
-      background-color:#1BA1E2; 
+      background-color:#f09609; 
       border-radius:5px; 
       padding-left:15px; 
       
@@ -134,7 +187,7 @@ li{
       padding-left:5px; 
       padding-right:5px; 
       background-color:white; 
-      color:#1BA1E2 !important;
+      color:#f09609 !important;
   }
 
 
@@ -172,7 +225,7 @@ li{
 }
 
 #PageBody{
-  background-color:white; 
+  background-color:tan; 
   padding-top:20px; 
   padding-bottom:50px;
 
