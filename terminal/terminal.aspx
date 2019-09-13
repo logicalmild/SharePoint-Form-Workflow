@@ -31,6 +31,7 @@ body {
   box-sizing: border-box;
   --color: lime;
 }
+
 </style>
     
 <body>
@@ -44,47 +45,78 @@ body {
 
 </body>
 <script>
- 
-    $('#term_demo').terminal(function(command) {
-       
-        switch(command){
-            case 'help':
-                        var text = GetHelp();
-                        this.echo(text);
-                        break;
-            case 'Get list':
-                        var text = GetAllListData();
-                        this.echo(text);
-                        break;
-            case 'Get site info':
-                        var text = GetSiteInfo();
-                        this.echo(text);
-                        break;
-            default:
-                        var text = 'This command is not match.\n';
-                        this.echo(text);
-                        break;
+    var LastCommand = '';
+    var TitleCommand = 'SP> ';
+    var ListSelected = '';
+
+
+    var command = {
+        'HELP                  ':'Show command and informations',
+        'GET LIST              ':'Show all list name of current site',
+        'GET LIST [Listname]   ':'Show all properties of list',
+        'QUERY LIST            ':'Query data of list',
+        'SITE INFO             ':'Show all information of current site',
+    };
+
+   var terminal = $('#term_demo').terminal(function(command) {
+        command = command.toUpperCase();
+        if(command.match(/HELP/gi)){
+            var text = GetHelp();
+            this.echo(text);
+        }else if(command.match(/GET LIST/gi)){
+            if(command == 'GET LIST'){
+                var text = GetList('title');
+                this.echo(text);
+            }else{
+                var ListName = command.split(' ');
+                ListName.splice(0,2);
+                ListName = ListName.toString();
+                ListName = ListName.replace(/,/g,' ');
+                var text = GetList(ListName);
+                this.echo(text);
+            
+            }
+            
+        }else if(command.match(/SITE INFO/gi)){
+            var text = GetSiteInfo();
+            this.echo(text);
+        }else if(command.match(/QUERY LIST/gi) || LastCommand == 'QUERY LIST'){
+            var text ='';
+            if(LastCommand == 'QUERY LIST'){
+                QueryList(command);
+            }else{
+                terminal.set_prompt('ListName> ');
+                
+            }
+            this.echo(text);
+            ListSelected = command;
+            LastCommand = 'QUERY LIST';
+        }else{
+            var text = 'This command is not match.\n';
+            this.echo(text);
         }
-   
+        scroll_to_bottom();
+
     }, { 
             greetings: 'This terminal for SharePoint via browser interface [Version 1.0.0.0] \nCreated by Saranchai Anunthananaruporn. All rights reserved\n',
             name: 'SPTerminal',
-            prompt: 'SP> ', 
+            prompt: TitleCommand , 
             name: 'test' ,
   
             
         });
 
     
+    function scroll_to_bottom() {
+        var body = $('body');
+        var sHeight = body.prop('scrollHeight');
+        body.scrollTop(sHeight);
+    }
 
     function GetHelp(){
         
         var text = '\n';
-        var HelpMessage = {
-            'help          ':'Show command and informations',
-            'Get list      ':'Show All list data of current site',
-            'Get site info ':'Show All information of curren site',
-        };
+        var HelpMessage = command;
         
         for(i in HelpMessage){
             text += i + '\t'+ HelpMessage[i] + '\n';
@@ -92,14 +124,43 @@ body {
         return text;
     }
 
-    function GetAllListData(){
+    function GetList(ListName){
 
-        var siteUrl = '/sites/MySiteCollection';
-        var clientContext = new SP.ClientContext(siteUrl);
-        var oWebsite = clientContext.get_web();
-        this.collList = oWebsite.get_lists();
-        clientContext.load(collList);
-        clientContext.executeQueryAsync(function(){},function(){});
+        var text = '\n';
+
+       
+        $.ajax({
+            url: _spPageContextInfo.webAbsoluteUrl + '/_api/web/lists',
+            type: 'GET',
+            async: false,
+            headers: {
+            'accept': 'application/json;odata=verbose',
+            'content-type': 'application/json;odata=verbose',
+            },
+            success: function (data) {
+                var temp = data.d.results;
+                
+                if(ListName == 'title'){
+                    for(i=0 ; i < temp.length ; i++){
+                        text += temp[i].Title + '\n';
+                    }
+                }else{
+                    for(i=0 ; i < temp.length ; i++){
+                        if(ListName.toUpperCase() == temp[i].Title.toUpperCase()){
+                            text += PackTextRow(40,temp[i]) + '\n';
+                        }else if(i == (temp.length-1)){
+                            text = 'List ' + ListName + ' is not found.\n';
+
+                        }
+                       
+                    }
+                }   
+                
+            },
+
+            error: {}
+        
+        });
 
 
         return text;
@@ -107,25 +168,73 @@ body {
     
     function GetSiteInfo(){
         
+        var text = '\n';
+        var Reserve = 40;
+        text += PackTextRow(Reserve,_spPageContextInfo);
+        return text;
+    }
+
+    function PackTextRow(Reserve,data){
         var text = '';
-    
-        for(i in _spPageContextInfo){
+        for(i in data){
+            var Title = i;
+            var Desc = data[i];
             
-            text+= i + '\t' + _spPageContextInfo[i] + '\n';
+            text += GroupData(Reserve,Title,Desc) + '\n';
+        }
+        
+        function GroupData(Reserve,Title,Desc){
+            var text2 = '';
+            for(i=0;i<Reserve;i++){
+                if(Title[i]){
+                    text2 += Title[i];
+                }else{
+                    text2 += ' ';
+                }
+            }
+            
+            text2 = text2 + Desc;
+            return text2;
         }
 
-        // var SiteUrl =  window.location.protocol + "//" + window.location.host + _spPageContextInfo.siteServerRelativeUrl;
-        // var SiteCollection = _spPageContextInfo.siteServerRelativeUrl;
-        // var SubSite = '';
-
-        // text += '\tSiteUrl : ' + SiteUrl + '\n';
-        // text += '\tSiteCollection : ' + SiteCollection + '\n';
-        // console.log(_spPageContextInfo);
-        debugger;
+        
 
         return text;
     }
     
+    function QueryList(query){
+        
+    }
+
+    function GetItemByRestAPI(Listname,Query){ 
+    
+        var requestUri = SiteUrl + "/_api/web/lists/getByTitle('"+Listname+"')/items" + Query;
+        var requestHeaders = {
+        "accept": "application/json;odata=verbose"
+        }
+        var extr_Data;
+
+        $.ajax({
+            url: requestUri,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            headers: requestHeaders,
+            success: function (data) 
+            {      
+                data = data.d.results; 
+                extr_Data = data;
+                
+            },
+            error: function ajaxError(response) {
+                console.log(response.status + ' ' + response.statusText);
+            }
+        });
+
+        return extr_Data;
+    }
+
+
 
 </script>
 </html>
