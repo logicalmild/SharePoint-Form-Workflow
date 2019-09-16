@@ -30,6 +30,7 @@ body {
   padding: 10px;
   box-sizing: border-box;
   --color: lime;
+  font-weight:initial;
 }
 
 </style>
@@ -48,26 +49,58 @@ body {
     var LastCommand = '';
     var TitleCommand = 'SP> ';
     var ListSelected = '';
-
+    var SiteUrl = '';
+    var GreetingMessage = 'Welcome to terminal for SharePoint via browser interface [Version 1.0.0.0] \nCreated by Saranchai Anunthananaruporn. All rights reserved\n\nType \'Help\' for suggest the command.\n\n';
 
     var command = {
-        'HELP                  ':'Show command and informations',
-        'GET LIST              ':'Show all list name of current site',
-        'GET LIST [Listname]   ':'Show all properties of list',
-        'QUERY LIST            ':'Query data of list',
-        'SITE INFO             ':'Show all information of current site',
+        '[Site Information]':{
+            'SITE INFO              ':'Show all information of current site.',
+            'GET SUBSITE            ':'Show all subsite.',
+        },
+        '[API]':{
+            'GET API                ':'Show all SharePoint API.',
+            'GET API [Properties]   ':'Get data form api name.',
+        },
+        '[List]':{
+            'GET LIST               ':'Show all list name of current site.',
+            'GET LIST [Listname]    ':'Show all properties of list.',
+            // 'Create List            ':'Create list data.',
+            // 'Delete List            ':'Delete list data.',
+        },
+        '[Retrieve Data]':{
+            'QUERY LIST [Listname]  ':'Query data of list.', 
+        },
+        '[Others]':{
+            'HELP                    ':'Show command and informations.',
+            'CLEAR                   ':'Clear screen.',
+            'LOGOUT                  ':'Logout from terminal',
+            'CREDIT                  ':'Credits',
+        }
+        
     };
+
+  
 
    var terminal = $('#term_demo').terminal(function(command) {
         command = command.toUpperCase();
+        var FirstStep = GetSiteInfo();
+
+
         if(command.match(/HELP/gi)){
+
             var text = GetHelp();
             this.echo(text);
-        }else if(command.match(/GET LIST/gi)){
+
+        }
+        else if(command.match(/GET LIST/gi)){
             if(command == 'GET LIST'){
+
                 var text = GetList('title');
                 this.echo(text);
-            }else{
+
+            }
+            else{
+
                 var ListName = command.split(' ');
                 ListName.splice(0,2);
                 ListName = ListName.toString();
@@ -77,32 +110,105 @@ body {
             
             }
             
-        }else if(command.match(/SITE INFO/gi)){
+        }
+        else if(command.match(/SITE INFO/gi)){
+
             var text = GetSiteInfo();
             this.echo(text);
-        }else if(command.match(/QUERY LIST/gi) || LastCommand == 'QUERY LIST'){
-            var text ='';
-            if(LastCommand == 'QUERY LIST'){
-                QueryList(command);
-            }else{
-                terminal.set_prompt('ListName> ');
-                
-            }
+
+        }
+        else if(command.match(/GET SUBSITE/gi)){
+
+            var text = GetSubsite();
             this.echo(text);
-            ListSelected = command;
-            LastCommand = 'QUERY LIST';
-        }else{
+
+        }
+        else if(command.match(/CREDIT/gi)){
+            
+            var text = '\nSharePoint Developer : [Saranchai Anunthananaruporn]\nJob position : [Senior Software Engineer]\nEmail: [Saranchai@SPOfficial.onmicrosoft.com]\n';
+            this.echo(text);
+            
+
+        }
+        else if(command.match(/QUERY LIST/gi)){
+
+            var text ='';
+            var Listname = command.split(' ');
+            Listname.splice(0,2);
+            Listname = Listname.toString();
+            Listname = Listname.replace(/,/g,' ');
+            text = QueryList(Listname);
+            // terminal.set_prompt('ListName> ');
+            this.echo(text);
+
+
+        }
+        else if(command.match(/GET API/gi)){
+            
+            var text = '';
+            var api = command.split(' ');
+                api.splice(0,2);
+                api = api.toString();
+                api = api.replace(/,/g,' ');
+
+            if(command.toUpperCase() == 'GET API'){
+                
+                text = GetAPI();
+
+            }
+            else{
+                
+                text = GetAPIByProp(api);
+
+            }
+            
+            this.echo(text);
+
+        }
+        else if(command.match(/LOGOUT/gi)){
+            
+            terminal.push(function(command) {
+                var history = terminal.history();
+                terminal.clear();
+                history.disable();
+                
+                terminal.push(function(command) {
+                    if (command.match(/^(y|yes)$/i)) {
+                        // terminal.echo('execute your command here');
+                        terminal.logout();
+                        terminal.clear();
+                        terminal.pop();
+                        history.enable();
+                        
+                    } else if (command.match(/^(n|no)$/i)) {
+                        terminal.pop();
+                        history.enable();
+                    }
+                }, {
+                    prompt: 'Are you sure to log out ? [y/n]\n'
+                });
+           
+            });
+            
+        }
+        else{
             var text = 'This command is not match.\n';
             this.echo(text);
         }
-        scroll_to_bottom();
 
     }, { 
-            greetings: 'This terminal for SharePoint via browser interface [Version 1.0.0.0] \nCreated by Saranchai Anunthananaruporn. All rights reserved\n',
+            greetings: GreetingMessage,
             name: 'SPTerminal',
             prompt: TitleCommand , 
-            name: 'test' ,
-  
+            login :function(user, password, callback) {
+                if (user == 'admin' && password == 'P@ssw0rd') {
+                    terminal.clear();
+                    callback('AUTHENTICATION TOKEN');
+                } else {
+                    callback(null);
+                }
+            },
+            
             
         });
 
@@ -117,10 +223,12 @@ body {
         
         var text = '\n';
         var HelpMessage = command;
-        
-        for(i in HelpMessage){
-            text += i + '\t'+ HelpMessage[i] + '\n';
-        }
+        text = JSON.stringify(HelpMessage, null , 2);
+        text = text.replace(/"/g,'');
+        text = text.replace(/,/g,'');
+        text = text.replace(/{/g,'');
+        text = text.replace(/}/g,'');
+        text = text.replace(/:/g,'\t\t');
         return text;
     }
 
@@ -169,8 +277,12 @@ body {
     function GetSiteInfo(){
         
         var text = '\n';
-        var Reserve = 40;
-        text += PackTextRow(Reserve,_spPageContextInfo);
+        var Reserve = 50;
+        text = JSON.stringify(_spPageContextInfo, null , 2);
+        text = text.replace(/"/g,'');
+        text = text.replace(/,/g,'');
+        SiteUrl = _spPageContextInfo.webServerRelativeUrl;
+
         return text;
     }
 
@@ -202,8 +314,12 @@ body {
         return text;
     }
     
-    function QueryList(query){
-        
+    function QueryList(Listname){
+        var data = GetItemByRestAPI(Listname,'');
+        text = JSON.stringify(data, null , 2);
+        text = text.replace(/"/g,'');
+        text = text.replace(/,/g,'');
+        return text;
     }
 
     function GetItemByRestAPI(Listname,Query){ 
@@ -235,6 +351,106 @@ body {
     }
 
 
+    function GetAPI(){
 
+        var requestUri = SiteUrl + "/_api/web/";
+        var requestHeaders = {
+        "accept": "application/json;odata=verbose"
+        }
+        var text;
+
+        $.ajax({
+            url: requestUri,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            headers: requestHeaders,
+            success: function (data) 
+            {      
+            
+                data = data.d; 
+                text = JSON.stringify(data, null , 2);
+                text = text.replace(/"/g,'');
+                text = text.replace(/,/g,'');
+                
+            },
+            error: function ajaxError(response) {
+                console.log(response.status + ' ' + response.statusText);
+            }
+        });
+
+        return text;
+
+    }
+
+
+    function GetAPIByProp(Prop){
+        
+        var requestUri = SiteUrl + "/_api/web/" + Prop;
+        var requestHeaders = {
+        "accept": "application/json;odata=verbose"
+        }
+        var text;
+
+        $.ajax({
+            url: requestUri,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            headers: requestHeaders,
+            success: function (data) 
+            {      
+            
+                data = data.d; 
+                text = JSON.stringify(data, null , 4);
+                text = text.replace(/"/g,'');
+                text = text.replace(/,/g,'');
+                // text = text.replace(/{/g,'');
+                // text = text.replace(/}/g,'');
+              
+                
+            },
+            error: function ajaxError(response) {
+                console.log(response.status + ' ' + response.statusText);
+            }
+        });
+
+        return text;
+    }
+    function GetSubsite(){
+        var requestUri = "https://spofficial.sharepoint.com/_api/search/query?querytext='contentclass:STS_Site contentclass:STS_Web'&selectproperties='Title,Path'&rowlimit=500";
+        var requestHeaders = {
+        "accept": "application/json;odata=verbose"
+        }
+        var text;
+
+        $.ajax({
+            url: requestUri,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            headers: requestHeaders,
+            success: function (data) 
+            {      
+            
+                data = data.d; 
+                text = JSON.stringify(data, null , 4);
+                text = text.replace(/"/g,'');
+                text = text.replace(/,/g,'');
+                // text = text.replace(/{/g,'');
+                // text = text.replace(/}/g,'');
+              
+                
+            },
+            error: function ajaxError(response) {
+                console.log(response.status + ' ' + response.statusText);
+            }
+        });
+
+        return text;
+
+    }
+
+    
 </script>
 </html>
