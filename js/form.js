@@ -29,8 +29,9 @@ $(document).ready(function(){
     //$('#suiteBarDelta').hide();
     GetCurrentUser();
     GetCurrentGroupsUser();
-    var InGroupMember = CheckUserInGroupID(GroupMember);    
+    var InGroupMember = CheckUserInGroupID(GroupMember);  
     if(InGroupMember == false){
+        
         AddCurrentUserToGroup(GroupMember);
     }
 
@@ -39,7 +40,7 @@ $(document).ready(function(){
 
 // Place For trigger for DOM 
 $('#CloseForm , #CloseForm2').click(function(){
-    CloseForm(0,SummaryPage); 
+    CloseForm(0); 
 });
 
 $('input').keypress(function(event){
@@ -67,8 +68,8 @@ $( "input" ).change(function() {
 
 });
 
-function StartSummernote(){
-    $('#summernote1').summernote({
+function StartSummernote(selector){
+    $(selector).summernote({
     
         toolbar: [
             // [groupName, [list of button]]
@@ -407,8 +408,8 @@ function AddLoading(){
     var loading ='<center><div class="loader" style="margin-top:15%; margin-bottom:15%;"></div></center>';
     $('#ModalBody').append(loading);
 }
-function CloseForm(flagclose,LinkPage){
-
+function CloseForm(flagclose){
+    var LinkPage = SummaryPage;
     if(flagclose == 1){
         window.location.href = LinkPage;
     }
@@ -687,6 +688,7 @@ function ValidateData(){ // return Pass
                             // checked an item
                             texterror += FieldValidate.Title + '<br>';
                             FlagPass = false;
+                            $("input[name="+FieldValidate.ID+"]:radio").parent().attr('style','color:red; margin-left:10px;');
                             // $("input[name='"+FieldValidate.ID+"']").attr('style','border-color:red;');
                         }
                     }else{
@@ -1002,7 +1004,7 @@ function SetPropertiesForm(oListItem,Status){
         case 'Create':
                         var index = GetParameterByName('FormMaster');
                         // var LinkForm = SiteUrl + '/SitePages/'+FormMaster[index].FormName+'.aspx?FormMaster='+ index +'&FormID=' + FormID;
-                        var LinkForm = SiteUrl + '/SitePages/'+FormMaster[index].FormName+'.aspx?FormMaster='+ index +'&FormID=' + FormID;
+                        var LinkForm = SiteUrl + '/SitePages/web/'+FormMaster[index].FormName+'.aspx?FormMaster='+ index +'&FormID=' + FormID;
                         var TagLink = '<a target="_blank" href="'+LinkForm+'">View</a>';
 
                         oListItem.set_item('View',TagLink);
@@ -1036,7 +1038,7 @@ function SetRequireField(){
            
             for(var j in Setting[i].Validate){
                     var FieldValidate = Setting[i].Validate[j];
-                    var str = '<p class="MarkRequired" style="color:red; left:0; position:absolute; top:0px; margin-bottom:0px; z-index:99;">*</p>';
+                    var str = '<p class="MarkRequired">*</p>';
                     $('#' + FieldValidate.ID).before(str);
                     $('#' + FieldValidate.ID).attr('require', true);
                     
@@ -1368,7 +1370,7 @@ function SubmitActionFinalFlag(Flag){
 
         UpdateFlagAttachment(); // FormMethodTemplate
         HistoryLog('add'); // FormMethodTemplate
-        CloseForm(1,SummaryPage); // FormMethodTemplate
+        CloseForm(1); // FormMethodTemplate
 
     }else{
 
@@ -1663,6 +1665,7 @@ function Disable_Panel(PartID){
 
 function RenderView(data){
     if(data){
+        $('.ms-cui-tts,#RibbonContainer-TabRowRight,#O365_MainLink_Settings,#O365_MainLink_Help,#Sites_BrandBar').slideUp(2000);
         Form.FormStatus = data.FormStatus;
         SetFormAction(); // FormMethodTemplate
             
@@ -1670,7 +1673,7 @@ function RenderView(data){
         $('#DocNO').text(data.RunningNO);
         $('#CreateDate').text(ConvertDate(data.Created)); 
         $('#FormStatus').text(data.FormStatus);
-        
+        $('#CreatedBy').text(data.Author.Title);
 
         // Map Current view according to FormView in config.js
         Form.FormView = FormMaster[MasterFormID].FormStep[Form.FormStatus].FormView;
@@ -1687,9 +1690,11 @@ function RenderView(data){
 
 function RenderFormNew(){
     // set panel status 
+    $('.ms-cui-tts,#RibbonContainer-TabRowRight,#O365_MainLink_Settings,#O365_MainLink_Help,#Sites_BrandBar').slideUp(2000);
     $('#DocNO').text('-');
     $('#CreateDate , #RequestDate').text(SetDateTime()); 
     $('#FormStatus').text('Create');
+    $('#CreatedBy').text(CurrentUser.Name);
     
     SetFormAction(); // FormMethodTemplate
 
