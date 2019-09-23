@@ -31,7 +31,7 @@ $(document).ready(function(){
     GetCurrentGroupsUser();
     var InGroupMember = CheckUserInGroupID(GroupMember);    
     if(InGroupMember == false){
-        AddCurrentUserToGroupMember();
+        AddCurrentUserToGroup(GroupMember);
     }
 
     StartSummernote();
@@ -1587,7 +1587,7 @@ function CheckMemberGroup(GroupID){
         }
 
         if(TempUserIDArr.indexOf(CurrentUser.ID) == -1){
-            AddCurrentUserToGroupMember();
+            AddCurrentUserToGroup(GroupMember);
         }else{
            // alert('User is in group');
         }
