@@ -151,7 +151,7 @@ function uploadFile(GroupID,InputID,IconLoading,IconComplete) {
    
 
     // check file support from config .js
-    if(FileType[0] != 'All'){
+    if(FileSupport[0] != 'All'){
         
         FileType = FileType[1];
         FileType = FileType.toLowerCase();
