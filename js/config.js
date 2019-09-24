@@ -1,54 +1,11 @@
-var SiteUrl = 'https://scgchemicals.scg.com/lotusnotes/TPCQA';
+var SiteUrl = 'https://scgchemicals.scg.com/lotusnotes/TPE_LAS';
 var IncorrectMark = '<img style="width:20px; height:20px;" src="'+SiteUrl+'/SiteAssets/web/asset/icon/incorrect.png">';
 var CorrectMark = '<img style="width:20px; height:20px;" src="'+SiteUrl+'/SiteAssets/web/asset/icon/correct.png">';
 var SiteCollection = 'lotusnotes';
-var SubSite = 'TPCQA';
-var GroupAdminID = 2511; // group admin
-var GroupQAManagerID = 2550;
-var GroupMember = 2595; 
-var GroupQASupervisorID = 2604;
-var GroupChemist = 2605;
+var SubSite = 'TPE_LAS';
+var GroupAdminID = 2649; // group admin
+var GroupMember = 2650; 
 
-
-
-
-//Script///////////////////////////////////////////////////////////////////
-var Script_Jquery = SiteUrl + '/SitePages/web/js/jquery.min.js';
-var Script_SPRuntime = '/_layouts/15/sp.runtime.js';
-var Script_SP = '/_layouts/15/sp.js';
-var Script_SPGuide = SiteUrl + '/SitePages/web/js/SPGuide.js';
-var Script_Log = SiteUrl + '/SitePages/web/js/Log.js';
-//Style///////////////////////////////////////////////////////////////////
-var Lib_Fontawesome = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css';
-
-
-var AppPath = {
-    'Homepage':{
-        'style':{
-            1:Lib_Fontawesome
-        },
-        'script':{
-            1:Script_Jquery,
-            2:Script_SPRuntime,
-            3:Script_SP,
-            4:Script_SPGuide,
-            5:Script_Log
-        }
-    },
-};
-
-/*///Workflow///////////////////////////////////////////////////////////////////
-Workflow internal name default first 8 characters and add '0' in digit 9 
-Status of workflow detail following this below
-0 - Starting
-1 - Failed on Start
-2 - In progress
-3 - Error Occurred
-4 - Cancelled
-5 - Completed
-6 - Failed on start (Retrying)
-7 - Error Occurred (Retrying)
-*/
 
 //Log
 var Log_Access = 'Log_Access';
@@ -56,8 +13,8 @@ var Log_Access = 'Log_Access';
 
 //Attachment
 var Attachment = 'Attachment';
-var FileSupport = ['jpg','png','pdf','jpeg','gif','bmp','jpe','jfif','tiff','tif'];
-//var FileSupport = ['All'];
+//var FileSupport = ['jpg','png','pdf','jpeg','gif','bmp','jpe','jfif','tiff','tif'];
+var FileSupport = ['All'];
 
 /////////////////////////////
 
@@ -73,10 +30,24 @@ var Inter_HistoryLog = 'HistoryLog';
 // Data Connection 
 var Connection_Obj = [];
 Connection_Obj[0] = {
-    Title:'',
-    SiteUrl : '',
-    ListName: '',
-    Query: '?$select=*&$top=5000'
+    Title:'Get area form master_Area',
+    SiteUrl : SiteUrl,
+    ListName: 'Master_Area',
+    Query: '?$select=Area&$top=1000&$orderby=Area asc'
+};
+
+Connection_Obj[1] = {
+    Title:'Get site form master_Site',
+    SiteUrl : SiteUrl,
+    ListName: 'Master_Site',
+    Query: '?$select=Site&$top=1000&$orderby=Site asc'
+};
+
+Connection_Obj[2] = {
+    Title:'Get RootCause form Master_RootCause',
+    SiteUrl : SiteUrl,
+    ListName: 'Master_RootCause',
+    Query: '?$select=RootCause&$top=1000&$orderby=RootCause asc'
 };
 
        
@@ -95,17 +66,540 @@ var CurrentUser = {
 
 
 //Form Master///////////////////////////////////////////////////////////////////////////////////
-// Group Involve
-
 var FormMaster = {};
 
 FormMaster[0] = {
+    FormID :'0',
+    FormName :'Form',
+    FileName :'Abnormality',
+    Listname :'Abnormality',
+    ListInternalName:'Abnormality',
+    FormatRunningNO:'Ab-',
+    Nav:{
+        TopNav:{
+            CloseForm:true,
+            Refresh:true,
+            Attachfile:false,
+            SaveDraft:true,
+        },
+        RightNav:{
+            CloseForm:true,
+            Attachfile:false,
+            SaveDraft:true,
+            RemoveItem:false,
+            Refresh:true
+        },
+    },
+    FieldData:{
+        field1:{
+            ID:'ProblemTitle',
+            Title:'Program Title',
+            TypeDom:'text',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'ProblemTitle'
+        },    
+        field2:{
+            ID:'Type',
+            Title:'Type',
+            TypeDom:'text',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'TypeProblem'
+        },      
+        field3:{
+            ID:'Area',
+            Title:'Area',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Area'
+        },    
+        field4:{
+            ID:'Reporter',
+            Title:'ผู้รายงาน',
+            TypeDom:'text',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Reporter'
+        },    
+        field5:{
+            ID:'Company',
+            Title:'บริษัท',
+            TypeDom:'text',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Company'
+        },    
+        field6:{
+            ID:'Department',
+            Title:'หน่วยงาน',
+            TypeDom:'text',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Department'
+        },    
+        field7:{
+            ID:'Site',
+            Title:'Site',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Site'
+        },    
+        field8:{
+            ID:'ProblemCategory',
+            Title:'Problem Category',
+            TypeDom:'radio',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'ProblemCategory'
+        },       
+        field9:{
+            ID:'summernote1',
+            Title:'ปัญหาและอาการของความเสียหายที่เกิดขึ้น',
+            TypeDom:'summernote',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'ProblemDamage'
+        },    
+        field10:{
+            ID:'summernote2',
+            Title:'การดำเนินการเฉพาะหน้า',
+            TypeDom:'summernote',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'Solution'
+        },       
+        field11:{
+            ID:'Responsible',
+            Title:'Response by',
+            TypeDom:'people',
+            TypeCol:'people',
+            Data:'',
+            Col:'Responsible'
+        },    
+        field12:{
+            ID:'Foreman',
+            Title:'Foreman',
+            TypeDom:'people',
+            TypeCol:'people',
+            Data:'',
+            Col:'Foreman'
+        },    
+        field13:{
+            ID:'summernote3',
+            Title:'Remark',
+            TypeDom:'summernote',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'Remark'
+        },    
+        field14:{
+            ID:'summernote4',
+            Title:'Root Cause',
+            TypeDom:'summernote',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'RootCause'
+        },    
+        field15:{
+            ID:'Factor1',
+            Title:'Factor1',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Factor1'
+        },    
+        field16:{
+            ID:'Desc1',
+            Title:'Desc1',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'Desc1'
+        },    
+        field17:{
+            ID:'Factor2',
+            Title:'Factor2',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Factor2'
+        },    
+        field18:{
+            ID:'Desc2',
+            Title:'Desc2',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'Desc2'
+        },    
+        field19:{
+            ID:'Factor3',
+            Title:'Factor3',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Factor3'
+        },    
+        field20:{
+            ID:'Desc3',
+            Title:'Desc3',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'Desc3'
+        },  
+        field21:{
+            ID:'Factor4',
+            Title:'Factor4',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Factor4'
+        },    
+        field22:{
+            ID:'Desc4',
+            Title:'Desc4',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'Desc4'
+        },    
+        field23:{
+            ID:'DueDate1',
+            Title:'',
+            TypeDom:'date',
+            TypeCol:'date',
+            Data:'',
+            Col:'DueDate1'
+        },    
+        field24:{
+            ID:'PreFactor1',
+            Title:'PreFactor1',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'PreFactor1'
+        },    
+        field25:{
+            ID:'PreDesc1',
+            Title:'PreDesc1',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'PreDesc1'
+        },  
+        field26:{
+            ID:'PreFactor2',
+            Title:'PreFactor2',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'PreFactor2'
+        },    
+        field27:{
+            ID:'PreDesc2',
+            Title:'PreDesc2',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'PreDesc2'
+        },  
+        field28:{
+            ID:'PreFactor3',
+            Title:'PreFactor3',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'PreFactor3'
+        },    
+        field29:{
+            ID:'PreDesc3',
+            Title:'PreDesc3',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'PreDesc3'
+        },  
+        field30:{
+            ID:'PreFactor4',
+            Title:'PreFactor4',
+            TypeDom:'select',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'PreFactor4'
+        },    
+        field31:{
+            ID:'PreDesc4',
+            Title:'PreDesc4',
+            TypeDom:'textarea',
+            TypeCol:'multipleline',
+            Data:'',
+            Col:'PreDesc4'
+        },  
+        field32:{
+            ID:'DueDate2',
+            Title:'DueDate2',
+            TypeDom:'date',
+            TypeCol:'date',
+            Data:'',
+            Col:'DueDate2'
+        },     
+        // field2:{
+        //     ID:'',
+        //     Title:'',
+        //     TypeDom:'text',
+        //     TypeCol:'singleline',
+        //     Data:'',
+        //     Col:''
+        // },    
+    },
+    Workflow:{
+        name:'Abnormality',
+        version:'2013'
+    },
+    FormStep:{
+        'Create':{
+            FormStatus:'Create',
+            FormView:'Create',
+            StatusAction:{
+                Submit:'Submit',
+            },
+            Nav:{
+                TopNav:{
+                    CloseForm:true,
+                    Refresh:true,
+                    Attachfile:false,
+                    SaveDraft:true,
+                },
+                RightNav:{
+                    CloseForm:true,
+                    Attachfile:false,
+                    SaveDraft:true,
+                    RemoveItem:false,
+                    Refresh:true
+                },
+            },
+            Validate:{
+                field1:{
+                    Title:'Problem Title',
+                    ID:'ProblemTitle',
+                    Type:'text'
+                },           
+                field2:{
+                    Title:'Type',
+                    ID:'Type',
+                    Type:'text'
+                },           
+                field3:{
+                    Title:'Area',
+                    ID:'Area',
+                    Type:'select'
+                },           
+                field4:{
+                    Title:'Reporter',
+                    ID:'Reporter',
+                    Type:'text'
+                },           
+                field5:{
+                    Title:'บริษัท',
+                    ID:'Company',
+                    Type:'text'
+                },           
+                field6:{
+                    Title:'หน่วยงาน',
+                    ID:'Department',
+                    Type:'text'
+                },           
+                field7:{
+                    Title:'Site',
+                    ID:'Site',
+                    Type:'select'
+                },           
+                field8:{
+                    Title:'Problem Category',
+                    ID:'ProblemCategory',
+                    Type:'radio'
+                },           
+            },
+
+        },
+        'Save Draft':{
+            FormStatus:'Save Draft',
+            FormView:'Save Draft',
+            StatusAction:{
+                Submit:'Submit',
+            },
+            Nav:{
+                TopNav:{
+                    CloseForm:true,
+                    Refresh:true,
+                    Attachfile:false,
+                    SaveDraft:true,
+                },
+                RightNav:{
+                    CloseForm:true,
+                    Attachfile:false,
+                    SaveDraft:true,
+                    RemoveItem:false,
+                    Refresh:true
+                },
+            },
+            Validate:{
+                field1:{
+                    Title:'Problem Title',
+                    ID:'ProblemTitle',
+                    Type:'text'
+                },           
+                field2:{
+                    Title:'Type',
+                    ID:'Type',
+                    Type:'text'
+                },           
+                field3:{
+                    Title:'Area',
+                    ID:'Area',
+                    Type:'select'
+                },           
+                field4:{
+                    Title:'Reporter',
+                    ID:'Reporter',
+                    Type:'text'
+                },           
+                field5:{
+                    Title:'บริษัท',
+                    ID:'Company',
+                    Type:'text'
+                },           
+                field6:{
+                    Title:'หน่วยงาน',
+                    ID:'Department',
+                    Type:'text'
+                },           
+                field7:{
+                    Title:'Site',
+                    ID:'Site',
+                    Type:'select'
+                },           
+                field8:{
+                    Title:'Problem Category',
+                    ID:'ProblemCategory',
+                    Type:'radio'
+                },           
+            },
+
+        },
+        'Complete':{
+            FormStatus:'Complete',
+            FormView:'Complete',
+            StatusAction:{
+                
+            },
+            Nav:{
+                TopNav:{
+                    CloseForm:true,
+                    Refresh:true,
+                    Attachfile:false,
+                    SaveDraft:true,
+                },
+                RightNav:{
+                    CloseForm:true,
+                    Attachfile:false,
+                    SaveDraft:true,
+                    RemoveItem:false,
+                    Refresh:true
+                },
+            },
+            Validate:{
+                    field:{
+                        Title:null,
+                        ID:null,
+                        Type:null
+                    }
+            },
+        }
+
+        
+    }
+};
+FormMaster[1] = {
     FormID :'1',
     FormName :'Form',
-    FileName :'ProblemReport',
-    Listname :'Problem Report',
-    ListInternalName:'ProblemReport',
-    FormatRunningNO:'QA-PB-',
+    FileName :'KPI',
+    Listname :'KPI',
+    ListInternalName:'KPI',
+    FormatRunningNO:'KPI-',
+    Nav:{
+        TopNav:{
+            CloseForm:true,
+            Refresh:true,
+            Attachfile:false,
+        },
+        RightNav:{
+            CloseForm:true,
+            Attachfile:false,
+            SaveDraft:false,
+            RemoveItem:false,
+            Refresh:true
+        },
+    },
+    FieldData:{
+        field1:{
+            ID:'Subject',
+            Title:'ชื่อเรื่อง',
+            TypeDom:'text',
+            TypeCol:'singleline',
+            Data:'',
+            Col:'Subject'
+        },    
+    },
+    Workflow:{
+        name:'Problem_x0020_Report_x0020_Workf',
+        version:'2013'
+    },
+    FormStep:{
+        'Create':{
+            FormStatus:'Create',
+            FormView:'Create',
+            StatusAction:{
+                Submit:'Submit',
+            },
+            Validate:{
+                field1:{
+                    Title:'',
+                    ID:'',
+                    Type:''
+                },           
+            },
+
+        },
+        'Complete':{
+            FormStatus:'Complete',
+            FormView:'Complete',
+            StatusAction:{
+                
+            },
+            Validate:{
+                    field:{
+                        Title:null,
+                        ID:null,
+                        Type:null
+                    }
+            },
+        }
+
+        
+    }
+};
+FormMaster[2] = {
+    FormID :'2',
+    FormName :'Form',
+    FileName :'GoodsReturn',
+    Listname :'GoodsReturn',
+    ListInternalName:'GoodsReturn',
+    FormatRunningNO:'GR-',
     Nav:{
         TopNav:{
             CloseForm:true,

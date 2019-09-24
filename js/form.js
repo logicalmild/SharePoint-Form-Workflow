@@ -23,6 +23,8 @@ var ListInternalName = FormMaster[MasterFormID].ListInternalName;
 var FormatRunningNO = FormMaster[MasterFormID].FormatRunningNO;
 var SummaryPage = SiteUrl + '/Lists/' + ListInternalName;// dashboard after submit form
 
+
+
 $(document).ready(function(){
     
     //$('#s4-ribbonrow').hide();
@@ -104,7 +106,7 @@ function StartSummernote(selector){
 }
 function GetData(query){ // FormMethodTemplate
             
-    var query = '?$select=*&$filter=FormID eq \''+FormID+'\'';
+    //var query = '?$select=*&$filter=FormID eq \''+FormID+'\'';
     var data = GetItemByRestAPI(ListData,query);
  
     if(data){
@@ -890,6 +892,65 @@ function CreateListItem(ListName,Object){
     );
 
 }
+function SaveByCreateListItem(ListName,Object){
+
+    var dataset = {};
+    dataset = Object;
+    var clientContext = new SP.ClientContext(SiteUrl);
+    var oList = clientContext.get_web().get_lists().getByTitle(ListName);
+    var itemCreateInfo = new SP.ListItemCreationInformation();
+    this.oListItem = oList.addItem(itemCreateInfo);
+    SetPropertiesForm(oListItem,'Create');
+    SetFormatData(dataset,oListItem); // set item all object by this action
+    oListItem.update();	
+    clientContext.executeQueryAsync(
+    function(){
+
+        $('#MainModal').modal('hide');
+
+        Swal.fire(
+            'Save as draft completely',
+            'Click for continue',
+            'success',
+            {
+                timer: 1500
+            }
+        ).then((result) => {
+
+            if(result.value){
+                SubmitActionFinalFlag('SaveDraft');
+            }
+
+        });
+        
+        
+
+        // $('#ModalBody').empty();
+        // $('#ModalBody').append('<p style="text-align:center;">Successfully...<p>');
+        
+    },
+    function(sender, args){
+
+        $('#MainModal').modal('hide');
+
+        Swal.fire({
+            type: 'error',
+            title: 'Oops... <br>Something went wrong! can not save as draft',
+            footer: 'Please contact your site admin for support.',
+           
+            
+        });
+
+        SubmitActionFinalFlag(false);
+        // $('#ModalBody').empty();
+        // $('#ModalBody').append('<p style="text-align:center; color:red;">Create list item error...<p>');
+        // alert('Request failed. ' + args.get_message() + '\n' + args.get_stackTrace());
+       
+    }
+
+    );
+
+}
 function UpdateListItem(ListName,Object){
 
     var dataset = Object ;
@@ -905,7 +966,7 @@ function UpdateListItem(ListName,Object){
     this.oListItem = oList.getItemById(ItemID);
     SetPropertiesForm(oListItem,'Update');
     SetFormatData(dataset,oListItem); // set item all object by this action
-
+    oListItem.set_item('FormStatus','Save Draft');
     oListItem.update();	
     clientContext.executeQueryAsync(function(){
 
@@ -935,6 +996,62 @@ function UpdateListItem(ListName,Object){
         Swal.fire({
             type: 'error',
             title: 'Oops... <br> Something went wrong!',
+            footer: 'Please contact your site admin for support.',
+            
+            
+        });
+
+        SubmitActionFinalFlag(false);
+
+    });
+
+}
+function SaveByUpdateListItem(ListName,Object){
+
+    var dataset = Object ;
+    var ItemID;
+    var query = '?$select=ID&$filter=FormID eq \''+FormID+'\'';
+    var data = GetItemByRestAPI(ListName,query);
+    if(data){
+        ItemID = data[0].ID;
+    }
+
+    var clientContext = new SP.ClientContext(SiteUrl);
+    var oList = clientContext.get_web().get_lists().getByTitle(ListName);
+    this.oListItem = oList.getItemById(ItemID);
+    SetPropertiesForm(oListItem,'Update');
+    oListItem.set_item('FormStatus','Save Draft');
+    SetFormatData(dataset,oListItem); // set item all object by this action
+
+    oListItem.update();	
+    clientContext.executeQueryAsync(function(){
+
+        
+        // $('#ModalBody').empty();
+        // $('#ModalBody').append('<p style="text-align:center;">Save Successfully...<p>');
+        // $('#MainModal').modal('hide');
+        Swal.fire(
+            'Save as draft completely',
+            'Click for continue',
+            'success',
+            {
+                timer: 1500
+            }
+        ).then((result) => {
+
+            if(result.value){
+                SubmitActionFinalFlag('SaveDraft');
+            }
+
+        });
+
+    }, function(){
+
+        $('#MainModal').modal('hide');
+
+        Swal.fire({
+            type: 'error',
+            title: 'Oops... <br>Something went wrong! can not save as draft',
             footer: 'Please contact your site admin for support.',
             
             
@@ -1372,6 +1489,10 @@ function SubmitActionFinalFlag(Flag){
         HistoryLog('add'); // FormMethodTemplate
         CloseForm(1); // FormMethodTemplate
 
+    }else if(Flag == 'SaveDraft'){
+        UpdateFlagAttachment(); // FormMethodTemplate
+        // enable submit button
+        $('#SubmitAction').prop('disabled',false);
     }else{
 
         // enable submit button
@@ -1530,21 +1651,17 @@ function TriggerTempData(){
 }
 function SaveDraft(){
     
-        $('#MainModal').modal('show');
-        AddLoading();
-        $('#TitleModal').text('Save Draft');
         TriggerTempData();
-        
         var StatusCreate = CheckUpdateOrCreate(ListData);
         switch(StatusCreate){   
             case 'Create':
                     
-                        CreateListItem(ListData,TempCurrentData);
+                        SaveByCreateListItem(ListData,TempCurrentData);
                         UpdateFlagAttachment(); 
                     break;
             case 'Update':
                     
-                        UpdateListItem(ListData,TempCurrentData);
+                        SaveByUpdateListItem(ListData,TempCurrentData);
                         UpdateFlagAttachment(); 
                     break;
         }
@@ -1607,27 +1724,16 @@ function CheckMemberGroup(GroupID){
 
 
 function CurrentRole(Role,TitleRole){
-    
-                     
-    if(CurrentUser.Name == Role || CurrentUser.Permission == 'Admin'){
-        if(CurrentUser.Name == Role && CurrentUser.Permission == 'Admin'){ // admin & current role
-            $('#Permission').text(TitleRole);
-           
-            
-        }
-        else if(CurrentUser.Name == Role && CurrentUser.Permission != 'Admin'){ // current role no admin
-            $('#Permission').text(TitleRole);
-            //hide button remove right nav
-            $('#RemoveCurrentForm').hide();
-        }
-        else{// admin no current role
-            $('#Permission').text('Admin');
-             
-            
-        } 
-    }else{
+                   
+               
+    if(TitleRole != 'Visitor'){
+        
+        $('#Permission').text(TitleRole);
+    }
+    else{
         
         Disable_Panel('All');
+        $('#Permission').text('Visitor');
         //hide button remove right nav
         $('#RemoveCurrentForm , #btnSaveDraft').hide();
         
@@ -1665,7 +1771,16 @@ function Disable_Panel(PartID){
 
 function RenderView(data){
     if(data){
-        $('.ms-cui-tts,#RibbonContainer-TabRowRight,#O365_MainLink_Settings,#O365_MainLink_Help,#Sites_BrandBar').slideUp(2000);
+
+        if(CurrentUser.Permission == 'Admin'){
+
+        }else{
+            $('.ms-cui-tts,#RibbonContainer-TabRowRight,#O365_MainLink_Settings,#O365_MainLink_Help,#Sites_BrandBar').slideUp(2000);
+        }
+
+        
+        
+        
         Form.FormStatus = data.FormStatus;
         SetFormAction(); // FormMethodTemplate
             
@@ -1690,7 +1805,14 @@ function RenderView(data){
 
 function RenderFormNew(){
     // set panel status 
-    $('.ms-cui-tts,#RibbonContainer-TabRowRight,#O365_MainLink_Settings,#O365_MainLink_Help,#Sites_BrandBar').slideUp(2000);
+    if(CurrentUser.Permission == 'Admin'){
+
+    }else{
+        
+        $('.ms-cui-tts,#RibbonContainer-TabRowRight,#O365_MainLink_Settings,#O365_MainLink_Help,#Sites_BrandBar').slideUp(2000);
+    
+    }
+    
     $('#DocNO').text('-');
     $('#CreateDate , #RequestDate').text(SetDateTime()); 
     $('#FormStatus').text('Create');
