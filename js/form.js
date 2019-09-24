@@ -114,6 +114,8 @@ function GetData(query){ // FormMethodTemplate
 
             data = data[0];
             
+            Form.FormStatus = data.FormStatus;
+
             if(data[workflow.name]){
                 var name = data[workflow.name];
                 CheckStatusWorkflow(name , workflow.version);  // FormMethodTemplate
@@ -901,6 +903,8 @@ function SaveByCreateListItem(ListName,Object){
     var itemCreateInfo = new SP.ListItemCreationInformation();
     this.oListItem = oList.addItem(itemCreateInfo);
     SetPropertiesForm(oListItem,'Create');
+    oListItem.set_item('FormStatus','Save Draft');
+    oListItem.set_item('RunningNO','Draft');
     SetFormatData(dataset,oListItem); // set item all object by this action
     oListItem.update();	
     clientContext.executeQueryAsync(
@@ -1021,6 +1025,7 @@ function SaveByUpdateListItem(ListName,Object){
     this.oListItem = oList.getItemById(ItemID);
     SetPropertiesForm(oListItem,'Update');
     oListItem.set_item('FormStatus','Save Draft');
+    oListItem.set_item('RunningNO','Draft');
     SetFormatData(dataset,oListItem); // set item all object by this action
 
     oListItem.update();	
@@ -1781,7 +1786,7 @@ function RenderView(data){
         
         
         
-        Form.FormStatus = data.FormStatus;
+       
         SetFormAction(); // FormMethodTemplate
             
         // Set top right info
@@ -1791,10 +1796,12 @@ function RenderView(data){
         $('#CreatedBy').text(data.Author.Title);
 
         // Map Current view according to FormView in config.js
+        // Form.FormView = FormMaster[MasterFormID].FormStep[Form.FormStatus].FormView;
+        Form.FormStatus = data.FormStatus;
         Form.FormView = FormMaster[MasterFormID].FormStep[Form.FormStatus].FormView;
-    
+  
         if(Form.FormView){
-            SwitchViewTo(Form.FormView,data);
+            SwitchViewTo(Form.FormView);
         }
         else{
             Disable_Panel('All');
