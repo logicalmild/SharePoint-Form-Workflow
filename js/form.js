@@ -20,7 +20,8 @@ var workflow =  FormMaster[MasterFormID].Workflow;
 var TempCurrentData = FormMaster[MasterFormID].FieldData;
 var ListData = FormMaster[MasterFormID].Listname;
 var ListInternalName = FormMaster[MasterFormID].ListInternalName;
-var FormatRunningNO = FormMaster[MasterFormID].FormatRunningNO;
+var IsRunningNOEnabled = FormMaster[MasterFormID].RunningNO.Enable;
+var FormatRunningNO = FormMaster[MasterFormID].RunningNO.FormatRunningNO;
 var SummaryPage = SiteUrl + '/Lists/' + ListInternalName;// dashboard after submit form
 
 
@@ -593,8 +594,12 @@ function GenDocNo(Type){ // DocNO,Year
     
     switch(Type){
         case 'DocNo': 
-                        length = length + 1;
-                        value = FormatRunningNO + yyyy+'/'+length;
+                        if(IsRunningNOEnabled == true){
+                            length = length + 1;
+                            value = FormatRunningNO + yyyy+'/'+length;
+                        }else{
+                            value = '';
+                        }
                         break;
 
         case 'Year':    value = yyyy;
@@ -905,6 +910,7 @@ function SaveByCreateListItem(ListName,Object){
     SetPropertiesForm(oListItem,'Create');
     oListItem.set_item('FormStatus','Save Draft');
     oListItem.set_item('RunningNO','Draft');
+    oListItem.set_item('FlagSubmit',false);
     SetFormatData(dataset,oListItem); // set item all object by this action
     oListItem.update();	
     clientContext.executeQueryAsync(
@@ -1026,6 +1032,7 @@ function SaveByUpdateListItem(ListName,Object){
     SetPropertiesForm(oListItem,'Update');
     oListItem.set_item('FormStatus','Save Draft');
     oListItem.set_item('RunningNO','Draft');
+    oListItem.set_item('FlagSubmit',false);
     SetFormatData(dataset,oListItem); // set item all object by this action
 
     oListItem.update();	
@@ -1801,7 +1808,7 @@ function RenderView(data){
         Form.FormView = FormMaster[MasterFormID].FormStep[Form.FormStatus].FormView;
   
         if(Form.FormView){
-            SwitchViewTo(Form.FormView);
+            SwitchViewTo(Form.FormView,data);
         }
         else{
             Disable_Panel('All');
