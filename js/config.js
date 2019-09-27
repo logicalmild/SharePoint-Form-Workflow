@@ -50,6 +50,13 @@ Connection_Obj[2] = {
     Query: '?$select=RootCause&$top=1000&$orderby=RootCause asc'
 };
 
+Connection_Obj[3] = {
+    Title:'Get Section Manager from list Master_Area',
+    SiteUrl : SiteUrl,
+    ListName: 'Master_Area',
+    Query: '?$select=SectionManager/Title,SectionManager/Id&$expand=SectionManager&$top=1000&$orderby=SectionManager/Title asc'
+};
+
        
 
 // CurrentUser object variable
@@ -74,21 +81,9 @@ FormMaster[0] = {
     FileName :'Abnormality',
     Listname :'Abnormality',
     ListInternalName:'Abnormality',
-    FormatRunningNO:'Ab-',
-    Nav:{
-        TopNav:{
-            CloseForm:true,
-            Refresh:true,
-            Attachfile:false,
-            SaveDraft:true,
-        },
-        RightNav:{
-            CloseForm:true,
-            Attachfile:false,
-            SaveDraft:true,
-            RemoveItem:false,
-            Refresh:true
-        },
+    RunningNO:{
+        Enable:false,
+        FormatRunningNO:'-',
     },
     FieldData:{
         field1:{
@@ -347,14 +342,6 @@ FormMaster[0] = {
             Data:'',
             Col:'DueDate2'
         },     
-        // field2:{
-        //     ID:'',
-        //     Title:'',
-        //     TypeDom:'text',
-        //     TypeCol:'singleline',
-        //     Data:'',
-        //     Col:''
-        // },    
     },
     Workflow:{
         name:'Abnormality',
@@ -422,6 +409,11 @@ FormMaster[0] = {
                     Title:'Problem Category',
                     ID:'ProblemCategory',
                     Type:'radio'
+                },           
+                field9:{
+                    Title:'Section Manager',
+                    ID:'SectionManager',
+                    Type:'people'
                 },           
             },
 
@@ -491,108 +483,85 @@ FormMaster[0] = {
             },
 
         },
-        'Complete':{
-            FormStatus:'Complete',
-            FormView:'Complete',
+        'Wait for section manager approve':{
+            FormStatus:'Wait for section manager approve',
+            FormView:'Wait for section manager approve',
             StatusAction:{
-                
+                Submit:'Submit',
+                Reject:'Reject',
             },
             Nav:{
                 TopNav:{
                     CloseForm:true,
                     Refresh:true,
                     Attachfile:false,
-                    SaveDraft:true,
+                    SaveDraft:false,
                 },
                 RightNav:{
                     CloseForm:true,
                     Attachfile:false,
-                    SaveDraft:true,
+                    SaveDraft:false,
                     RemoveItem:false,
                     Refresh:true
                 },
             },
             Validate:{
-                    field:{
-                        Title:null,
-                        ID:null,
-                        Type:null
-                    }
-            },
-        }
-
-        
-    }
-};
-FormMaster[1] = {
-    FormID :'1',
-    FormName :'Form',
-    FileName :'KPI',
-    Listname :'KPI',
-    ListInternalName:'KPI',
-    FormatRunningNO:'KPI-',
-    Nav:{
-        TopNav:{
-            CloseForm:true,
-            Refresh:true,
-            Attachfile:false,
-        },
-        RightNav:{
-            CloseForm:true,
-            Attachfile:false,
-            SaveDraft:false,
-            RemoveItem:false,
-            Refresh:true
-        },
-    },
-    FieldData:{
-        field1:{
-            ID:'Subject',
-            Title:'ชื่อเรื่อง',
-            TypeDom:'text',
-            TypeCol:'singleline',
-            Data:'',
-            Col:'Subject'
-        },    
-    },
-    Workflow:{
-        name:'Problem_x0020_Report_x0020_Workf',
-        version:'2013'
-    },
-    FormStep:{
-        'Create':{
-            FormStatus:'Create',
-            FormView:'Create',
-            StatusAction:{
-                Submit:'Submit',
-            },
-            Validate:{
-                field1:{
-                    Title:'',
-                    ID:'',
-                    Type:''
+                field0:{
+                    Title:'Response by',
+                    ID:'Responsible',
+                    Type:'people'
                 },           
+                field1:{
+                    Title:'Foreman',
+                    ID:'Foreman',
+                    Type:'people'
+                },           
+                // field1:{
+                //     Title:'Problem Title',
+                //     ID:'ProblemTitle',
+                //     Type:'text'
+                // },           
+                   
             },
 
         },
-        'Complete':{
-            FormStatus:'Complete',
-            FormView:'Complete',
+        'Close':{
+            FormStatus:'Close',
+            FormView:'Close',
             StatusAction:{
-                
+
+            },
+            Nav:{
+                TopNav:{
+                    CloseForm:true,
+                    Refresh:true,
+                    Attachfile:false,
+                    SaveDraft:false,
+                },
+                RightNav:{
+                    CloseForm:true,
+                    Attachfile:false,
+                    SaveDraft:false,
+                    RemoveItem:false,
+                    Refresh:true
+                },
             },
             Validate:{
-                    field:{
-                        Title:null,
-                        ID:null,
-                        Type:null
-                    }
+       
+                   
             },
-        }
+
+        },
+
 
         
     }
 };
+
+
+
+
+
 FormMaster[2] = {
     FormID :'2',
     FormName :'Form',

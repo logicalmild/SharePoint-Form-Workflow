@@ -976,7 +976,6 @@ function UpdateListItem(ListName,Object){
     this.oListItem = oList.getItemById(ItemID);
     SetPropertiesForm(oListItem,'Update');
     SetFormatData(dataset,oListItem); // set item all object by this action
-    oListItem.set_item('FormStatus','Save Draft');
     oListItem.update();	
     clientContext.executeQueryAsync(function(){
 
@@ -1738,17 +1737,17 @@ function CheckMemberGroup(GroupID){
 function CurrentRole(Role,TitleRole){
                    
                
-    if(TitleRole != 'Visitor'){
-        
-        $('#Permission').text(TitleRole);
-    }
-    else{
+    if(TitleRole == 'Visitor'){
         
         Disable_Panel('All');
         $('#Permission').text('Visitor');
         //hide button remove right nav
         $('#RemoveCurrentForm , #btnSaveDraft').hide();
         
+    }
+    else{
+
+        $('#Permission').text(TitleRole);
     }
 }
 

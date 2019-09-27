@@ -6,13 +6,23 @@
 
 
         var RightNavStr = '';
-        var CloseBtn = '<a id="CloseForm2" data-toggle="tooltip" title="Close Form" type="button" class="btn btn btn-primary btn-md" style="background-color:#ff6600; border-color:#ff6600; color:white; font-weight:bold;"><i class="fa fa-remove"></i></a>';
+        var CloseBtn = '<a id="CloseForm2" onclick="CloseForm(\'0\');" data-toggle="tooltip" title="Close Form" type="button" class="btn btn btn-primary btn-md" style="background-color:#dc3545; border-color:#ff6600; color:white; font-weight:bold;"><i class="fa fa-remove"></i></a>';
         var AttachFileBtn = '<a onclick="Attachfile();" data-toggle="tooltip" title="Attachfile" type="button" class="btn btn btn-primary btn-md" style="background-color:#1BA1E2; border-color:#1BA1E2; color:white; font-weight:bold;"><i class="fa fa-paperclip"></i></a>';
-        var SaveDraftBtn = '<a onclick="SaveDraft();" id="btnSaveDraft" data-toggle="tooltip" title="Save Draft" type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(196, 193, 50); border-color:rgb(196, 193, 50);; color:white; font-weight:bold; padding-left:11.5px; padding-right:11.5px;"><i class="fa fa-floppy-o"></i></a>';
+        var SaveDraftBtn = '<a onclick="SaveDraft();" id="btnSaveDraft" data-toggle="tooltip" title="Save Draft" type="button" class="btn btn btn-primary btn-md" style="backgrond-color:#007bff; color:white; font-weight:bold; padding-left:11.5px; padding-right:11.5px;"><i class="fa fa-floppy-o"></i></a>';
         var RemoveItemBtn = '<a id="RemoveCurrentForm" onclick="RemoveCurrentForm();" data-toggle="tooltip" title="Remove this form" type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(138, 28, 28); border-color:rgb(138, 28, 28); color:white; font-weight:bold;" ><i class="fa fa-trash-o"></i></a>';
         var RefreshBtn = '<a onclick="RefreshPage();" data-toggle="tooltip" title="Refresh page" type="button" class="btn btn btn-primary btn-md" style="background-color:#fcba03; border-color:#fcba03; color:white; font-weight:bold;" ><i class="fa fa-refresh"></i></a>';
    
-        var RightMenu =  FormMaster[MasterFormID].Nav.RightNav;
+        // var RightMenu =  FormMaster[MasterFormID].Nav.RightNav;
+        var TempFormID = GetParameterByName('FormID');
+        if(TempFormID){    
+            var GetFormStatus = '?$select=FormStatus&$filter=FormID eq \''+FormID+'\'';
+            var TrigForGetFormStatus = GetData(GetFormStatus);
+            
+        }else{
+            Form.FormStatus = 'Create';
+        }
+        
+        var RightMenu =  FormMaster[MasterFormID].FormStep[Form.FormStatus].Nav.RightNav;
         
             if(RightMenu.CloseForm){
                 RightNavStr += CloseBtn;
