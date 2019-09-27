@@ -4,57 +4,64 @@ Form &amp; Workflow
 ## Structure
 ``` bash
 └───web
-    ├───asset
+│   ├───asset
+│   └───icon
+├───component
+│   ├───Approval
+│   ├───Attachment
+│   ├───Btn_CreateForm.html
+│   ├───Control_Icon
+│   ├───File
+│   ├───HistoryLog
+│   ├───HomeMenu
+│   ├───Log
+│   ├───ModalTemplate
+│   ├───NavBar
+│   ├───Page
+│   ├───RightNavMenu
+│   └───Table
+├───css
+│   └───images
+├───form
+│   └───FormTemplate
+├───js
+├───lib
+│   ├───bootstrap
+│   │   ├───css
+│   │   └───js
+│   └───summernote
+│       └───dist
+│           ├───font
+│           ├───lang
+│           └───plugin
+│               ├───databasic
+│               ├───hello
+│               └───specialchars
+├───report
+│   ├───css
+│   ├───datatable
+│   │   ├───Buttons-1.5.4
+│   │   │   ├───css
+│   │   │   ├───js
+│   │   │   └───swf
+│   │   ├───DataTables-1.10.18
+│   │   │   ├───css
+│   │   │   ├───images
+│   │   │   └───js
+│   │   ├───jQuery-3.3.1
+│   │   └───Responsive-2.2.2
+│   │       ├───css
+│   │       └───js
+│   ├───html_report
+│   ├───img
+│   └───js
+└───terminal
+    ├───img
     │   └───icon
-    ├───component
-    │   ├───Approval
-    │   ├───Attachment
-    │   ├───Btn_CreateForm.html
-    │   ├───Control_Icon
-    │   ├───HistoryLog
-    │   ├───ModalTemplate
-    │   ├───NavBar
-    │   └───Page
-    ├───css
-    │   └───images
-    ├───form
-    │   ├───FormTemplate
-    │   └───S_Reservation
-    ├───js
-    ├───lib
-    │   ├───bootstrap
-    │   │   ├───css
-    │   │   └───js
-    │   └───summernote
-    │       └───dist
-    │           ├───font
-    │           ├───lang
-    │           └───plugin
-    │               ├───databasic
-    │               ├───hello
-    │               └───specialchars
-    └───report
-        ├───css
-        ├───datatable
-        │   ├───Buttons-1.5.4
-        │   │   ├───css
-        │   │   ├───js
-        │   │   └───swf
-        │   ├───DataTables-1.10.18
-        │   │   ├───css
-        │   │   ├───images
-        │   │   └───js
-        │   ├───jQuery-3.3.1
-        │   └───Responsive-2.2.2
-        │       ├───css
-        │       └───js
-        ├───html_report
-        ├───img
-        └───js
+    └───js
 ```
 ## Start
-Start project with insert file install InstallSiteStruct.aspx and run in browser under current site
-1) Open page in url SiteUrl/Sitepages/web/Installer/Installer.aspx
+
 
 ## Settings
 First Setting in ./js/config.js
@@ -141,6 +148,7 @@ FormStep:{
   - check
   - object
   - var
+  - summernote
 
 (TypeCol) (Type support)
   - singleline
@@ -154,6 +162,8 @@ Validate field data (Type support)
 - date
 - people
 - select
+- radio
+- summernote
 
 ## Function 
 
