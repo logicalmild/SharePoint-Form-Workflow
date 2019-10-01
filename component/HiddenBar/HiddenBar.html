@@ -1,0 +1,20 @@
+
+
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_LAS/SitePages/web/js/jquery.min.js"></script>
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_LAS/SitePages/web/js/config.js"></script>
+<script src="https://scgchemicals.scg.com/lotusnotes/TPE_LAS/SitePages/web/js/SPGuide.js"></script>
+
+
+<script>
+    $(function(){
+        
+        GetCurrentUser();
+        
+        // Check : Is CurrentUser in group admin ?
+        var IsUser = CheckUserInGroupID(GroupAdminID);
+        if(IsUser == false){
+            $('.ms-cui-tts,#RibbonContainer-TabRowRight,#O365_MainLink_Settings,#O365_MainLink_Help,#Sites_BrandBar').slideUp(2000);
+        }
+    });
+
+</script>

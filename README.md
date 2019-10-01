@@ -307,9 +307,7 @@ Validate field data (Type support)
   - radio
   - summernote
 
-## Function 
-
-### SPGuide.js
+### Function SPGuide.js
  Section1: Query Data<br/><br/>
             - GetCurrentPageName()[return string];<br/>
             - GetParameterByName(name)[return string];<br/>
@@ -363,14 +361,3 @@ Validate field data (Type support)
 ``` 
 
 
-
-### Interface
-
-1) AddLoading()<br/>
-   open modal and show loading.<br/>
-
-2) RoutingPage('Filename.html')<br/>
-   Replace current page with new page not redirect<br/>
-
-3) IncludeComponent(ElementID,Component)<br/>
-   Include component into div component<br/>
