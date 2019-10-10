@@ -604,6 +604,10 @@ function GenDocNo(Type){ // DocNO,Year
 
         case 'Year':    value = yyyy;
                         break;
+        case 'Month':
+                        var ArrMonth = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                        value = ArrMonth[mm-1];
+                        break;
 
     }
     return value;
@@ -1139,6 +1143,7 @@ function SetPropertiesForm(oListItem,Status){
                         oListItem.set_item('FormID',FormID);
                         oListItem.set_item('RunningNO',GenDocNo('DocNo'));
                         oListItem.set_item('Year',GenDocNo('Year'));
+                        oListItem.set_item('Month',GenDocNo('Month'));
                         
                         
                         break;
@@ -1342,7 +1347,7 @@ function SetElementByItemData(item,TempData){
                         }
                         //
                         break;
-            case 'check':
+            case 'checkbox':
                         if(TempData == true){
                             $('#'+item.ID).prop('checked', true);
                             var Str_Part = item.ID;
@@ -1574,7 +1579,7 @@ function TriggerTempData(){
                                         break;
 
                                         
-                        case 'check':
+                        case 'checkbox':
                                         if ($('#'+field.ID).is(":checked"))
                                         {
                                             field.Data = true;
@@ -1846,4 +1851,37 @@ function RenderFormNew(){
         $('#Permission').text('Requestor');
       
     }  
+}
+
+
+function GoToTop(){
+   
+    $('#s4-workspace').animate({scrollTop:0}, 'slow');
+
+    // var w = document.getElementById("s4-workspace");
+    // w.scrollTop({behavior: "smooth"});
+}
+
+function SetFieldFormMaster(ConnectionID,DomID,TypeDom){
+    switch(TypeDom){
+        case 'select':
+                        var data = DataConnection(ConnectionID);
+                        var str='';
+                        if(data){
+
+                            var value = data[0].Value;
+                            value = value.split(',');
+                            if(value){
+                                str+='<option value="-">Please Select...</option>';
+                                for(i=0;i<value.length;i++){
+                                    str+='<option value="'+value[i]+'">'+value[i]+'</option>';
+                                } 
+                                $('#' + DomID).empty();
+                                $('#' + DomID).append(str);  
+                            }
+                            
+                        }
+                        break;
+    }
+    
 }
