@@ -673,8 +673,16 @@ function SetFormatData(dataset,oListItem){
                                 break;
             case 'radio':
                                 if(Value){
-                                    Value = Value
+                                    Value = Value;
                                 }
+                                break;
+            case 'checkbox':
+                                if(Value){
+                                    Value = Value;
+                                }else{
+                                    Value = false;
+                                }
+                                
                                 break;
             
         
