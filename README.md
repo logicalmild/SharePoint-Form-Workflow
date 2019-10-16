@@ -367,37 +367,31 @@ Validate field data (Type support)
 
 ### Input people picker multiple selection in page
 
-    HTML Page<br/>>
+     Page<br/>
 
     ``` html
-
         <div class="col-md-12" style="background-color:lightgray; min-height:100px;">
             <ul id="CC_Email" class="form-inline tag-person"></ul>
             <button onclick="SetPeople.modal('field45');" style="position:absolute; right:15px; bottom:15px;" type="button" class="btn btn btn-primary btn-sm">Browse</button>
         </div>
-
     ``` 
 
     Config.js
 
     ``` javascript
-    
-    'field45':{
-            ID:'CC_Email',
-            Title:'CC Email',
-            TypeDom:'people_multiple',
-            TypeCol:'people_multiple',
-            Data:{},
-            Col:'CC_Email'
-        },  
-
-
+        'field45':{
+                ID:'CC_Email',
+                Title:'CC Email',
+                TypeDom:'people_multiple',
+                TypeCol:'people_multiple',
+                Data:{},
+                Col:'CC_Email'
+            },  
     ``` 
 
     Properties
 
     ``` javascript
-
         var FieldIndex = 'field45';
 
         // Show modal display
@@ -414,7 +408,4 @@ Validate field data (Type support)
 
         // Return data for insert people field (multiple)
         SetPeople.data(FieldIndex); 
-
-      
-
     ``` 
