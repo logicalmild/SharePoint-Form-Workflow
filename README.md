@@ -400,15 +400,20 @@ Validate field data (Type support)
 
         var FieldIndex = 'field45';
 
-        SetPeople.modal(FieldIndex); // Show modal display
+        // Show modal display
+        SetPeople.modal(FieldIndex); 
+        
+        // add people to TempData
+        SetPeople.add(FieldIndex); 
 
-        SetPeople.add(FieldIndex); // add people to TempData
+        // del people from TempData
+        SetPeople.del(FieldIndex); 
 
-        SetPeople.del(FieldIndex); // del people from TempData
- 
-        SetPeople.show(FieldIndex); // show people of TempData
+        // show people of TempData
+        SetPeople.show(FieldIndex); 
 
-        SetPeople.data(FieldIndex); // Return data for insert people field (multiple)
+        // Return data for insert people field (multiple)
+        SetPeople.data(FieldIndex); 
 
       
 
