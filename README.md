@@ -367,14 +367,14 @@ Validate field data (Type support)
 
 ### Input people picker multiple selection in page
 
-    HTML Page
+    HTML Page<br/>>
 
     ``` html
 
-    <div class="col-md-12" style="background-color:lightgray; min-height:100px;">
-        <ul id="CC_Email" class="form-inline tag-person"></ul>
-        <button onclick="SetPeople.modal('field45');" style="position:absolute; right:15px; bottom:15px;" type="button" class="btn btn btn-primary btn-sm">Browse</button>
-    </div>
+        <div class="col-md-12" style="background-color:lightgray; min-height:100px;">
+            <ul id="CC_Email" class="form-inline tag-person"></ul>
+            <button onclick="SetPeople.modal('field45');" style="position:absolute; right:15px; bottom:15px;" type="button" class="btn btn btn-primary btn-sm">Browse</button>
+        </div>
 
     ``` 
 
