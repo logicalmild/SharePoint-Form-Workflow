@@ -351,7 +351,6 @@ Validate field data (Type support)
 
 
 ### Input people picker html
-
     BrowsePeople(DOMInputID)<br/>
     browse people in organize via sharepoint put in button onclick.<br/>
     Return title="UserID" and value="UserTitle" to dom input<br/>
