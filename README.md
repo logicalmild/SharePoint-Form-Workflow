@@ -311,7 +311,7 @@ Validate field data (Type support)
   - summernote
 
 ### Function SPGuide.js
- Section1: Query Data<br/><br/>
+ - Section1: Query Data<br/><br/>
             - GetCurrentPageName()[return string];<br/>
             - GetParameterByName(name)[return string];<br/>
             - Include(ElementID,Url);<br/>
@@ -319,7 +319,7 @@ Validate field data (Type support)
             - GetItemFromOtherSite(Site,Listname,Query)[data]<br/>
             - GetItemByRestAPI(Listname,Query)[data]<br/>
 
- Section2: Date Time<br/><br/>
+ - Section2: Date Time<br/><br/>
             - GetCurrentTime()[return time]<br/>
             - ConvertDateTime(DateTime)[return date]<br/>
             - ConvertDateOnly[return date]<br/>
@@ -330,20 +330,20 @@ Validate field data (Type support)
             - SetTime(time)[date]<br/>
             - SetDateTime()[date]<br/>
 
- Section3: Operation String<br/><br/>
+ - Section3: Operation String<br/><br/>
 
- Section4:  Generate<br/><br/>
+ - Section4:  Generate<br/><br/>
             - GenGUID()[return string];<br/>
             - generateUID()[return string]<br/>
 
- Section5: User and permission<br/><br/>
+ - Section5: User and permission<br/><br/>
             - AddCurrentUserToGroup(GroupID)[];<br/>
             - addUsersToGroup(usernames, GroupID)[];<br/>
             - CheckUserInGroupID(GroupID)[return bool];<br/>
             - GetAllUserFromGroupID(GroupID)[return object people];<br/>
             - removeUserFromGroup(userLoginName,GroupID,success,error)[];<br/>
 
- Section6: Validate data<br/><br/>
+ - Section6: Validate data<br/><br/>
             - SetRequireField(FieldID,TypeDom)[];<br/>
 
 
