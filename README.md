@@ -304,6 +304,7 @@
 
 Validate field data (Type support)
   - text 
+  - textarea
   - date
   - people
   - select
