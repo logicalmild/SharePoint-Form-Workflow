@@ -581,8 +581,9 @@ function GenDocNo(Type){ // DocNO,Year
     var length = 0;
     var value;
     //var query = '?$select=DocNo,ID&$top=5000&$filter=Year eq \''+yyyy+'\'';
-    var query = '?$select=RunningNO,ID&$top=1&$filter=Year eq \''+yyyy+'\'&$orderby=ID desc';
+    var query = '?$select=RunningNO,ID&$top=1&$filter=Year eq \''+yyyy+'\' and RunningNO ne \'Draft\'&$orderby=ID desc';
     var data = GetItemByRestAPI(ListData,query);
+    debugger;
     if(data){
         if(data.length>0){
             var Temp_DocNo = data[0].RunningNO;
@@ -1876,8 +1877,14 @@ function GoToTop(){
    
     $('#s4-workspace').animate({scrollTop:0}, 'slow');
 
-    // var w = document.getElementById("s4-workspace");
-    // w.scrollTop({behavior: "smooth"});
+}
+
+function GoToBottom(){
+   
+    $('#s4-workspace').animate({scrollTop:3000}, 3000);
+
+
+
 }
 
 function SetFieldFormMaster(ConnectionID,DomID,TypeDom){

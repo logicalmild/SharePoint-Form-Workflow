@@ -1,6 +1,13 @@
 <div id="RightElem" style="position:fixed; right:5%; top:20%; width:13px;">  
 </div>
 
+<div id="RightElemBottom" style="position:fixed; right:5%; bottom:10%; width:13px;">
+    <a onclick="GoToTop();" data-toggle="tooltip" title="Go to top page" type="button" class="btn btn btn-primary btn-md" style="background-color:#4287f5; border-color:#4287f5; color:white; font-weight:bold;" ><i style="font-weight:bold;" class="fa fa-angle-double-up"></i></a>
+</div>
+<div id="RightElemTop" style="position:fixed; right:5%; bottom:3%; width:13px;">
+    <a onclick="GoToBottom();" data-toggle="tooltip" title="Go to bottom page" type="button" class="btn btn btn-primary btn-md" style="background-color:#4287f5; border-color:#4287f5; color:white; font-weight:bold;" ><i style="font-weight:bold;" class="fa fa-angle-double-down"></i></a>
+</div>
+
 <script type="text/javascript">
 
 
@@ -11,6 +18,7 @@
         var SaveDraftBtn = '<a onclick="SaveDraft();" id="btnSaveDraft" data-toggle="tooltip" title="Save Draft" type="button" class="btn btn btn-primary btn-md" style="backgrond-color:#007bff; color:white; font-weight:bold; padding-left:11.5px; padding-right:11.5px;"><i class="fa fa-floppy-o"></i></a>';
         var RemoveItemBtn = '<a id="RemoveCurrentForm" onclick="RemoveCurrentForm();" data-toggle="tooltip" title="Remove this form" type="button" class="btn btn btn-primary btn-md" style="background-color:rgb(138, 28, 28); border-color:rgb(138, 28, 28); color:white; font-weight:bold;" ><i class="fa fa-trash-o"></i></a>';
         var RefreshBtn = '<a onclick="RefreshPage();" data-toggle="tooltip" title="Refresh page" type="button" class="btn btn btn-primary btn-md" style="background-color:#fcba03; border-color:#fcba03; color:white; font-weight:bold;" ><i class="fa fa-refresh"></i></a>';
+
    
         // var RightMenu =  FormMaster[MasterFormID].Nav.RightNav;
         var TempFormID = GetParameterByName('FormID');
@@ -39,14 +47,13 @@
             if(RightMenu.Refresh){
                 RightNavStr += RefreshBtn;
             }
-
             $('#RightElem').empty();
             $('#RightElem').append(RightNavStr);
   
         
         
 
-    
+        
 
     
 </script>
