@@ -1593,7 +1593,9 @@ function TriggerTempData(){
                                         break;
                         case 'people_multiple':  
                                     
-                                        field.Data = SetPeople_Param(''+field.ID+'');
+                                        if(field.Data){
+                                            field.Data = SetPeople.data(field.Data);
+                                        }
                                         
                                         break;
 
