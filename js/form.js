@@ -715,9 +715,12 @@ function GenDocNo(Type){ // DocNO,Year
     if(data){
         if(data.length>0){
             var Temp_DocNo = data[0].RunningNO;
-            var arr_t1 = Temp_DocNo.split('/');
-            var t1 = arr_t1[1];
-            length = parseInt(t1);
+            if(Temp_DocNo){
+                var arr_t1 = Temp_DocNo.split('/');
+                var t1 = arr_t1[1];
+                length = parseInt(t1);
+            }
+            
         }
     }
     
