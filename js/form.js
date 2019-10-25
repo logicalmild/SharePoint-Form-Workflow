@@ -24,7 +24,135 @@ var IsRunningNOEnabled = FormMaster[MasterFormID].RunningNO.Enable;
 var FormatRunningNO = FormMaster[MasterFormID].RunningNO.FormatRunningNO;
 var SummaryPage = SiteUrl + '/Lists/' + ListInternalName;// dashboard after submit form
 
+var SetPeople = {
+  
+    modal:function(FieldIndex){
+        
+        var str='';
+        str+='<div class="form-inline col-md-12" style="margin-bottom:30px; margin-left:auto; margin-right:auto;">';
+        str+='    <div id="peoplePickerDiv"></div>';
+        str+='    <button onclick="SetPeople.add(\''+FieldIndex+'\');" style="margin-left:10px;" type="button" class="btn btn btn-primary btn-sm">Select</button>';
+        str+='</div>';
+        $('#ModalBody').empty();
+        $('#ModalBody').append(str);
+        
+        initializePeoplePicker('peoplePickerDiv');
+        registerPPOnChangeEvent($('#peoplePickerDiv'));
+        $('#TitleModal').text('Search people..');
+        $('#MainModal').modal('show');
+        $('#ModalBody').css('max-height','500px');
+        $('.modal-dialog').css('max-width','500px');
+        $('.modal-dialog').css('max-height','500px');
+    },
+    add:function(FieldIndex) {
+    
+        var ObjField = FormMaster[MasterFormID].FieldData[FieldIndex].Data;
 
+        var EmpID;
+        var EmpName;
+        var SetData_Approver = $('#peoplePickerDiv_TopSpan_HiddenInput').val();
+        if(SetData_Approver){
+            var appset = JSON.parse(SetData_Approver);
+           
+            var arr = appset[0].Key;
+                EmpName = appset[0].DisplayText;
+            var LoginName = arr.split('|');
+            var LoginName = LoginName[1];
+            var clientContext = SP.ClientContext.get_current();
+            var website = clientContext.get_web();
+            currentUser = website.ensureUser(LoginName);
+            clientContext.load(website);
+            clientContext.load(currentUser);
+            clientContext.executeQueryAsync(onRequestSucceeded, onRequestFailed);
+    
+            function onRequestSucceeded() {
+    
+                EmpID = currentUser.get_id();
+                var length;
+              
+                if(typeof ObjField === 'undefined'){
+                    FormMaster[MasterFormID].FieldData[FieldIndex].Data = {};
+                    ObjField = FormMaster[MasterFormID].FieldData[FieldIndex].Data;
+
+            
+                    length = 0;
+                }else{
+                    length = Object.keys(ObjField).length;
+                }
+                 
+               
+                var Temp = {
+          
+                    [length]: {
+                      Title: EmpName,
+                      Id: EmpID
+                    }
+              
+                };
+                
+                
+                ObjField = Object.assign(ObjField,Temp);
+
+               
+                SetPeople.show(FieldIndex);
+                
+            }
+    
+            function onRequestFailed(sender, args) {
+        
+                alert('Error: ' + args.get_message());
+            }
+        }
+        
+        $('#MainModal').modal('hide');
+
+
+
+
+
+    } ,
+    del:function(FieldIndex,Key){
+   
+        var ObjField = FormMaster[MasterFormID].FieldData[FieldIndex].Data;
+        delete ObjField[Key];
+        SetPeople.show(FieldIndex);
+    } ,
+    show:function(FieldIndex){
+
+        var ObjField = FormMaster[MasterFormID].FieldData[FieldIndex].Data;
+        var DomID = FormMaster[MasterFormID].FieldData[FieldIndex].ID;
+        var str= '';
+        for(i in ObjField){
+            str+='';
+            str+='<li>';
+            str+='  <div class="form-inline">';
+            str+='    <p style="margin-bottom:0px;">'+ObjField[i].Title+'</p>';
+            str+='    <a style="cursor: pointer;" onclick="SetPeople.del(\''+FieldIndex+'\',\''+i+'\');" type="button">x</a>';
+            str+='  </div>';
+            str+='</li>';
+        }
+        
+        $('#'+DomID).empty();
+        $('#'+DomID).append(str);
+    },
+    data:function(ObjField){
+        var str;
+        if(ObjField){
+            str='';
+            for(i in ObjField){
+
+                str += ObjField[i].Id + ';#' + ObjField[i].Title +';#';
+            } 
+        }else{
+            str = {};
+        }
+               
+
+        return str;
+    }
+
+
+};
 
 $(document).ready(function(){
     
